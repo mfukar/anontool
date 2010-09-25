@@ -1,0 +1,25 @@
+* Documentation
+	- Doxygen for code?
+	- Document XML configuration.
+
+* Measure PIC version on x86. If it's significantly slower, try to compile
+  a non-PIC version and see what happens. (WTB TIME KKTHXBAI)
+
+* Configurable key for AES/3DES (prefix-preserving anon)
+	- Defined in XML syntax
+	- Implement in anonymization_functions.c
+	- Move the call to aes_set_key()/des3_set_3keys() to an appropriate spot, to only
+	  be called once?
+	- aes_init() -> update key in anonflow & call aes_set_key()
+	- If the recent attacks on 10-round 256-bit AES get any better, we might have to
+	  at least emit some warning.
+
+* Implement IPFIX file as input source (LOW PRIORITY)
+
+* Add SCTP support (primarily for IPFIX transport). This is gonna get popular.
+
+* Implement some metric of assessing the achieved anonymization levels
+depending on the functions/parameters used?
+
+* I really need to get a domain for this. FORTH has completely ditched this as a project,
+  and they're not willing to maintain/develop it any further. Not me, though. :-)
