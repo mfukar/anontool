@@ -1,0 +1,9 @@
+* Started adding support for XML configuration files to describe the anonymization
+  policy. View /applications/example_policy.xml for a sample policy and further explanation.
+
+* Added support for anonymization of binary payloads. Payloads identified at the moment include:
+	Stuttgart decoder, Wuerzburg decoder, generic wget requests on a shell, Konstanz decoder,
+	and other various XOR decoders. See the nepenthes project page for more information.
+
+* Fixed some restrictions which prevented prefix-preserving anonymization from being
+  applied on the "next hop" fields for Netflow v5 and v9.

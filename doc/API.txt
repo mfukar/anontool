@@ -1,0 +1,124 @@
+#########Predefined Protocol Field Names#############
+
+The following is the list of predefined names that can be used as
+the field_description parameter:
+
+    Common to all protocols: PAYLOAD
+    Common to IP, TCP, UDP, ICMP: CHECKSUM
+    ETHERNET: SRC_IP, DST_IP, ETHER_TYPE
+    IP: SRC_IP, DST_IP, TTL, TOS, ID, IP_PROTO, VERSION, IHL, OPTIONS, FRAGMENT_OFFSET, PACKET_LENGTH
+    Common to TCP and UDP: SRC_PORT, DST_PORT
+    TCP: SEQUENCE_NUMBER, ACK_NUMBER, FLAGS, WINDOW, TCP_OPTIONS, URGENT_POINTER, OFFSET_AND_RESERVED
+    UDP: UDP_DATAGRAM_LENGTH
+    ICMP: TYPE, CODE
+    
+    HTTP: HTTP_VERSION, METHOD, URI, USER_AGENT, ACCEPT, ACCEPT_CHARSET, ACCEPT_ENCODING, ACCEPT_LANGUAGE, ACCEPT_RANGES, AGE, ALLOW, AUTHORIZATION,CACHE-CONTROL, CONNECTION_TYPE,  CONTENT_ENCODING, CONTENT_TYPE, CONTENT_LENGTH, CONTENT_LOCATION, CONTENT_MD5, CONTENT_RANGE, COOKIE, DATE, ETAG, EXPECT, EXPIRES, FROM . HOST, IF_MATCH, IF_MODIFIED_SINCE, IF_NONE_MATCH, IF_RANGE, IF_UNMODIFIED_SINCE, LAST_MODIFIED, LOCATION, KEEP_ALIVE, MAX_FORWRDS, PRAGMA, PROXY_AUTHENTICATE, PROXY_AUTHORIZATION, RANGE, REFERRER, RETRY_AFTER, SET_COOKIE, SERVER, TE, TRAILER, TRANSFER_ENCODING, UPGRADE, USER_AGENT, VARY, VIA, WARNING, WWW_AUTHENTICATE, X_POWERED_BY, RESPONSE_CODE, RESP_CODE_DESCR
+    
+    FTP: USER, PASS, ACCT, FTP_TYPE, STRU, MODE, CWD, PWD, CDUP, PASV, RETR, REST, PORT, LIST, NLST, QUIT, SYST, STAT, HELP, NOOP, STOR, APPE, STOU, ALLO, MKD, RMD, DELE, RNFR, RNTO, SITE, FTP_RESPONSE_CODE, FTP_RESPONSE_ARG
+    
+    NETFLOW v5: NF5_VERSION, NF5_FLOWCOUNT, NF5_UPTIME,	NF5_UNIX_SECS, NF5_UNIX_NSECS, NF5_SEQUENCE, NF5_ENGINE_TYPE, NF5_ENGINE_ID,
+NF5_SRCADDR,NF5_DSTADDR,NF5_NEXTHOP,NF5_INPUT,NF5_OUTPUT,NF5_DPKTS,NF5_DOCTETS,NF5_FIRST,NF5_LAST,NF5_SRCPORT,NF5_DSTPORT,NF5_TCP_FLAGS,
+NF5_PROT,NF5_TOS,NF5_SRC_AS,NF5_DST_AS,NF5_SRC_MASK,NF5_DST_MASK
+    
+    NETFLOW v9: NETFLOW_VERSION, COUNT, UPTIME, UNIXSECS, PACKAGESEQ, SOURCEID,
+FLOWSET_ID, LENGTH, TEMPLATEID, FIELD_COUNT,
+IN_BYTES, IN_PKTS, FLOWS, PROTOCOL, SRC_TOS, NF9_TCP_FLAGS, L4_SRC_PORT, IPV4_SRC_ADDR,	SRC_MASK, INPUT_SNMP, L4_DST_PORT,
+IPV4_DST_ADDR, DST_MASK, OUTPUT_SNMP, IPV4_NEXT_HOP, SRC_AS, DST_AS, BGP_IPV4_NEXT_HOP, MUL_DST_PKTS, MUL_DST_BYTES, LAST_SWITCHED
+FIRST_SWITCHED, OUT_BYTES, OUT_PKTS, MIN_PKT_LENGTH, MAX_PKT_LENGTH, IPV6_SRC_ADDR, IPV6_DST_ADDR, IPV6_SRC_MASK, IPV6_DST_MASK
+IPV6_FLOW_LABEL, ICMP_TYPE, MUL_IGMP_TYPE, SAMPLING_INTERVAL, SAMPLING_ALGORITHM, FLOW_ACTIVE_TIMEOUT, FLOW_INACTIVE_TIMEOUT,
+ENGINE_TYPE, ENGINE_ID, TOTAL_BYTES_EXP, TOTAL_PKTS_EXP, TOTAL_FLOWS_EXP, VENDOR_43, IPV4_SRC_PREFIX, IPV4_DST_PREFIX,
+MPLS_TOP_LABEL_TYPE, MPLS_TOP_LABEL_IP_ADDR,FLOW_SAMPLER_ID,FLOW_SAMPLER_MODE,FLOW_SAMPLER_RANDOM_INTERVAL,VENDOR_51
+MIN_TTL,MAX_TTL,IPV4_IDENT,DST_TOS,IN_SRC_MAC,OUT_DST_MAC,SRC_VLAN,DST_VLAN,IP_PROTOCOL_VERSION,DIRECTION,IPV6_NEXT_HOP
+BGP_IPV6_NEXT_HOP,IPV6_OPTION_HEADERS,VENDOR_65,VENDOR_66,VENDOR_67,VENDOR_68,VENDOR_69,MPLS_LABEL_1,MPLS_LABEL_2,
+MPLS_LABEL_3,MPLS_LABEL_4,MPLS_LABEL_5,MPLS_LABEL_6,MPLS_LABEL_7,MPLS_LABEL_8,MPLS_LABEL_9,MPLS_LABEL_10,IN_DST_MAC,
+OUT_SRC_MAC,IF_NAME,IF_DESC,SAMPLER_NAME,IN_PERMANENT_BYTES,IN_PERMANENT_PKTS,VENDOR_87,NF9_FRAGMENT_OFFSET,FORWARDING_STATUS,
+SYSTEM,INTERFACE,LINE_CARD,NETFLOW_CACHE,TEMPLATE
+	
+    BINARY_PAYLOAD: URL_PROTOCOL, URL_USER, URL_PASS, URL_HOST, URL_PORT, URL_PATH, URL_DIR, URL_FILE
+    
+    There's more to be added very soon for binary payloads including defines for IPs, whole URLs and so forth..
+
+##########Complete List of the Protocol Field Anonymization Functions#############
+
+The following is the complete list of useful functions that could be
+applied to the various protocol fields.
+
+    UNCHANGED: leaves field unchanged. This function takes no arguments.
+    MAP: maps a field to an integer. Each field will have different mapping except SRC_IP and DST_IP which share common mapping as well as SRC_PORT and DST_PORT. The rest of the fields share a common mapping based on their length: fields with length 4 have a common mapping, fields with length 2 have their own and finally fields with length 1 share their own mapping. Mapping cannot be applied to payload and IP/TCP options, only in header fields. This function takes no arguments.
+    MAP_DISTRIBUTION: field is replaced by a value extracted from a distribution like uniform or Gaussian, with user-supplied parameters. The first parameter defines the type of distribution and can be UNIFORM or GAUSSIAN. If type is UNIFORM the next 2 arguments specify the range inside which the distribution selects uniformly numbers. If type is GAUSSIAN the next 2 arguments specify the median and standard deviation. Similarly to MAP function, MAP_DISTRIBUTION can only be applied to IP, TCP, UDP and ICMP header fields, except IP and TCP options.
+    STRIP: removes the field from the packet. Optionally, STRIP may not remove the whole field but can keep a portion of it. The user defines the number of bytes to be kept. STRIP cannot be applied to IP, TCP, UDP and ICMP headers except IP and TCP options and can be fully applied to all HTTP and FTP fields.
+    RANDOM: replaces the field with a random number. This function takes no arguments.
+    FILENAME_RANDOM: a sub-case of RANDOM. If the field is in a filename format, e.g. ``picture.bmp'' then the extension is left untouched while the filename is replaced by random characters
+    HASHED: field is replaced by a hash value. Supported hash functions are MD5, SHA, SHA_2, CRC32 and AES and TRIPLE_DES for encryption. Note that MD5, SHA, SHA_2 and CRC32 may generate values with less or greater length than the original field. The hash functions when applied to IP, TCP, UDP and ICMP header fields, their last bytes are used to replace the field. For all the other fields, the padding behavior is supplied as a parameter.  If the hashed value has less length, the user can pad the rest bytes with zero by defining PAD_WITH_ZERO or can strip the remaining bytes by defining STRIP_REST as an argument to the function. If the hashed values has length greater than the original field, then the rest of packet contents are shifted accordingly. In all cases, the packet length in protocol headers is adjusted to the new length.
+    PATTERN_FILL: field is repeatedly filled with a pattern . The pattern can be an integer or string. This function takes as a parameter the type of pattern, INTEGER for integer and STR for strings, and the pattern to be used.
+    ZERO: a sub-case of pattern fill where field is set to zero. This function takes no arguments
+    REPLACE: field is replaced by a single value (a string). The packet length is reduced accordingly, based on the length of the replace pattern. The final length cannot exceed the maximum packet size. This function takes the pattern to be used as an argument.
+    PREFIX_PRESERVING: can only be applied to source and destination IP addresses and performs a key-hashing, preserving the prefixes of IP addresses.
+    PREFIX_PRESERVING_MAP: can only be applied to source and destination IP addresses and performs a preserving the prefixes of IP addresses using mapping table.
+    REGEXP: field is transformed according to regular expression. As an example, performing add_function(setdescriptor, "ANONYMIZE", TCP, PAYLOAD, REGEXP, "(.*) password:(.*) (.*)", {NULL, "xxxxx",NULL}) 
+    on a set we can substitute the value after a "password:" field with the "xxxxx" string.
+    Each "(.*)" in the regular expression indicates a match and the last argument is a set of replacements for each match (NULL leaves match unmodified).
+    CHECKSUM_ADJUST: if we want the anonymized packet stream to be used by other applications, the anonymization modifications to each packet requires careful treatment of the checksum. This function can be only applied to CHECKSUM field.
+    SUBFIELD: with this function we can apply any of the
+    functions defined above to a subfield of the given
+    field. Therefore the arguments of SUBFIELD are the
+    two offsets over the identified protocol field, which are the bounds of the
+    subfield, followed by any of the above field anonymization functions
+    with their parameters. The identified field anonymization
+    function which is passed as parameter to SUBFIELD will be
+    applied to the subfield that is bounded by the given offsets.
+
+##############Sample application#################
+
+In this application we perform anonymization on
+tcp/udp traffic. Prefix-preserving anonymization is applied
+on IP addresses and payload is removed.
+
+#include "anonymization.h"
+
+int main(int argc, char *argv[]) {
+	
+	int sd;
+	
+	if (argc < 3)
+	{
+		fprintf(stderr, "Usage %s 
+		   input output\n", argv[0]);
+		return -1;
+	}
+	
+	//create set
+	sd = create_set();
+	
+	//set traffic source
+	set_source(TCPDUMP_TRACE, argv[1]);
+	
+	//set output
+	set_output(sd, TCPDUMP_TRACE, argv[2]);
+
+	//set filter
+	add_function(sd, "BPF_FILTER",
+	    "tcp or udp");
+
+	//anonymize IP addresses
+	add_function(sd, "ANONYMIZE",
+	    IP, SRC_IP, PREFIX_PRESERVING_MAP);
+	add_function(sd, "ANONYMIZE",
+	    IP, DST_IP, PREFIX_PRESERVING_MAP);
+
+	//remove payload
+	add_function(sd, "ANONYMIZE",
+	    TCP, PAYLOAD, STRIP, 0);
+	add_function(sd,"ANONYMIZE",
+	    TCP, PAYLOAD, STRIP, 0);
+
+	//fix checksums
+	add_function(sd, "ANONYMIZE",
+	    IP, CHECKSUM, CHECKSUM_ADJUST);
+
+	//start processing packets
+	start_processing();
+	return 1;
+
+} 
+
