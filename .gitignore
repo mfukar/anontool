@@ -1,0 +1,6 @@
+# Editor drops
+*.swp
+*~
+
+# GCC drops
+*.o
