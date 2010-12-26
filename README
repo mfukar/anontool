@@ -1,0 +1,63 @@
+anontool - an open source anonymization tool
+
+
+DEPENDS
+Anontool depends on the following:
+(Ubuntu aptitude packages used as a reference)
+    - libglib2.0-dev
+    - libnet1-dev
+    - libpcre3 and libpcre3-dev
+    - libpcap0.8-dev
+    - libxml2-dev
+
+COMPILATION
+    - Just type 'make' :-)
+    - See below for some important usage notes.
+
+NOTES - USAGE
+    - /lib/anonlib.so is the shared library containing the implementation
+    of the anonymization framework. Applications are linking onto this
+    library.
+
+    - In the /applications/ folder, 3 small apps are provided.
+
+    - Anontool depends on libnids. For the user's convenience, a fairly
+    customized version is included under /lib/libnids/. Currently, I'm
+    not considering including a make rule for newer versions of libnids.
+    However, bear in mind that /lib/libnids/src/libnids.so.1.21 must be
+    visible from your loader - simplest way to do that is setting your
+    library path accordingly.
+
+    - The above issue is due to amd64, R_X86_64_PC32 relocation, stuff
+    that was invented to save RAM (by now a moot point) and other bad
+    ideas. The current solution favours PIC on amd64 and their awesome
+    PC relative addressing. Code on x86 is somewhat bloated as a result,
+    and I feel it'll royally fuck cache performance as well, but I haven't
+    measured it yet. If somebody is willing to do so, you're welcome -
+    please provide me with the results and I'll happily consider a non-PIC
+    version (even statically linked).
+
+    - For more information on what you can do with the sample applications
+    have a look in /doc/README.
+
+MAINTENANCE
+    The current maintainer of this tool is Michael Foukarakis.
+    Please report any bugs or feature requests to:
+    foukarakis DOT michael AT google's email service domain name
+
+TODO
+    Autoconf and automake support will never come, at least from me. If,
+    however, you can point me to a usable, stable and free alternative,
+    I'd be more than happy to take a look at it.
+
+    Support for L2TP, GRE, IPsec and other protocols is on the way.
+
+    A TCP reassembly processor (so we can get rid of libnids),
+    affectionately named stream6, is also on the way.
+
+    If you want anonymization for another protocol to be implemented,
+    drop me a line and I will consider it. Be informed, however, that the
+    tool was designed with the thought of new protocols/input sources/etc.
+    being added constantly in mind, so it follows a very simple modular
+    architecture to allow this without requiring
+    extensive knowledge of the code, ie. you can also do it yourself.

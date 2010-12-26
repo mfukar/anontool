@@ -1,40 +1,9 @@
-Compilation:
-	Install prerequisites. Ubuntu & Debian required package names:
-	- libglib2.0-dev
-	- libnet1-dev
-	- libpcre3
-	- libpcre3-dev
-	- libpcap0.8-dev
-	- libxml2-dev
-
-	- make :-)
-
-	- anonlib.so is the shared library containing the anonymization framework.
+APPLICATION USAGE
+=================
 	- There are 3 anonymization applications provided, in the folder applications/
 	  plus 2 small tcpdump traces for testing (small_trace -> various TCP traffic, netflow_v9_small -> what it says)
 
-	*************
-	! IMPORTANT !
-	*************
-	 - Note that anontool depends on libnids. For your convenience we have included a
-	   somewhat customized version under /lib/libnids. Currently I'm NOT including a
-	   'make install' for libnids in case you're using some newer version, I'm not
-	   willing to screw it up. HOWEVER, if you want the anonymization applications
-	   to work, you must put libnids.so.1.21 (found in /lib/libnids/src/) to your
-	   /usr/lib directory OR set your library path accordingly.
-	 - In case you decide not to read this file or follow the instructions above, you
-	   are just going to get a big fat "RTFM" in my otherwise quite polite email
-	   reply to you. Thanks.
-	 - This is all due to amd64, R_X86_64_PC32 relocation, stuff that was invented to
-	   save RAM (a point which is now moot) and generally other BAD IDEAS™. The
-	   solution I chose favours PIC on amd64 and their awesome PC-relative-addressing.
-	   It causes code on x86 to be somewhat bloated, and I feel it'll royally fuck
-	   cache as well, but I haven't measured the speed difference because frankly,
-	   I don't have the time for it. You're welcome to try it and provide me with some
-	   results, and I will definitely consider compiling a non-PIC version of the library.
-
-#### Anonymization appications:
-
+=================
 	The first of these, is a sample application that uses the framework in order to anonymize TCP and UDP packets.
 The tool is able to anonymize IP addresses, tcp ports, TCP/UDP payload, checksums, IP options, as well as printing 
 the packets. The application reads packets from a pcap trace file or from an network interface and dumps the anonymized
@@ -63,7 +32,7 @@ Examples:
 	
 	./anon_packets -i eth0 -p -c -z -a MAP -d STRIP output_file
 
-#### Anonymization applications part II:
+=================
 
 	The second & third applications are able to perform anonymization of Netflow datagrams, as exported by a Cisco router.
 	The Netflow datagram export format is defined in excruciating detail here:
@@ -81,24 +50,11 @@ One could as easily feed the file to another NIC through the use of UNIX pipes &
 
 ANONYMIZATION API
 =================
-
 Please read the API.txt for the API documentation.
+
 It contains all available fields and functions to develop 
 your own applications along with source code of a bare-bones sample application.
 
 
-NOTES -- TODO LIST
-==================
-The current maintainer of this tool is Michael Foukarakis.
-Please report any bugs you come across to foukarakis DOT michael AT gmail DOT com.
-
-Autoconf & automake support will never come. Don't ask for them, or you
-might be brutally violated and murdered, and not in that order, either.
-If, however, you can point me to a usable, stable, and open-source alternative,
-I'd be happy to take a look at it.
-
-If you want anonymization for another protocol to be implemented, drop me a line,
-I might even consider it. Be informed, however, that the tool was designed
-with the thought of new protocols/input sources/etc. being added constantly in mind,
-so it follows a simple modular architecture to allow this without requiring
-extensive knowledge of the code, ie. you can also do it yourself.
+NOTES
+=================
