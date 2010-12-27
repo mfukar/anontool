@@ -20,7 +20,6 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-//#include <sys/shm.h>
 #include <string.h>
 #include <errno.h>
 #include <time.h>
@@ -55,7 +54,6 @@ int anoncallback_process(struct anonflow *flow, void *internal_data, unsigned ch
 
 	int             status;
 	struct callback_data *data = (struct callback_data *)internal_data;
-//    printf("IN CALLBACK\n");
 	status = data->packet_callback((unsigned char *)dev_pkt, pkt_head);
 
 	return status;

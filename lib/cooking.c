@@ -25,7 +25,6 @@
 #include <time.h>
 #include <errno.h>
 #include <pcap.h>
-#include <sys/shm.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
@@ -44,7 +43,7 @@
 #define CHECKED 15
 #define NON_CHECKED 16
 
-//#define COOK_DEBUG
+/* #define COOK_DEBUG 1*/
 
 static int      threshold = 0;
 static unsigned int timeout = 0;
@@ -68,18 +67,6 @@ extern void     process_flushed_data(struct anonflow *flow);
 
 int             callbacks = 0;
 
-/*
-char           *adres(struct tuple4 addr)
-{
-	static char     buf[1024];
-	buf[0] = '\0';
-	strcpy(buf, int_ntoa(addr.saddr));
-	sprintf(buf + strlen(buf), ":%i->", addr.source);
-	strcat(buf, int_ntoa(addr.daddr));
-	sprintf(buf + strlen(buf), ":%i", addr.dest);
-	return buf;
-}
-*/
 void tcp_callback(struct tcp_stream *ns, void **param)
 {
 	struct anonflow *flow;

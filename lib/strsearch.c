@@ -20,7 +20,6 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-//#include <sys/shm.h>
 #include <string.h>
 #include <errno.h>
 #include <time.h>
@@ -34,13 +33,13 @@ extern int     *make_skip(char *ptrn, int plen);
 extern int      mSearch(char *buf, int blen, char *ptrn, int plen, int *skip, int *shift);
 
 struct strsearch_data {
-	unsigned char  *str;
-	int             slen;	/* length of string */
-	int             offset;	/* Starting search position from the beginning of packet */
-	int             depth;	/* Maximum search depth from the beginning of search position */
-	int            *shift;	/* Boyer-Moore Shift table */
-	int            *skip;	/* Boyer-Moore Skip table */
-	char            not_flag;
+	unsigned char	*str;
+	int		slen;	/* length of string */
+	int		offset;	/* Starting search position from the beginning of packet */
+	int		depth;	/* Maximum search depth from the beginning of search position */
+	int		*shift;	/* Boyer-Moore shift table */
+	int		*skip;	/* Boyer-Moore skip table */
+	char		not_flag;
 };
 
 short isEscaped(char *pos)
