@@ -1,14 +1,22 @@
 /*
- * Copyright (c) 2002,2003 Endace Technology Ltd, Hamilton, New Zealand.
- * All rights reserved.
+ * anontool Copyright Notice, License & Disclaimer
  *
- * This source code is proprietary to Endace Technology Limited and no part
- * of it may be redistributed, published or disclosed except as outlined in
- * the written contract supplied with this product.
+ * Copyright 2006 by Antonatos Spiros, Koukis Demetres & Foukarakis Michael
  *
- * $Id: pcapio.h,v 1.1.1.1 2006/11/14 13:35:28 antonat Exp $
+ * Permission to use, copy, modify, and distribute this software and its
+ * documentation for any purpose and without fee is hereby granted, provided
+ * that the above copyright notice appear in all copies and that both the
+ * copyright notice and this permission notice and warranty disclaimer appear
+ * in supporting documentation, and that the names of the authors not be used
+ * in advertising or publicity pertaining to distribution of the software without
+ * specific, written prior permission.
  *
- * Savefile
+ * The authors disclaim all warranties with regard to this software, including all
+ * implied warranties of merchantability and fitness.  In no event shall we be liable
+ * for any special, indirect or consequential damages or any damages whatsoever
+ * resulting from loss of use, data or profits, whether in an action of contract,
+ * negligence or other tortious action, arising out of or in connection with the
+ * use or performance of this software.
  */
 struct pcap_sf {
 	FILE           *rfile;
@@ -20,13 +28,12 @@ struct pcap_sf {
 
 struct pcap_md {
 	struct pcap_stat stat;
-	                /*XXX*/ int use_bpf;
-	u_long          TotPkts;	/* can't oflow for 79 hrs on ether 
-					 */
-	u_long          TotAccepted;	/* count accepted by filter */
-	u_long          TotDrops;	/* count of dropped packets */
-	long            TotMissed;	/* missed by i/f during this run */
-	long            OrigMissed;	/* missed by i/f before this run */
+	/*XXX*/ int use_bpf;
+	u_long          TotPkts;
+	u_long          TotAccepted;	/* accepted by filter */
+	u_long          TotDrops;
+	long            TotMissed;	/* missed by iface during this run */
+	long            OrigMissed;	/* missed by iface before this run */
 #ifdef linux
 	int             pad;
 	int             skip;

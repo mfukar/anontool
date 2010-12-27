@@ -20,7 +20,6 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-//#include <sys/shm.h>
 #include <string.h>
 #include <errno.h>
 #include <time.h>
@@ -44,8 +43,8 @@ void init_tcpdump_trace(struct anonflow *flow)
 int open_tcpdump_trace(char *filename)
 {
 	char            errbuf[PCAP_ERRBUF_SIZE];
+
 	pkt_handler = (void *)pcap_open_offline(filename, errbuf);
-	//printf(" in here %d\n",pkt_handler);
 	if (pkt_handler == NULL) {
 		printf("Error in open_tcpdump_trace: %s\n", errbuf);
 		return -1;
@@ -123,7 +122,7 @@ struct sourceinfo tcpdumptraceinfo = {
 int open_nic_dev(char *dev)
 {
 	char            errbuf[PCAP_ERRBUF_SIZE];
-	//printf(" in here\n");
+
 	pkt_handler = (void *)pcap_open_live(dev, NIC_PKTCAP_LEN, 1, 0, errbuf);
 	if (pkt_handler == NULL) {
 		printf("Error in open_nic_dev: %s\n", errbuf);

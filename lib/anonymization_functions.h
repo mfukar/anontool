@@ -57,8 +57,6 @@ pattern_fill_field(p->tcphdr->payload,1500,"ABCDEFGH",1) or if we want to
 zero the TLL field it will be called as pattern_fill_field(p->iphdr->ttl,1,0,0)*/
 void pattern_fill_field(unsigned char *field, int len, int pattern_type, void *pattern); 
 
-
-
 /* Replaces field with random numbers. S is used as a seed to the random
 number generator */
 void random_field(unsigned char *field, int len);

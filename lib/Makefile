@@ -9,8 +9,6 @@ all: $(TARGETS)
 
 anonlib.so: libnids.a tool.o bpf.o pcap_input.o cooking.o flist.o strsearch.o mstring.o callback.o printpacket.o anonymize.o decoders.o anon_snort_decode.o anon_print_packet.o anon_checksums.o anon_prefix_preserving.o prefix_preserving_map.o md5.o sha1.o sha256.o anonymization_functions.o crc32.o des.o aes.o uncook.o binaryPayload.o
 	gcc $(CFLAGS) -shared -o $@ $^ -lpcap -lpcre -lm -L../ -L. $(LIB_DIR)
-#	ar -cr $@ $^
-#	ranlib $@
 
 libnids.a: 
 	cd libnids && ./configure --disable-libnet --enable-shared && make
