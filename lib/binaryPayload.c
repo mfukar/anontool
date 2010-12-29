@@ -583,9 +583,6 @@ int binaryStuttgartDecode(anonpacket * packet, struct anonflow *flow, stuttgartL
 			inet_ntoa(*(struct in_addr *)&address), port,
 			authKey[0], authKey[1], authKey[2], authKey[3]);
 
-//              unsigned char *base64Key = g_Nepenthes->getUtilities()->b64encode_alloc(authKey,4);
-//              asprintf(&url,"link://%s:%i/%s",inet_ntoa(*(in_addr *)&address),port,base64Key);
-
 		return (0);
 	}
 	return (-1);

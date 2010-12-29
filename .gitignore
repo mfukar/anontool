@@ -4,3 +4,6 @@
 
 # GCC drops
 *.o
+
+# PCAP drops
+*.pcap

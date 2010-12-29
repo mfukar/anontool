@@ -1,25 +1,33 @@
 * Documentation
 	- Doxygen for code?
-	- Document XML configuration.
+	- XML config was a bad idea from the start. Something more usable like a JSON
+	format would be nicer.
+
+* Get rid of all the magic numbers in the code.
+* Get rid of all the non-standard types.
+
+* Finish stream6, get rid of libnids.
+
+* Binary payload matchers are way outdated. I have to figure out what to do with that
+  feature..
 
 * Measure PIC version on x86. If it's significantly slower, try to compile
-  a non-PIC version and see what happens. (WTB TIME KKTHXBAI)
+  a non-PIC version and see what happens. (WTB TIME)
 
 * Configurable key for AES/3DES (prefix-preserving anon)
-	- Defined in XML syntax
 	- Implement in anonymization_functions.c
 	- Move the call to aes_set_key()/des3_set_3keys() to an appropriate spot, to only
-	  be called once?
+	  be called once.
 	- aes_init() -> update key in anonflow & call aes_set_key()
 	- If the recent attacks on 10-round 256-bit AES get any better, we might have to
-	  at least emit some warning.
+	  at least emit some warning?
 
-* Implement IPFIX file as input source (LOW PRIORITY)
+* Implement IPFIX file as input source (if anybody needs this..)
 
-* Add SCTP support (primarily for IPFIX transport). This is gonna get popular.
+* Add SCTP support (primarily for IPFIX transport).
 
 * Implement some metric of assessing the achieved anonymization levels
-depending on the functions/parameters used?
+depending on the functions/parameters used.
 
 * I really need to get a domain for this. FORTH has completely ditched this as a project,
   and they're not willing to maintain/develop it any further. Not me, though. :-)

@@ -30,11 +30,9 @@ void usage(char *en)
 	printf("\t-h Print this help message\n");
 	printf("\n");
 	printf("Examples:\n");
-	printf
-	    ("Prefix-preserving anonymization for IP addressses, mapping to intergers for TCP ports, zero TCP/IP options, replace TCP/UDP payload with hash and fix checksums. Read packets from pcap file input_file and dump anonymized packets to pcap file output_file\n");
+	printf("Prefix-preserving anonymization for IP addressses, mapping to intergers for TCP ports, zero TCP/IP options, replace TCP/UDP payload with hash and fix checksums. Read packets from pcap file input_file and dump anonymized packets to pcap file output_file\n");
 	printf("\t%s -f input_file -c -z -a PREFIX -t MAP -d HASH output_file\n\n", en);
-	printf
-	    ("Map IP addressses to integers, zero TCP/IP options, remove TCP/UDP payload with hash, fix checksums and print anonymized packets.Read packets from eth0 interface and dump anonymized packets to pcap file output_file\n");
+	printf("Map IP addressses to integers, zero TCP/IP options, remove TCP/UDP payload with hash, fix checksums and print anonymized packets.Read packets from eth0 interface and dump anonymized packets to pcap file output_file\n");
 	printf("\t%s -i eth0 -p -c -z -a MAP -d STRIP output_file\n", en);
 	printf("\n\tWARNING: -i or -f MUST precede every other argument switch.\n");
 }
@@ -106,9 +104,7 @@ void parseField(xmlDocPtr doc, xmlNodePtr node, int setNumber)
 			     arguments[1], arguments[2]);
 		break;
 	default:
-		fprintf(stderr,
-			"Too many arguments for function %s. Require divine intervention.\nPlease report this as a bug.\n",
-			algorithm);
+		fprintf(stderr, "Too many arguments for function %s. Require divine intervention.\nPlease report this as a bug.\n", algorithm);
 		exit(-3);
 	}
 }
@@ -155,7 +151,7 @@ int main(int argc, char *argv[])
 			/* XXX FILENAME SIZE LIMIT XXX */
 			config = strndup(optarg, 5192);
 			/*
-			 * this initialize the library and check potential ABI mismatches
+			 * this initializes the library and checks potential ABI mismatches
 			 * between the version it was compiled for and the actual shared
 			 * library used.
 			 */
@@ -256,7 +252,6 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
-	//add_function(sd, "ANONYMIZE", BINARY_PAYLOAD, PAYLOAD, ZERO);
 
 	status = set_output(sd, TCPDUMP_TRACE, argv[argc - 1]);
 	printf("Output: File %s\n\n", argv[argc - 1]);

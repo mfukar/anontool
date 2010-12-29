@@ -3,7 +3,7 @@
 static unsigned long crc_table[256];
 
 void gen_table(void)
-{				/* build the crc table */
+{
 	unsigned long   crc, poly;
 	int             i, j;
 
@@ -21,7 +21,7 @@ void gen_table(void)
 }
 
 unsigned long get_crc(unsigned char *p, int len)
-{				/* calculate the crc value */
+{
 	register unsigned long crc;
 	int             ch, i;
 
