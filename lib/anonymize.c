@@ -404,6 +404,7 @@ apply_function_to_field(int function, int protocol, int field,
 	int            *counter;
 	unsigned char  *packet_end;
 	unsigned int    total_len;
+	/* XXX this is major fail XXX */
 	unsigned char   DES3_keys[24] =
 	    { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x23, 0x45,
 		0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
@@ -443,12 +444,10 @@ apply_function_to_field(int function, int protocol, int field,
 
 		break;
 	case BD_MAP:
-		if (field == SRC_IP)	// || field == SRC_PORT
-		{
+		if (field == SRC_IP) { // || field == SRC_PORT
 			mapTable = srcIpMappingTable;
 			counter = (int *)&src_ip_count;
-		} else if (field == DST_IP)	// || field == DST_PORT
-		{
+		} else if (field == DST_IP) { // || field == DST_PORT
 			mapTable = dstIpMappingTable;
 			counter = (int *)&dst_ip_count;
 		} else {

@@ -362,9 +362,9 @@ void map_field(unsigned char *field, short len, mapNode ** map_table, int *count
 	unsigned int    mapped_value;
 	unsigned int    value = *field;	//8 bits, len = 1 byte
 
-	if (len == 2)		//16 bits, len =2 bytes
+	if (len == 2)		//16 bits, len = 2 bytes
 		value = *((short *)field);
-	else if (len == 4)	//32 bits, len=4 bytes
+	else if (len == 4)	//32 bits, len = 4 bytes
 		value = *((int *)field);
 
 	mapped_value = lookup_value(map_table, value);

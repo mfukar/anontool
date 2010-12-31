@@ -18,10 +18,6 @@
  * negligence or other tortious action, arising out of or in connection with the
  * use or performance of this software.
  */
-/** \file flist.c
-	Implementation of a simple single linked list for flows or functions.
-	Based on slist in adm_ctrl
-*/
 #include <stdio.h>
 
 #include "stdlib.h"
