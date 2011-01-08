@@ -1,22 +1,12 @@
 #!/usr/bin/ruby
-
-#
-# When you have acquired a list of flow sizes in a text file named lengths.txt
-# use this script to extract the delta factor from it.
+# When you have acquired a list of flow sizes in a text file named
+# lengths.txt use this script to extract the delta factor from it.
 #
 # Usage: ./sortlengths.rb
 #
-
-words = File.open("lengths.txt") {|f| f.read }.split
-
-values = Array.new(0)
-words.each { |value| values << value.to_i }
-values.sort!
-values.uniq!
-
-diffs = Array.new(0)
-sum = 0
-s = 0
-values.each_index { |index| if index.to_i < values.length-1 then sum += values.at(index.to_i + 1) - values.at(index.to_i) end }
-puts "delta has the value of\n"
-puts values.at(0) / 2
+# Read integer numbers from file, sort them ASC and remove duplicates
+values = File.read("lengths.txt").split.map(&:to_i).sort.uniq
+# Take pairwise combinations of values and calculate the total sum
+sum = values.each_cons(2).map { |a, b| b - a }.inject(0, :+)
+# Compute and print the average
+puts "delta has the value of %d" % sum / values.length
