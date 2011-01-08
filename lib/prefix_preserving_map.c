@@ -15,33 +15,9 @@
 
 nodehdr_t       addr_propagate = { NH_FL_RANDOM_PROPAGATE, 0xffffffff, 0x01000000 };
 
-/*static unsigned
-rand_accum(unsigned prev, unsigned *px, int ints)
-{
-    // now, sum it all, shifting all the time
-    while (ints--) {
-        prev ^= *px++;
-        prev = (prev<<1)|(prev>>31);
-    }
-    return prev;
-}*/
-
-/*static void rand_start(void)
-{
-#if     defined(SVR4)
-    srand48((long)time(NULL));
-#else   // defined(SVR4)
-    srandom((long)time(NULL));
-#endif  // defined(SVR4)
-}*/
-
 static long rand32()
 {
-#if     defined(SVR4)
-	return ((lrand48() & 0xffff) << 15) | (lrand48() & 0xfff);
-#else				/* defined(SVR4) */
 	return ((random() & 0xffff) << 16) | (random() & 0xffff);
-#endif				/* defined(SVR4) */
 }
 
 int bi_ffs(u_long value)
@@ -141,7 +117,7 @@ static inline node_p make_peer(u_long input, node_p old, nodehdr_p hdr)
 
 	old->input = down[1]->input;	/* NB: 1s to the right (0s to the left) */
 	old->output = down[1]->output;
-	old->down[0] = down[0];	/* point to children */
+	old->down[0] = down[0];		/* point to children */
 	old->down[1] = down[1];
 
 	return down[bitvalue];

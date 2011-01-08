@@ -365,7 +365,8 @@ static int anonymize_init(va_list vl, void *fu, struct anonflow *fl)
 	if (!various_inited) {
 		init_mapping_tables();
 		gen_table();
-		srand48((long)time(NULL));
+		srandom(time(NULL));
+		srand48((long int)time(NULL));
 		lookup_init(&addr_propagate);
 		various_inited = 1;
 	}

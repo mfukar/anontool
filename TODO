@@ -5,6 +5,8 @@
 
 * Get rid of all the magic numbers in the code.
 * Get rid of all the non-standard types.
+* Get rid of all the standard random functions. Instead, use MT (already
+  implemented) as input to all functions which produce a distribution.
 
 * Finish stream6, get rid of libnids.
 

@@ -36,20 +36,18 @@
 extern anon_pkthdr_t *last_header_seen;
 extern uint32_t delta;
 
-/************ REPLACE RANDOM ***********/
-
+/* REPLACE RANDOM */
 void random_field(unsigned char *field, int len)
 {
 	int             i;
 
 	for (i = 0; i < len; i++) {
-		*field = (unsigned char)(lrand48() % 256);
+		*field = (unsigned char)(random() % 256);
 		field++;
 	}
 }
 
-/********** REPLACE FILENAME (PRINTABLE) ******/
-
+/* REPLACE FILENAME (PRINTABLE) */
 void filename_random_field(unsigned char *p, int len)
 {
 	unsigned char  *pos, *tmp;
@@ -65,13 +63,12 @@ void filename_random_field(unsigned char *p, int len)
 		pos = p + len;
 
 	for (tmp = p; tmp < pos; tmp++) {
-		tmp[0] = (int)(126 - 33) * drand48() + 33;
+		tmp[0] = (int)(126 - 33) * random() + 33;
 	}
 
 }
 
-/********* PATTERN FILL ************/
-
+/* PATTERN FILL */
 void pattern_fill_field(unsigned char *field, int len, int pattern_type, void *pattern)
 {
 	int             i;
@@ -94,8 +91,7 @@ void pattern_fill_field(unsigned char *field, int len, int pattern_type, void *p
 	}
 }
 
-/************** STRIP ************/
-
+/* STRIP */
 void strip(anonpacket * p, unsigned char *field, int len, int keep_bytes, int total_len,
 	   unsigned char *packet_end)
 {
@@ -106,11 +102,15 @@ void strip(anonpacket * p, unsigned char *field, int len, int keep_bytes, int to
 		      packet_end);
 }
 
-/********* DISTRIBUTION / DEVIATION*************/
-
+/* NORMAL DISTRIBUTION */
+/* XXX float is always truncated to int XXX*/
 float box_muller(float m, float s)
-{				/* Implements the Polar form of the Box-Muller
-	   Transformation. (Gaussian) *//* mean m, standard deviation s */
+{
+	/* Implements the Polar form of the Box-Muller
+	 * Transformation.
+	 * Result : Gaussian distribution with mean m,
+	 * and standard deviation s
+	 */
 	float           x1, x2, w, y1;
 	static float    y2;
 	static int      use_last = 0;
@@ -356,7 +356,7 @@ int aes_hash(unsigned char *field, int len, unsigned char *key,
 	return 0;
 }
 
-/****** MAP FIELD (HASH TABLE)****************/
+/* MAP FIELD (HASH TABLE) */
 void map_field(unsigned char *field, short len, mapNode ** map_table, int *count)
 {
 	unsigned int    mapped_value;
@@ -369,13 +369,12 @@ void map_field(unsigned char *field, short len, mapNode ** map_table, int *count
 
 	mapped_value = lookup_value(map_table, value);
 
-	if (!mapped_value)	// NOT FOUND, new mapping
-	{
+	if (!mapped_value) {	// NOT FOUND, new mapping
 		mapped_value = *count;
 		insert_value(map_table, value, mapped_value);
 		(*count)++;
 	}
-	//put in field the mapped value
+	// write the mapped value in the field
 	if (len == 4) {
 		*((int *)field) = htonl(mapped_value);
 	} else if (len == 2) {
@@ -428,8 +427,7 @@ void insert_value(mapNode ** map_table, unsigned int value, unsigned int mapped_
 
 }
 
-/************ REPLACE FIELD******************/
-
+/* REPLACE FIELD */
 int checkMTU(int packet_length, int field_old_length, int field_new_length)
 {
 	int             MTU = 1514;
@@ -519,7 +517,7 @@ int replace_field(unsigned char *field, int len, unsigned char *pattern, int pat
 	return 0;
 }
 
-/************* REGULAR EXPRESSION **************/
+/* REGULAR EXPRESSION */
 #define PCRE_OVECTOR_SIZE 30
 int reg_exp_substitute(unsigned char *field, int len, char *regular_expression,
 		       char **replacement_vector, int num_of_matches, anonpacket * p, int total_len,
@@ -561,18 +559,23 @@ int reg_exp_substitute(unsigned char *field, int len, char *regular_expression,
 /*
  * Handles values (typically values of fields like length, etc.)
  * adds a uniformly random value in the set [-delta, delta].
- *
- * Uses high order bits from mrand48().
  */
 int value_shift(unsigned char *field, unsigned int len)
 {
-	// 0x80000000 = 2^31 = largest value returned by mrand48()
-	int32_t         shift = (int32_t) (delta * (mrand48() / (0x80000000 + 1.0)));
+	/* random() returns a value in [0, RANDOM_MAX]
+	 * we're shifting the distribution to [-RANDOM_MAX/2, RANDOM_MAX/2]
+	 * and then adjusting to our desired range.
+	 *
+	 * TODO: Replace stdlib random() with MT (faster + better)
+	 * backend and adjusting through our functions producing
+	 * a desirable distribution.
+	 */
+	int32_t	shift = (delta * ((random() - RANDOM_MAX/2) / 0x80000000));
 
-	if (len == sizeof(int32_t))
+	if (len == sizeof(int32_t)) {
 		*(int32_t *) field = htonl(shift + ntohl(*(uint32_t *) field));
-	else if (len == sizeof(int64_t))
-		*(int64_t *) field = htonl(shift + ntohl(*(uint32_t *) field));
-
+	} else if (len == sizeof(int64_t)) {
+		*(int64_t *) field = htonl(shift << 32 + ntohl(*(uint32_t *) field));
+	}
 	return (0);
 }
