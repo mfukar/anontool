@@ -63,7 +63,7 @@ void filename_random_field(unsigned char *p, int len)
 		pos = p + len;
 
 	for (tmp = p; tmp < pos; tmp++) {
-		tmp[0] = (int)(126 - 33) * random() + 33;
+		tmp[0] = (unsigned char)(93.0 * ((float)random() / RANDOM_MAX) + 33);
 	}
 
 }
