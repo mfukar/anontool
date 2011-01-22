@@ -22,7 +22,7 @@
 
 /* the eight DES S-boxes */
 
-uint32          SB1[64] = {
+uint32_t          SB1[64] = {
 	0x01010400, 0x00000000, 0x00010000, 0x01010404,
 	0x01010004, 0x00010404, 0x00000004, 0x00010000,
 	0x00000400, 0x01010400, 0x01010404, 0x00000400,
@@ -41,7 +41,7 @@ uint32          SB1[64] = {
 	0x00010004, 0x00010400, 0x00000000, 0x01010004
 };
 
-static uint32   SB2[64] = {
+static uint32_t   SB2[64] = {
 	0x80108020, 0x80008000, 0x00008000, 0x00108020,
 	0x00100000, 0x00000020, 0x80100020, 0x80008020,
 	0x80000020, 0x80108020, 0x80108000, 0x80000000,
@@ -60,7 +60,7 @@ static uint32   SB2[64] = {
 	0x80000000, 0x80100020, 0x80108020, 0x00108000
 };
 
-static uint32   SB3[64] = {
+static uint32_t   SB3[64] = {
 	0x00000208, 0x08020200, 0x00000000, 0x08020008,
 	0x08000200, 0x00000000, 0x00020208, 0x08000200,
 	0x00020008, 0x08000008, 0x08000008, 0x00020000,
@@ -79,7 +79,7 @@ static uint32   SB3[64] = {
 	0x00020208, 0x00000008, 0x08020008, 0x00020200
 };
 
-static uint32   SB4[64] = {
+static uint32_t   SB4[64] = {
 	0x00802001, 0x00002081, 0x00002081, 0x00000080,
 	0x00802080, 0x00800081, 0x00800001, 0x00002001,
 	0x00000000, 0x00802000, 0x00802000, 0x00802081,
@@ -98,7 +98,7 @@ static uint32   SB4[64] = {
 	0x00000080, 0x00800000, 0x00002000, 0x00802080
 };
 
-static uint32   SB5[64] = {
+static uint32_t   SB5[64] = {
 	0x00000100, 0x02080100, 0x02080000, 0x42000100,
 	0x00080000, 0x00000100, 0x40000000, 0x02080000,
 	0x40080100, 0x00080000, 0x02000100, 0x40080100,
@@ -117,7 +117,7 @@ static uint32   SB5[64] = {
 	0x00000000, 0x40080000, 0x02080100, 0x40000100
 };
 
-static uint32   SB6[64] = {
+static uint32_t   SB6[64] = {
 	0x20000010, 0x20400000, 0x00004000, 0x20404010,
 	0x20400000, 0x00000010, 0x20404010, 0x00400000,
 	0x20004000, 0x00404010, 0x00400000, 0x20000010,
@@ -136,7 +136,7 @@ static uint32   SB6[64] = {
 	0x20404000, 0x20000000, 0x00400010, 0x20004010
 };
 
-static uint32   SB7[64] = {
+static uint32_t   SB7[64] = {
 	0x00200000, 0x04200002, 0x04000802, 0x00000000,
 	0x00000800, 0x04000802, 0x00200802, 0x04200800,
 	0x04200802, 0x00200000, 0x00000000, 0x04000002,
@@ -155,7 +155,7 @@ static uint32   SB7[64] = {
 	0x04000002, 0x04000800, 0x00000800, 0x00200002
 };
 
-static uint32   SB8[64] = {
+static uint32_t   SB8[64] = {
 	0x10001040, 0x00001000, 0x00040000, 0x10041040,
 	0x10000000, 0x10001040, 0x00000040, 0x10000000,
 	0x00040040, 0x10040000, 0x10041040, 0x00041000,
@@ -176,14 +176,14 @@ static uint32   SB8[64] = {
 
 /* PC1: left and right halves bit-swap */
 
-static uint32   LHs[16] = {
+static uint32_t   LHs[16] = {
 	0x00000000, 0x00000001, 0x00000100, 0x00000101,
 	0x00010000, 0x00010001, 0x00010100, 0x00010101,
 	0x01000000, 0x01000001, 0x01000100, 0x01000101,
 	0x01010000, 0x01010001, 0x01010100, 0x01010101
 };
 
-static uint32   RHs[16] = {
+static uint32_t   RHs[16] = {
 	0x00000000, 0x01000000, 0x00010000, 0x01010000,
 	0x00000100, 0x01000100, 0x00010100, 0x01010100,
 	0x00000001, 0x01000001, 0x00010001, 0x01010001,
@@ -194,18 +194,18 @@ static uint32   RHs[16] = {
 
 #define GET_UINT32(n,b,i)                       \
 {                                               \
-    (n) = ( (uint32) (b)[(i)    ] << 24 )       \
-        | ( (uint32) (b)[(i) + 1] << 16 )       \
-        | ( (uint32) (b)[(i) + 2] <<  8 )       \
-        | ( (uint32) (b)[(i) + 3]       );      \
+    (n) = ( (uint32_t) (b)[(i)    ] << 24 )       \
+        | ( (uint32_t) (b)[(i) + 1] << 16 )       \
+        | ( (uint32_t) (b)[(i) + 2] <<  8 )       \
+        | ( (uint32_t) (b)[(i) + 3]       );      \
 }
 
 #define PUT_UINT32(n,b,i)                       \
 {                                               \
-    (b)[(i)    ] = (uint8) ( (n) >> 24 );       \
-    (b)[(i) + 1] = (uint8) ( (n) >> 16 );       \
-    (b)[(i) + 2] = (uint8) ( (n) >>  8 );       \
-    (b)[(i) + 3] = (uint8) ( (n)       );       \
+    (b)[(i)    ] = (uint8_t) ( (n) >> 24 );       \
+    (b)[(i) + 1] = (uint8_t) ( (n) >> 16 );       \
+    (b)[(i) + 2] = (uint8_t) ( (n) >>  8 );       \
+    (b)[(i) + 3] = (uint8_t) ( (n)       );       \
 }
 
 /* Initial Permutation macro */
@@ -253,10 +253,10 @@ static uint32   RHs[16] = {
 
 /* DES key schedule */
 
-int des_main_ks(uint32 SK[32], uint8 key[8])
+int des_main_ks(uint32_t SK[32], uint8_t key[8])
 {
 	int             i;
-	uint32          X, Y, T;
+	uint32_t          X, Y, T;
 
 	GET_UINT32(X, key, 0);
 	GET_UINT32(Y, key, 4);
@@ -322,7 +322,7 @@ int des_main_ks(uint32 SK[32], uint8 key[8])
 	return (0);
 }
 
-int des_set_key(des_context * ctx, uint8 key[8])
+int des_set_key(des_context * ctx, uint8_t key[8])
 {
 	int             i;
 
@@ -342,9 +342,9 @@ int des_set_key(des_context * ctx, uint8 key[8])
 
 /* DES 64-bit block encryption/decryption */
 
-void des_crypt(uint32 SK[32], uint8 input[8], uint8 output[8])
+void des_crypt(uint32_t SK[32], uint8_t input[8], uint8_t output[8])
 {
-	uint32          X, Y, T;
+	uint32_t          X, Y, T;
 
 	GET_UINT32(X, input, 0);
 	GET_UINT32(Y, input, 4);
@@ -374,19 +374,19 @@ void des_crypt(uint32 SK[32], uint8 input[8], uint8 output[8])
 	PUT_UINT32(X, output, 4);
 }
 
-void des_encrypt(des_context * ctx, uint8 input[8], uint8 output[8])
+void des_encrypt(des_context * ctx, uint8_t input[8], uint8_t output[8])
 {
 	des_crypt(ctx->esk, input, output);
 }
 
-void des_decrypt(des_context * ctx, uint8 input[8], uint8 output[8])
+void des_decrypt(des_context * ctx, uint8_t input[8], uint8_t output[8])
 {
 	des_crypt(ctx->dsk, input, output);
 }
 
 /* Triple-DES key schedule */
 
-int des3_set_2keys(des3_context * ctx, uint8 key1[8], uint8 key2[8])
+int des3_set_2keys(des3_context * ctx, uint8_t key1[8], uint8_t key2[8])
 {
 	int             i;
 
@@ -410,7 +410,7 @@ int des3_set_2keys(des3_context * ctx, uint8 key1[8], uint8 key2[8])
 	return (0);
 }
 
-int des3_set_3keys(des3_context * ctx, uint8 key1[8], uint8 key2[8], uint8 key3[8])
+int des3_set_3keys(des3_context * ctx, uint8_t key1[8], uint8_t key2[8], uint8_t key3[8])
 {
 	int             i;
 
@@ -434,9 +434,9 @@ int des3_set_3keys(des3_context * ctx, uint8 key1[8], uint8 key2[8], uint8 key3[
 
 /* Triple-DES 64-bit block encryption/decryption */
 
-void des3_crypt(uint32 SK[96], uint8 input[8], uint8 output[8])
+void des3_crypt(uint32_t SK[96], uint8_t input[8], uint8_t output[8])
 {
-	uint32          X, Y, T;
+	uint32_t          X, Y, T;
 
 	GET_UINT32(X, input, 0);
 	GET_UINT32(Y, input, 4);
@@ -500,17 +500,21 @@ void des3_crypt(uint32 SK[96], uint8 input[8], uint8 output[8])
 	PUT_UINT32(X, output, 4);
 }
 
-void des3_encrypt(des3_context * ctx, uint8 input[8], uint8 output[8])
+void des3_encrypt(des3_context * ctx, uint8_t input[8], uint8_t output[8])
 {
 	des3_crypt(ctx->esk, input, output);
 }
 
-void des3_decrypt(des3_context * ctx, uint8 input[8], uint8 output[8])
+void des3_decrypt(des3_context * ctx, uint8_t input[8], uint8_t output[8])
 {
 	des3_crypt(ctx->dsk, input, output);
 }
 
 #ifdef DESTEST
+/*
+ * TODO: Implement the actual tests and remove these from here.
+ * TODO: Test additional modes.
+ */
 
 #include <string.h>
 #include <stdio.h>
