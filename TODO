@@ -4,7 +4,7 @@
 	format would be nicer.
 
 * Get rid of all the magic numbers in the code.
-* Get rid of all the non-standard types.
+* Get rid of all the non-standard types, use exact width types from stdint.h where needed.
 * Get rid of all the standard random functions. Instead, use MT (already
   implemented) as input to all functions which produce a distribution.
 
@@ -16,7 +16,7 @@
 * Measure PIC version on x86. If it's significantly slower, try to compile
   a non-PIC version and see what happens. (WTB TIME)
 
-* Configurable key for AES/3DES (prefix-preserving anon)
+* Configurable keys for AES/3DES (prefix-preserving anon)
 	- Implement in anonymization_functions.c
 	- Move the call to aes_set_key()/des3_set_3keys() to an appropriate spot, to only
 	  be called once.
@@ -24,12 +24,10 @@
 	- If the recent attacks on 10-round 256-bit AES get any better, we might have to
 	  at least emit some warning?
 
-* Implement IPFIX file as input source (if anybody needs this..)
-
-* Add SCTP support (primarily for IPFIX transport).
+* Add support for SCTP (primarily for IPFIX transport), GRE, L2TP, GTP, etc.
 
 * Implement some metric of assessing the achieved anonymization levels
-depending on the functions/parameters used.
+depending on the functions/parameters used. Bibliography?
 
-* I really need to get a domain for this. FORTH has completely ditched this as a project,
-  and they're not willing to maintain/develop it any further. Not me, though. :-)
+* I mightneed to get a domain for this. FORTH has completely ditched this as a project,
+  and they're not willing to maintain/develop it any further.

@@ -1037,30 +1037,29 @@ void start_processing()
 
 	if (autoreorder == ON) {
 		if (reordering() == -1) {
-			printf("Error during reordering... Exiting\n");
+			fprintf(stderr, "Error during reordering.. Exiting\n");
 			return;
 		}
 	}
 
 	if (optimize == ON) {
 		if (do_optimization() == -1) {
-			printf("Error during optimization... Exiting\n");
+			fprintf(stderr, "Error during optimization.. Exiting\n");
 			return;
 		}
 	}
 
 	info = search_for_registered_source(source_type);
 	if (!info) {
-		printf("Unknown source type\n");
+		fprintf(stderr, "Unknown source type.\n");
 		return;
 	}
 
 	if (!info->process_packets) {
-		printf("This source does not support process packet functionality!!!!!!!!!\n");
+		fprintf(stderr, "This source does not support process packet functionality.\n");
 		return;
 	}
 
 	info->process_packets();
 	return;
-
 }
