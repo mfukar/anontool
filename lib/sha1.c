@@ -18,24 +18,22 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <string.h>
-
 #include "sha1.h"
 
 #define GET_UINT32(n,b,i)                       \
 {                                               \
-    (n) = ( (uint32) (b)[(i)    ] << 24 )       \
-        | ( (uint32) (b)[(i) + 1] << 16 )       \
-        | ( (uint32) (b)[(i) + 2] <<  8 )       \
-        | ( (uint32) (b)[(i) + 3]       );      \
+    (n) = ( (uint32_t) (b)[(i)    ] << 24 )       \
+        | ( (uint32_t) (b)[(i) + 1] << 16 )       \
+        | ( (uint32_t) (b)[(i) + 2] <<  8 )       \
+        | ( (uint32_t) (b)[(i) + 3]       );      \
 }
 
 #define PUT_UINT32(n,b,i)                       \
 {                                               \
-    (b)[(i)    ] = (uint8) ( (n) >> 24 );       \
-    (b)[(i) + 1] = (uint8) ( (n) >> 16 );       \
-    (b)[(i) + 2] = (uint8) ( (n) >>  8 );       \
-    (b)[(i) + 3] = (uint8) ( (n)       );       \
+    (b)[(i)    ] = (uint8_t) ( (n) >> 24 );       \
+    (b)[(i) + 1] = (uint8_t) ( (n) >> 16 );       \
+    (b)[(i) + 2] = (uint8_t) ( (n) >>  8 );       \
+    (b)[(i) + 3] = (uint8_t) ( (n)       );       \
 }
 
 void sha1_starts(sha1_context * ctx)
@@ -50,9 +48,9 @@ void sha1_starts(sha1_context * ctx)
 	ctx->state[4] = 0xC3D2E1F0;
 }
 
-void sha1_process(sha1_context * ctx, uint8 data[64])
+void sha1_process(sha1_context * ctx, uint8_t data[64])
 {
-	uint32          temp, W[16], A, B, C, D, E;
+	uint32_t          temp, W[16], A, B, C, D, E;
 
 	GET_UINT32(W[0], data, 0);
 	GET_UINT32(W[1], data, 4);
@@ -206,9 +204,9 @@ void sha1_process(sha1_context * ctx, uint8 data[64])
 	ctx->state[4] += E;
 }
 
-void sha1_update(sha1_context * ctx, uint8 * input, uint32 length)
+void sha1_update(sha1_context * ctx, uint8_t * input, uint32_t length)
 {
-	uint32          left, fill;
+	uint32_t          left, fill;
 
 	if (!length)
 		return;
@@ -241,18 +239,18 @@ void sha1_update(sha1_context * ctx, uint8 * input, uint32 length)
 	}
 }
 
-static uint8    sha1_padding[64] = {
+static uint8_t    sha1_padding[64] = {
 	0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-void sha1_finish(sha1_context * ctx, uint8 digest[20])
+void sha1_finish(sha1_context * ctx, uint8_t digest[20])
 {
-	uint32          last, padn;
-	uint32          high, low;
-	uint8           msglen[8];
+	uint32_t          last, padn;
+	uint32_t          high, low;
+	uint8_t           msglen[8];
 
 	high = (ctx->total[0] >> 29)
 	    | (ctx->total[1] << 3);
