@@ -18,25 +18,22 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <string.h>
-#include <stdio.h>
-
 #include "md5.h"
 
 #define GET_UINT32(n,b,i)                       \
 {                                               \
-    (n) = ( (uint32) (b)[(i)    ]       )       \
-        | ( (uint32) (b)[(i) + 1] <<  8 )       \
-        | ( (uint32) (b)[(i) + 2] << 16 )       \
-        | ( (uint32) (b)[(i) + 3] << 24 );      \
+    (n) = ( (uint32_t) (b)[(i)    ]       )       \
+        | ( (uint32_t) (b)[(i) + 1] <<  8 )       \
+        | ( (uint32_t) (b)[(i) + 2] << 16 )       \
+        | ( (uint32_t) (b)[(i) + 3] << 24 );      \
 }
 
 #define PUT_UINT32(n,b,i)                       \
 {                                               \
-    (b)[(i)    ] = (uint8) ( (n)       );       \
-    (b)[(i) + 1] = (uint8) ( (n) >>  8 );       \
-    (b)[(i) + 2] = (uint8) ( (n) >> 16 );       \
-    (b)[(i) + 3] = (uint8) ( (n) >> 24 );       \
+    (b)[(i)    ] = (uint8_t) ( (n)       );       \
+    (b)[(i) + 1] = (uint8_t) ( (n) >>  8 );       \
+    (b)[(i) + 2] = (uint8_t) ( (n) >> 16 );       \
+    (b)[(i) + 3] = (uint8_t) ( (n) >> 24 );       \
 }
 
 void md5_starts(md5_context * ctx)
@@ -50,9 +47,9 @@ void md5_starts(md5_context * ctx)
 	ctx->state[3] = 0x10325476;
 }
 
-void md5_process(md5_context * ctx, uint8 data[64])
+void md5_process(md5_context * ctx, uint8_t data[64])
 {
-	uint32          X[16], A, B, C, D;
+	uint32_t          X[16], A, B, C, D;
 
 	GET_UINT32(X[0], data, 0);
 	GET_UINT32(X[1], data, 4);
@@ -173,9 +170,9 @@ void md5_process(md5_context * ctx, uint8 data[64])
 	ctx->state[3] += D;
 }
 
-void md5_update(md5_context * ctx, uint8 * input, uint32 length)
+void md5_update(md5_context * ctx, uint8_t * input, uint32_t length)
 {
-	uint32          left, fill;
+	uint32_t          left, fill;
 
 	if (!length)
 		return;
@@ -208,18 +205,18 @@ void md5_update(md5_context * ctx, uint8 * input, uint32 length)
 	}
 }
 
-static uint8    md5_padding[64] = {
+static uint8_t    md5_padding[64] = {
 	0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-void md5_finish(md5_context * ctx, uint8 digest[16])
+void md5_finish(md5_context * ctx, uint8_t digest[16])
 {
-	uint32          last, padn;
-	uint32          high, low;
-	uint8           msglen[8];
+	uint32_t          last, padn;
+	uint32_t          high, low;
+	uint8_t           msglen[8];
 
 	high = (ctx->total[0] >> 29)
 	    | (ctx->total[1] << 3);
@@ -241,6 +238,9 @@ void md5_finish(md5_context * ctx, uint8 digest[16])
 }
 
 #ifdef MD5TEST
+/*
+ * TODO: Migrate into tests.
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
