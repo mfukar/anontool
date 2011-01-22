@@ -1,7 +1,7 @@
-#ifndef _PRINTF_H          /* defined in stdio.h */
-#include <stdio.h>
-#endif
+#ifndef _ANONTOOL_CRC_32
+#define _ANONTOOL_CRC_32
 
-/* generate the crc table. Must be called before calculating the crc value */
+/* Generate the CRC table. Must be called before calculating any CRC value. */
 void gen_table(void);
-unsigned long get_crc(unsigned char*, int);   /* calculate the crc32 value */
+unsigned long get_crc(unsigned char*, int);
+#endif

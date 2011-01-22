@@ -21,8 +21,9 @@
 #ifndef _FLIST_H
 #define _FLIST_H 1
 
-//Flow/function linked list
-//Based on slist in adm_ctrl
+/*
+ * Implementation of a single-linked list.
+ */
 
 typedef struct flist_node
 {
