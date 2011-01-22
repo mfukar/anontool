@@ -273,6 +273,9 @@ void sha1_finish(sha1_context * ctx, uint8_t digest[20])
 }
 
 #ifdef SHA1TEST
+/*
+ * TODO: Out of here and into /test
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
