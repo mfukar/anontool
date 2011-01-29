@@ -63,7 +63,7 @@ void filename_random_field(unsigned char *p, int len)
 		pos = p + len;
 
 	for (tmp = p; tmp < pos; tmp++) {
-		tmp[0] = (unsigned char)(93.0 * ((float)random() / RANDOM_MAX) + 33);
+		tmp[0] = (unsigned char)(93.0 * ((float)random() / RAND_MAX) + 33);
 	}
 
 }
@@ -210,7 +210,7 @@ int md5_hash(unsigned char *field, int len, int padding_behavior, anonpacket * p
 		return 0;
 
 	md5_starts(&ctx);
-	md5_update(&ctx, (uint8 *) field, len);
+	md5_update(&ctx, (uint8_t *) field, len);
 	md5_finish(&ctx, md5sum);
 
 	hash_padding(field, len, padding_behavior, md5sum, hash_length, p, total_len, packet_end,
@@ -233,7 +233,7 @@ int sha1_hash(unsigned char *field, int len, int padding_behavior, anonpacket * 
 		return 0;
 
 	sha1_starts(&ctx);
-	sha1_update(&ctx, (uint8 *) field, len);
+	sha1_update(&ctx, (uint8_t *) field, len);
 	sha1_finish(&ctx, sha1sum);
 
 	hash_padding(field, len, padding_behavior, sha1sum, hash_length, p, total_len, packet_end,
@@ -256,7 +256,7 @@ int sha256_hash(unsigned char *field, int len, int padding_behavior, anonpacket 
 		return 0;
 
 	sha256_starts(&ctx);
-	sha256_update(&ctx, (uint8 *) field, len);
+	sha256_update(&ctx, (uint8_t *) field, len);
 	sha256_finish(&ctx, sha256sum);
 
 	hash_padding(field, len, padding_behavior, sha256sum, hash_length, p, total_len, packet_end,
@@ -562,15 +562,15 @@ int reg_exp_substitute(unsigned char *field, int len, char *regular_expression,
  */
 int value_shift(unsigned char *field, unsigned int len)
 {
-	/* random() returns a value in [0, RANDOM_MAX]
-	 * we're shifting the distribution to [-RANDOM_MAX/2, RANDOM_MAX/2]
+	/* random() returns a value in [0, RAND_MAX]
+	 * we're shifting the distribution to [-RAND_MAX/2, RAND_MAX/2]
 	 * and then adjusting to our desired range.
 	 *
 	 * TODO: Replace stdlib random() with MT (faster + better)
 	 * backend and adjusting through our functions producing
 	 * a desirable distribution.
 	 */
-	int32_t	shift = (delta * ((random() - RANDOM_MAX/2) / 0x80000000));
+	int32_t	shift = (delta * ((random() - RAND_MAX/2) / 0x80000000));
 
 	if (len == sizeof(int32_t)) {
 		*(int32_t *) field = htonl(shift + ntohl(*(uint32_t *) field));

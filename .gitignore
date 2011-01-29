@@ -7,3 +7,7 @@
 
 # PCAP drops
 *.pcap
+
+# configure drops
+config.log
+config.status
