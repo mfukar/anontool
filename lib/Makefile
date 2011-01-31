@@ -1,19 +1,21 @@
 INCLUDE=-I. -I..
+WARNINGS=-Wall -Wsign-compare -Wpointer-arith -Wnested-externs -Wcast-align
 SHAREDFLAGS=-fPIC
-DEBUGFLAGS=-g
-CFLAGS=-O3 -Wall -Wsign-compare -Wpointer-arith -Wnested-externs \
--Wcast-align -D_GNU_SOURCE $(INCLUDE) $(SHAREDFLAGS)
+DEBUGFLAGS=-ggdb
+OPTIMIZATIONFLAGS=-O3
+CFLAGS=$(OPTIMIZATIONFLAGS) $(WARNINGS) $(INCLUDE) $(SHAREDFLAGS) -D_GNU_SOURCE
+LIBRARIES=-lpcap -lpcre -lm
 
-TARGETS=anonlib.so
+TARGETS=libnids.a anonlib.so
 all: $(TARGETS)
 
-anonlib.so: libnids.a tool.o bpf.o pcap_input.o cooking.o flist.o strsearch.o mstring.o callback.o printpacket.o anonymize.o decoders.o anon_snort_decode.o anon_print_packet.o anon_checksums.o anon_prefix_preserving.o prefix_preserving_map.o md5.o sha1.o sha256.o anonymization_functions.o crc32.o des.o aes.o uncook.o binaryPayload.o
-	gcc $(CFLAGS) -shared -o $@ $^ -lpcap -lpcre -lm -L../ -L. $(LIB_DIR)
+anonlib.so:tool.o bpf.o pcap_input.o cooking.o flist.o strsearch.o mstring.o callback.o printpacket.o anonymize.o decoders.o anon_snort_decode.o anon_print_packet.o anon_checksums.o anon_prefix_preserving.o prefix_preserving_map.o md5.o sha1.o sha256.o anonymization_functions.o crc32.o des.o aes.o uncook.o binaryPayload.o
+	gcc $(CFLAGS) -shared -o $@ $^ -L.. -L. $(LIBRARIES)
 
 libnids.a: 
 	cd libnids && ./configure --disable-libnet --enable-shared && make
-	cp ./libnids/src/libnids.a .
-	cp ./libnids/src/libnids.so.1.21 ./libnids.so
+	if [ -e libnids.so ]; then unlink libnids.so; fi
+	ln -s libnids/src/libnids.so.1.21 libnids.so
 
 tool.o: tool.c internal.h
 	gcc $(CFLAGS) -c $<
@@ -92,4 +94,5 @@ anonymization_functions.o: anonymization_functions.c anonymization_functions.h
 
 clean:
 	cd libnids && make clean
-	rm -f *.o *.so *~ libnids.a $(TARGETS)
+	if [ -h libnids.so ]; then unlink libnids.so; fi
+	rm -f *.o *.so *~ $(TARGETS)

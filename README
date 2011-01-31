@@ -6,7 +6,7 @@ Anontool depends on the following:
 (Ubuntu aptitude packages used as a reference)
     - libglib2.0-dev
     - libnet1-dev
-    - libpcre3 and libpcre3-dev
+    - libpcre3, libpcre3-dev
     - libpcap0.8-dev
     - libxml2-dev
 
@@ -24,9 +24,13 @@ NOTES - USAGE
     - Anontool depends on libnids. For the user's convenience, a fairly
     customized version is included under /lib/libnids/. Currently, I'm
     not considering including a make rule for newer versions of libnids.
-    However, bear in mind that /lib/libnids/src/libnids.so.1.21 must be
-    visible from your loader - simplest way to do that is setting your
-    library path accordingly.
+    However, bear in mind that /lib/libnids/src/libnids.so.1.21 MUST BE
+    visible from your loader when attempting to execute an application -
+    the simplest way to do that is setting your library path accordingly.
+
+    I will refrain from doing so myself in the make scripts, as it is
+    rather intrusive. Please bear with this (stupid, admittedly)
+    setup while I'm trying to get rid of libnids..
 
     - The above issue is due to amd64, R_X86_64_PC32 relocation, stuff
     that was invented to save RAM (by now a moot point) and other bad
@@ -45,12 +49,16 @@ MAINTENANCE
     Please report any bugs or feature requests to:
     foukarakis DOT michael AT google's email service domain name
 
+    If you wanted, you could fork anontool from github
+    [ https://github.com/mfukar/anontool ], make your changes
+    and a pull request to me. :-)
+
 TODO
     Autoconf and automake support will never come, at least from me. If,
     however, you can point me to a usable, stable and free alternative,
     I'd be more than happy to take a look at it.
 
-    Support for L2TP, GRE, IPsec and other protocols is on the way.
+    Support for L2TP, GRE, GTP, IPsec and other protocols is on the way.
 
     A TCP reassembly processor (so we can get rid of libnids),
     affectionately named stream6, is also on the way.
