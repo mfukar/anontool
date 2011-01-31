@@ -9,7 +9,7 @@ LIBRARIES=-lpcap -lpcre -lm
 TARGETS=libnids.a anonlib.so
 all: $(TARGETS)
 
-anonlib.so:tool.o bpf.o pcap_input.o cooking.o flist.o strsearch.o mstring.o callback.o printpacket.o anonymize.o decoders.o anon_snort_decode.o anon_print_packet.o anon_checksums.o anon_prefix_preserving.o prefix_preserving_map.o md5.o sha1.o sha256.o anonymization_functions.o crc32.o des.o aes.o uncook.o binaryPayload.o
+anonlib.so:tool.o bpf.o pcap_input.o cooking.o flist.o strsearch.o mstring.o callback.o printpacket.o anonymize.o decoders.o anon_snort_decode.o anon_print_packet.o anon_checksums.o anon_prefix_preserving.o prefix_preserving_map.o md5.o sha1.o sha256.o anonymization_functions.o crc32.o des.o aes.o uncook.o binaryPayload.o util.o
 	gcc $(CFLAGS) -shared -o $@ $^ -L.. -L. $(LIBRARIES)
 
 libnids.a: 
@@ -91,6 +91,9 @@ binaryPayload.o: binaryPayload.c
 
 anonymization_functions.o: anonymization_functions.c anonymization_functions.h
 	gcc $(CFLAGS) -c $<
+
+util.o: util.c util.h
+	gcc $(CFLAGS) -std=c99 -c $<
 
 clean:
 	cd libnids && make clean

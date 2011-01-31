@@ -21,6 +21,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <time.h>
 #include <math.h>
 #include <pcre.h>
@@ -32,6 +33,7 @@
 #include "crc32.h"
 #include "des.h"
 #include "aes.h"
+#include "util.h"
 
 extern anon_pkthdr_t *last_header_seen;
 extern uint32_t delta;
@@ -570,17 +572,12 @@ int value_shift(unsigned char *field, unsigned int len)
 	 * backend and adjusting through our functions producing
 	 * a desirable distribution.
 	 */
-	int32_t	shift = (delta * ((random() - RAND_MAX/2) / 0x80000000));
+	int64_t	shift = (delta * ((random() - RAND_MAX/2) / 0x80000000));
 
 	if (len == sizeof(int32_t)) {
 		*(int32_t *) field = htonl(shift + ntohl(*(uint32_t *) field));
+	} else if (len == sizeof(int64_t)) {
+		*(int64_t *) field = htonq((shift << 32) + ntohl(*(uint32_t *)field));
 	}
-	/*
-	 * This is SO wrong.
-	 *
-	else if (len == sizeof(int64_t)) {
-		*(int64_t *) field = htonl(shift << 32 + ntohl(*(uint32_t *) field));
-	}
-	 */
 	return (0);
 }

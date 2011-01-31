@@ -4,6 +4,8 @@
 
 # GCC drops
 *.o
+*.a
+*.so
 
 # PCAP drops
 *.pcap
