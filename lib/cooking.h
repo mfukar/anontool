@@ -27,13 +27,10 @@
 /* Session states */
 #define SSN_TWH		0
 #define SSN_ESTB	1
-#define SSN_CLOSING 2
-#define SSN_SCLOSED 3
-#define SSN_CCLOSED 4
+#define SSN_CLOSING	2
+#define SSN_SCLOSED	3
+#define SSN_CCLOSED	4
 #define SSN_BCLOSED	5
-
-typedef unsigned char byte;
-
 
 struct cooking_data
 {
@@ -42,5 +39,5 @@ struct cooking_data
 	int id;
 };
 
-/////////////////////////////////////////////////////////////////////
+void		create_mod_pkt(unsigned char *, struct anonflow *, anon_pkthdr_t *);
 #endif	//_COOK_H_

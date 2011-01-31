@@ -136,7 +136,7 @@ float box_muller(float m, float s)
 
 void map_distribution(unsigned char *field, short len, int distribution_type, int arg1, int arg2)
 {
-	int             distribution_result;
+	int             distribution_result = UNIFORM;
 	int             temp_len = (len >= 4) ? 4 : len;
 
 	if (distribution_type == UNIFORM)	//uniform
@@ -574,8 +574,13 @@ int value_shift(unsigned char *field, unsigned int len)
 
 	if (len == sizeof(int32_t)) {
 		*(int32_t *) field = htonl(shift + ntohl(*(uint32_t *) field));
-	} else if (len == sizeof(int64_t)) {
+	}
+	/*
+	 * This is SO wrong.
+	 *
+	else if (len == sizeof(int64_t)) {
 		*(int64_t *) field = htonl(shift << 32 + ntohl(*(uint32_t *) field));
 	}
+	 */
 	return (0);
 }

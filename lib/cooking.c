@@ -31,9 +31,9 @@
 #include <arpa/inet.h>
 #include <assert.h>
 
+#include "libnids/src/nids.h"
 #include "cooking.h"
 #include "pcapio.h"
-#include "libnids/src/nids.h"
 
 #define COOKING "COOKING"
 #define SERVER 0
@@ -57,8 +57,6 @@ int             status;
 
 #define int_ntoa(x) ((char *)inet_ntoa(*((struct in_addr *)&x)))
 
-void            create_mod_pkt(unsigned char *dev_pkt, struct anonflow *flow,
-			       anon_pkthdr_t * pkt_head);
 extern struct tcp_stream *find_stream(struct tcphdr *this_tcphdr, struct ip *this_iphdr,
 				      int *from_client, int id);
 extern void     process_flushed_data(struct anonflow *flow);
