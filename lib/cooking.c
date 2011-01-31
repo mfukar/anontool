@@ -29,7 +29,6 @@
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
-#include <assert.h>
 
 #include "libnids/src/nids.h"
 #include "cooking.h"
@@ -45,17 +44,15 @@
 
 /* #define COOK_DEBUG 1*/
 
-static int      threshold = 0;
-static unsigned int timeout = 0;
-unsigned char  *to_free = NULL;
-unsigned char  *to_free2 = NULL;
-extern struct pcap_pkthdr *nids_last_pcap_header;
-static int      cooking_id = 0;
-unsigned char  *last_dev_pkt;
+static int			threshold = 0;
+static unsigned int		timeout = 0;
+unsigned char			*to_free = NULL;
+unsigned char			*to_free2 = NULL;
+extern struct pcap_pkthdr	*nids_last_pcap_header;
+static int			cooking_id = 0;
+unsigned char			*last_dev_pkt;
 
-int             status;
-
-#define int_ntoa(x) ((char *)inet_ntoa(*((struct in_addr *)&x)))
+int				status;
 
 extern struct tcp_stream *find_stream(struct tcphdr *this_tcphdr, struct ip *this_iphdr,
 				      int *from_client, int id);
@@ -67,8 +64,7 @@ int             callbacks = 0;
 
 void tcp_callback(struct tcp_stream *ns, void **param)
 {
-	struct anonflow *flow;
-	flow = (struct anonflow *)(ns->flow);
+	struct anonflow *flow = (struct anonflow *)(ns->flow);
 
 	callbacks++;
 
@@ -79,13 +75,13 @@ void tcp_callback(struct tcp_stream *ns, void **param)
 			ns->client_reassembly_limit = 0;
 		} else {
 			ns->client.reassembled_data =
-			    (char *)malloc(sizeof(char) * threshold + 2000);
+			    malloc(sizeof(char) * threshold + 2000);
 		}
 		ns->client.read = 0;
 		ns->client.total_read = 0;
 		if(ns->client.headers == NULL) {
 			fprintf(stderr, "Initing 2..\n");
-			ns->client.headers = (flist_t *) malloc(sizeof(flist_t));
+			ns->client.headers = malloc(sizeof(flist_t));
 			flist_init(ns->client.headers);
 		}
 		ns->client.pkt_count = 0;
@@ -97,13 +93,13 @@ void tcp_callback(struct tcp_stream *ns, void **param)
 			ns->server_reassembly_limit = 0;
 		} else {
 			ns->server.reassembled_data =
-			    (char *)malloc(sizeof(char) * threshold + 2000);
+			    malloc(sizeof(char) * threshold + 2000);
 		}
 
 		ns->server.read = 0;
 		ns->server.total_read = 0;
 		if(ns->server.headers == NULL) {
-			ns->server.headers = (flist_t *) malloc(sizeof(flist_t));
+			ns->server.headers = malloc(sizeof(flist_t));
 			flist_init(ns->server.headers);
 		}
 		ns->server.pkt_count = 0;
@@ -290,7 +286,7 @@ static int cook_init(va_list vl, void *fu, struct anonflow *fl)
 	struct function *funct = (struct function *)fu;
 
 	// cooking data
-	struct cooking_data *data = (struct cooking_data *)malloc(sizeof(struct cooking_data));
+	struct cooking_data *data = malloc(sizeof(struct cooking_data));
 	tmp = va_arg(vl, int);	//threshold
 	data->threshold = tmp;
 
@@ -376,16 +372,14 @@ int cook_process(struct anonflow *flow, void *internal_data, unsigned char *dev_
 			headers->ts.tv_usec = pkt_head->ts.tv_usec;
 			if(from_client == 0) {
 				if(stream->client.headers == NULL) {
-					stream->client.headers =
-					    (flist_t *) malloc(sizeof(flist_t));
+					stream->client.headers = malloc(sizeof(flist_t));
 					flist_init(stream->client.headers);
 				}
 				flist_append(stream->client.headers, stream->client.pkt_count,
 					     (void *)headers);
 			} else {
 				if(stream->server.headers == NULL) {
-					stream->server.headers =
-					    (flist_t *) malloc(sizeof(flist_t));
+					stream->server.headers = malloc(sizeof(flist_t));
 					flist_init(stream->server.headers);
 				}
 				flist_append(stream->server.headers, stream->server.pkt_count,
@@ -422,14 +416,14 @@ int cook_process(struct anonflow *flow, void *internal_data, unsigned char *dev_
 
 		if(from_client == 0) {
 			if(stream->client.headers == NULL) {
-				stream->client.headers = (flist_t *) malloc(sizeof(flist_t));
+				stream->client.headers = malloc(sizeof(flist_t));
 				flist_init(stream->client.headers);
 			}
 			flist_append(stream->client.headers, stream->client.pkt_count,
 				     (void *)headers);
 		} else {
 			if(stream->server.headers == NULL) {
-				stream->server.headers = (flist_t *) malloc(sizeof(flist_t));
+				stream->server.headers = malloc(sizeof(flist_t));
 				flist_init(stream->server.headers);
 			}
 			flist_append(stream->server.headers, stream->server.pkt_count,
@@ -467,8 +461,7 @@ void create_mod_pkt(unsigned char *dev_pkt, struct anonflow *flow, anon_pkthdr_t
 
 	flow->mod_pkt = malloc(sizeof(char) * (flow->client_size + ether_len + ip_len + tcp_len));
 	if(flow->mod_pkt == NULL) {
-		//fprintf(stderr,"client size: %d\n",client_size);
-		assert(flow->mod_pkt != NULL);
+		exit(-1);
 	}
 	memcpy(flow->mod_pkt, eth, ether_len);
 	memcpy(&flow->mod_pkt[ether_len], ip, ip_len);
@@ -478,10 +471,9 @@ void create_mod_pkt(unsigned char *dev_pkt, struct anonflow *flow, anon_pkthdr_t
 	       flow->client_size);
 
 	//server packet
-	flow->server_mod_pkt =
-	    malloc(sizeof(char) * (flow->server_size + ether_len + ip_len + tcp_len));
+	flow->server_mod_pkt = malloc(sizeof(char) * (flow->server_size + ether_len + ip_len + tcp_len));
 	if(flow->server_mod_pkt == NULL) {
-		assert(flow->server_mod_pkt != NULL);
+		exit(-1);
 	}
 	memcpy(flow->server_mod_pkt, eth, ether_len);
 	memcpy(&flow->server_mod_pkt[ether_len], ip, ip_len);
