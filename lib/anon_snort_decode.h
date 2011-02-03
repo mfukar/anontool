@@ -503,17 +503,14 @@ struct ppp_header {
 #define EXTRACT_16BITS(p) ((u_short) ntohs (*(u_short *)(p)))
 
 #ifdef WORDS_MUSTALIGN
-
-#if defined(__GNUC__)
-/* force word-aligned ntohl parameter */
-    #define EXTRACT_32BITS(p)  ({ u_int32_t __tmp; memmove(&__tmp, (p), sizeof(u_int32_t)); (u_int32_t) ntohl(__tmp);})
-#endif /* __GNUC__ */
-
+	#if defined(__GNUC__)
+	/* force word-aligned ntohl parameter */
+		#define EXTRACT_32BITS(p) \
+		({ u_int32_t __tmp; memmove(&__tmp, (p), sizeof(u_int32_t)); (u_int32_t) ntohl(__tmp);})
+	#endif /* __GNUC__ */
 #else
-
-/* allows unaligned ntohl parameter - dies w/SIGBUS on SPARCs */
-    #define EXTRACT_32BITS(p) ((u_int32_t) ntohl (*(u_int32_t *)(p)))
-
+	/* allows unaligned ntohl parameter - dies w/SIGBUS on SPARCs */
+	#define EXTRACT_32BITS(p) ((u_int32_t) ntohl (*(u_int32_t *)(p)))
 #endif                /* WORDS_MUSTALIGN */
 
 /* packet status flags */

@@ -290,7 +290,7 @@ ip_options_compile(unsigned char *iph)
 
 eol:
   if (!pp_ptr)
-    if (!((struct options *) optholder)->srr)
+    if (!opt->srr)
       return 0;
 
 error:

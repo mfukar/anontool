@@ -325,7 +325,7 @@ static aes_context	ctx;
 
 void aes_init(unsigned char *key, unsigned int keylen)
 {
-	aes_set_key(&ctx, key, keylen);
+	aes_schedule_key(&ctx, key, keylen);
 
 	return;
 }
@@ -339,7 +339,7 @@ int aes_hash(unsigned char *field, int len, unsigned char *key,
 	int             index = 0;
 	int             rest, i;
 
-	aes_set_key(&ctx, key, keylen);
+	aes_schedule_key(&ctx, key, keylen);
 
 	while (index <= (len - 16)) {
 		aes_encrypt(&ctx, field + index, field + index);

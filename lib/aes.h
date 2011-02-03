@@ -11,7 +11,7 @@ typedef struct
 }
 aes_context;
 
-int  aes_set_key( aes_context *ctx, uint8_t *key, int nbits );
+int  aes_schedule_key( aes_context *ctx, uint8_t *key, int nbits );
 void aes_encrypt( aes_context *ctx, uint8_t input[16], uint8_t output[16] );
 void aes_decrypt( aes_context *ctx, uint8_t input[16], uint8_t output[16] );
 void aes_gen_tables( void );

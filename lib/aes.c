@@ -437,7 +437,7 @@ uint32_t          KT3[256];
 
 /* AES key scheduling routine */
 
-int aes_set_key(aes_context * ctx, uint8_t * key, int nbits)
+int aes_schedule_key(aes_context * ctx, uint8_t * key, int nbits)
 {
 	int             i;
 	uint32_t         *RK, *SK;

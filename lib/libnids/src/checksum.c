@@ -244,7 +244,8 @@ ip_compute_csum(u_short *addr, int len)
 u_short
 my_tcp_check(struct tcphdr *th, int len, u_int saddr, u_int daddr)
 {
-  int i, sum = 0;
+  int sum = 0;
+  unsigned int i = 0;
   struct psuedo_hdr hdr;
   
   hdr.saddr = saddr;
@@ -260,7 +261,8 @@ my_tcp_check(struct tcphdr *th, int len, u_int saddr, u_int daddr)
 u_short
 my_udp_check(void *u, int len, u_int saddr, u_int daddr)
 {
-  int i, sum = 0;
+  int sum = 0;
+  unsigned int i = 0;
   struct psuedo_hdr hdr;
   
   hdr.saddr = saddr;

@@ -2073,10 +2073,9 @@ int padDecrypt(const UINT8 * input, int inputOctets, UINT8 * outBuffer)
 	return 16 * numBlocks - padLen;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ALGORITHM
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
+ * Key scheduling algorithm
+ */
 void keySched(UINT8 key[_MAX_KEY_COLUMNS][4])
 {
 	int             j, rconpointer = 0;
@@ -2371,7 +2370,7 @@ UINT32 anonymize(const UINT32 orig_addr)
 	return result ^ orig_addr;
 }
 
-int             inited = 0;
+static int initialized = 0;
 
 void prefix_preserving_anonymize_field(unsigned char *raw_addr)
 {
@@ -2382,9 +2381,9 @@ void prefix_preserving_anonymize_field(unsigned char *raw_addr)
 	unsigned int    anonymized_addr;
 	unsigned char   p, *an;
 
-	if (!inited) {
+	if (!initialized) {
 		PAnonymizer(my_key);
-		inited = 1;
+		initialized = 1;
 	}
 
 	p = raw_addr[0];

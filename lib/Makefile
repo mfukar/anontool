@@ -96,6 +96,6 @@ util.o: util.c util.h
 	gcc $(CFLAGS) -std=c99 -c $<
 
 clean:
-	cd libnids && make clean
+	cd libnids && make distclean
 	if [ -h libnids.so ]; then unlink libnids.so; fi
 	rm -f *.o *.so *~ $(TARGETS)

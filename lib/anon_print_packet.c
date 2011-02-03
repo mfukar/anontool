@@ -1,13 +1,15 @@
 #include <stdio.h>
-#include <sys/types.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <time.h>
 #include <ctype.h>
+
 #include "anonymization.h"
 
 #define TIMEBUF_SIZE 26
@@ -37,7 +39,11 @@ void PrintTcpOptions(FILE * fp, anonpacket * p)
 {
 	int             i;
 	int             j;
-	u_char          tmp[5];
+	union {
+		u_char          tmp_char[5];
+		uint16_t	tmp_short;
+		uint32_t	tmp_long;
+	} tmp;
 	u_long          init_offset;
 	u_long          print_offset;
 
@@ -58,10 +64,10 @@ void PrintTcpOptions(FILE * fp, anonpacket * p)
 
 		switch (p->tcp_options[i].code) {
 		case TCPOPT_MAXSEG:
-			bzero((char *)tmp, 5);
+			memset(tmp.tmp_char, 0, sizeof tmp.tmp_char);
 			fwrite("MSS: ", 5, 1, fp);
-			memcpy(tmp, p->tcp_options[i].data, 2);
-			fprintf(fp, "%u ", EXTRACT_16BITS(tmp));
+			memcpy(tmp.tmp_char, p->tcp_options[i].data, 2);
+			fprintf(fp, "%u ", EXTRACT_16BITS(&tmp.tmp_short));
 			break;
 
 		case TCPOPT_EOL:
@@ -77,12 +83,12 @@ void PrintTcpOptions(FILE * fp, anonpacket * p)
 			break;
 
 		case TCPOPT_SACK:
-			bzero((char *)tmp, 5);
-			memcpy(tmp, p->tcp_options[i].data, 2);
-			fprintf(fp, "Sack: %u@", EXTRACT_16BITS(tmp));
-			bzero((char *)tmp, 5);
-			memcpy(tmp, (p->tcp_options[i].data) + 2, 2);
-			fprintf(fp, "%u ", EXTRACT_16BITS(tmp));
+			memset(tmp.tmp_char, 0, sizeof tmp.tmp_char);
+			memcpy(tmp.tmp_char, p->tcp_options[i].data, 2);
+			fprintf(fp, "Sack: %u@", EXTRACT_16BITS(&tmp.tmp_short));
+			memset(tmp.tmp_char, 0, sizeof tmp.tmp_char);
+			memcpy(tmp.tmp_char, (p->tcp_options[i].data) + 2, 2);
+			fprintf(fp, "%u ", EXTRACT_16BITS(&tmp.tmp_short));
 			break;
 
 		case TCPOPT_SACKOK:
@@ -90,42 +96,43 @@ void PrintTcpOptions(FILE * fp, anonpacket * p)
 			break;
 
 		case TCPOPT_ECHO:
-			bzero((char *)tmp, 5);
-			memcpy(tmp, p->tcp_options[i].data, 4);
-			fprintf(fp, "Echo: %u ", EXTRACT_32BITS(tmp));
+			memset(tmp.tmp_char, 0, sizeof tmp.tmp_char);
+			memcpy(tmp.tmp_char, p->tcp_options[i].data, 4);
+			fprintf(fp, "Echo: %u ", EXTRACT_32BITS(&tmp.tmp_long));
 			break;
 
 		case TCPOPT_ECHOREPLY:
-			bzero((char *)tmp, 5);
-			memcpy(tmp, p->tcp_options[i].data, 4);
-			fprintf(fp, "Echo Rep: %u ", EXTRACT_32BITS(tmp));
+			memset(tmp.tmp_char, 0, sizeof tmp.tmp_char);
+			memcpy(tmp.tmp_char, p->tcp_options[i].data, 4);
+			fprintf(fp, "Echo Rep: %u ", EXTRACT_32BITS(&tmp.tmp_long));
 			break;
 
 		case TCPOPT_TIMESTAMP:
-			bzero((char *)tmp, 5);
-			memcpy(tmp, p->tcp_options[i].data, 4);
-			fprintf(fp, "TS: %u ", EXTRACT_32BITS(tmp));
-			bzero((char *)tmp, 5);
-			memcpy(tmp, (p->tcp_options[i].data) + 4, 4);
-			fprintf(fp, "%u ", EXTRACT_32BITS(tmp));
+			memset(tmp.tmp_char, 0, sizeof tmp.tmp_char);
+			memcpy(tmp.tmp_char, p->tcp_options[i].data, 4);
+			fprintf(fp, "TS: %u ", EXTRACT_32BITS(&tmp.tmp_long));
+
+			memset(tmp.tmp_char, 0, sizeof tmp.tmp_char);
+			memcpy(tmp.tmp_char, (p->tcp_options[i].data) + 4, 4);
+			fprintf(fp, "%u ", EXTRACT_32BITS(&tmp.tmp_long));
 			break;
 
 		case TCPOPT_CC:
-			bzero((char *)tmp, 5);
-			memcpy(tmp, p->tcp_options[i].data, 4);
-			fprintf(fp, "CC %u ", EXTRACT_32BITS(tmp));
+			memset(tmp.tmp_char, 0, sizeof tmp.tmp_char);
+			memcpy(tmp.tmp_char, p->tcp_options[i].data, 4);
+			fprintf(fp, "CC %u ", EXTRACT_32BITS(&tmp.tmp_long));
 			break;
 
 		case TCPOPT_CCNEW:
-			bzero((char *)tmp, 5);
-			memcpy(tmp, p->tcp_options[i].data, 4);
-			fprintf(fp, "CCNEW: %u ", EXTRACT_32BITS(tmp));
+			memset(tmp.tmp_char, 0, sizeof tmp.tmp_char);
+			memcpy(tmp.tmp_char, p->tcp_options[i].data, 4);
+			fprintf(fp, "CCNEW: %u ", EXTRACT_32BITS(&tmp.tmp_long));
 			break;
 
 		case TCPOPT_CCECHO:
-			bzero((char *)tmp, 5);
-			memcpy(tmp, p->tcp_options[i].data, 4);
-			fprintf(fp, "CCECHO: %u ", EXTRACT_32BITS(tmp));
+			memset(tmp.tmp_char, 0, sizeof tmp.tmp_char);
+			memcpy(tmp.tmp_char, p->tcp_options[i].data, 4);
+			fprintf(fp, "CCECHO: %u ", EXTRACT_32BITS(&tmp.tmp_long));
 			break;
 
 		default:

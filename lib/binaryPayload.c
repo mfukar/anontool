@@ -18,6 +18,7 @@
  * negligence or other tortious action, arising out of or in connection with the
  * use or performance of this software.
  */
+#include <arpa/inet.h>
 
 #include "anonymization.h"
 
@@ -114,7 +115,7 @@ int binaryGenericXORInit()
 
 	if ((regexpIPAddress =
 	     pcre_compile
-	     ("(\[0-9]{1,3})[\.](\[0-9]{1,3})[\.](\[0-9]{1,3})[\.](\[0-9]{1,3})",
+	     ("([0-9]{1,3})[\\.]([0-9]{1,3})[\\.]([0-9]{1,3})[\\.]([0-9]{1,3})",
 	      PCRE_DOTALL, &pcreError, (int *)&pcreErrorPos, 0)) == NULL) {
 		fprintf(stderr,
 			"binaryInit() could not compile pattern for IP Address Error:\"%s\" at Position %u",
@@ -125,7 +126,7 @@ int binaryGenericXORInit()
 	 * URL regexp
 	 * this may need to be checked and updated from time to time.
 	 */
-	if ((regexpURL = pcre_compile(".((ht|f)tp(s?))\://([0-9a-zA-Z\-]+\.)+[a-zA-Z]{2,6}(/\S*)?",	//(\:[0-9]+)?(/\S*)?",
+	if ((regexpURL = pcre_compile(".((ht|f)tp(s?))\\://([0-9a-zA-Z\\-]+\\.)+[a-zA-Z]{2,6}(/\\S*)?",
 				      PCRE_DOTALL, &pcreError, (int *)&pcreErrorPos, 0)) == NULL) {
 		fprintf(stderr,
 			"binaryInit() could not compile pattern for URL Error:\"%s\" at Position %u",
@@ -255,8 +256,6 @@ int binaryGenericXORDecode(anonpacket * packet, struct anonflow *flow, XORPayloa
 			memcpy(decodedMessage, match, totalsize);
 			pcre_free_substring(match);
 
-			//logInfo ("Detected generic XOR decoder %s size length has %d bytes, size is %d, totalsize %d.\n", (*context)->m_Name.c_str (), codesizeLen, codesize, totalsize);
-
 			switch (keysize) {
 			case 1:
 				if (codesize > totalsize)
@@ -359,7 +358,6 @@ binaryGenericWgetDecode(anonpacket * packet, struct anonflow *flow, struct gener
 		       (int *)piOutput, sizeof(piOutput) / sizeof(int32_t))) > 0) {
 
 		pcre_get_substring((char *)shellcode, (int *)piOutput, (int)iResult, 1, &pUrl);
-//              fprintf(stderr, "Detected generic wget Shellcode: \"%s\"\n", pUrl);
 		htmlenc = strdup(pUrl);
 
 		pcre_free_substring(pUrl);
@@ -374,7 +372,6 @@ binaryGenericWgetDecode(anonpacket * packet, struct anonflow *flow, struct gener
 					memcpy(num, &htmlenc[i + 1], 2);	//htmlenc.substr(i+1,2);
 
 					thisbyte = (char)strtol(num, NULL, 16);
-//                                      printf("decoding %s -> %x\n",num.c_str(),(int)thisbyte);
 					i += 2;
 					htmldec = realloc(htmldec, ++declen);	// htmldec += thisbyte;
 					htmldec[declen - 1] = thisbyte;
@@ -421,7 +418,7 @@ binaryGenericWgetDecode(anonpacket * packet, struct anonflow *flow, struct gener
 */
 		for (i = 0; i < strlen(url); i++) {
 			if (isprint(url[i]) == 0) {
-				fprintf(stderr, "wget url contained unprintable chars \n");
+				fprintf(stderr, "wget url contained unprintable chars\n");
 				return (-1);
 			}
 		}
@@ -558,7 +555,8 @@ int binaryStuttgartDecode(anonpacket * packet, struct anonflow *flow, stuttgartL
 	     pcre_exec(stuttgartPattern, 0, (char *)shellcode, len, 0, 0,
 		       (int *)ovec, sizeof(ovec) / sizeof(int32_t))) > 0) {
 		uint16_t        netPort, port;
-		uint32_t        address;
+		char		ipv4_addr_str[INET_ADDRSTRLEN] = {0};
+		struct in_addr	address;
 		const char     *match;
 		unsigned char   authKey[4];
 
@@ -580,7 +578,7 @@ int binaryStuttgartDecode(anonpacket * packet, struct anonflow *flow, stuttgartL
 
 		fprintf(stderr,
 			"Link (from stuttgart-shellcode) host found [%s:%d, key 0x%02x%02x%02x%02x.]\n",
-			inet_ntoa(*(struct in_addr *)&address), port,
+			inet_ntop(AF_INET, &address, ipv4_addr_str, INET_ADDRSTRLEN), port,
 			authKey[0], authKey[1], authKey[2], authKey[3]);
 
 		return (0);

@@ -601,8 +601,8 @@ anonymize_field(int protocol, int field, int function, anonpacket * packet,
 {
 	unsigned char  *field_pointer = NULL;
 	unsigned char  *header_pointer = NULL;
-	unsigned int    len, header_len;
-	//int helper
+	unsigned int    len = 0, header_len = 0;
+
 	int             i;
 	unsigned char   DES3_keys[24] =
 	    { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x23, 0x45,

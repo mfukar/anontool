@@ -26,14 +26,12 @@ unsigned int in_cksum(u_int16_t * addr, int len)
 unsigned short calculate_tcp_sum(anonpacket * p)
 {
 	unsigned int    sum;
-	unsigned char   backup;
+	unsigned char   backup = 0;
 	short           padding = 0;
 
 	int             len;
-//                      int ip_hlen=IP2_HLEN(p->iph) << 2;
 
 	len = ntohs(p->iph->ip_len) - sizeof(IPHdr) - p->ip_options_len;
-	//fprintf(stderr,"len: %d (<%d) (%d-%d-%d)\n",len,ntohs(len),ntohs(p->iph->ip_len),sizeof(IPHdr),p->ip_options_len);
 
 	if (len % 2 == 1) {
 		backup = ((unsigned char *)p->tcph)[len];

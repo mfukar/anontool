@@ -136,7 +136,7 @@ extern void     wrap_ppacket(unsigned char *, const struct pcap_pkthdr *,
 
 void process_nic_data()
 {
-	unsigned char  *packet;
+	unsigned char  *packet = NULL;
 
 	if (pkt_handler == NULL)
 		return;

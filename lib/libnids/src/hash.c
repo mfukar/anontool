@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -15,8 +16,8 @@ getrnd ()
   int fd = open ("/dev/urandom", O_RDONLY);
   if (fd > 0)
     {
-      read (fd, xor, 12);
-      read (fd, perm, 12);
+      if(read (fd, xor, 12) < 0) exit(-1);
+      if(read (fd, perm, 12) < 0) exit(-1);
       close (fd);
       return;
     }
@@ -51,17 +52,17 @@ init_hash ()
     }
 }
 
-u_int
-mkhash (u_int src, u_short sport, u_int dest, u_short dport)
+u_int mkhash (u_int src, u_short sport, u_int dest, u_short dport)
 {
-  u_int res = 0;
-  int i;
-  u_char data[12];
-  *(u_int *) (data) = src;
-  *(u_int *) (data + 4) = dest;
-  *(u_short *) (data + 8) = sport;
-  *(u_short *) (data + 10) = dport;
-  for (i = 0; i < 12; i++)
-    res = ( (res << 8) + (data[perm[i]] ^ xor[i])) % 0xff100f;
-  return res;
+	u_int res = 0;
+	int i;
+	u_char data[12];
+	
+	memcpy(data, &src, sizeof src);
+	memcpy(data + 4, &dest, sizeof dest);
+	memcpy(data + 8, &sport, sizeof sport);
+	memcpy(data + 10, &dport, sizeof dport);
+	for (i = 0; i < 12; i++)
+		res = ( (res << 8) + (data[perm[i]] ^ xor[i])) % 0xff100f;
+	return res;
 }
