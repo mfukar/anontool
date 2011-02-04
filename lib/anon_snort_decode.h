@@ -807,7 +807,9 @@ typedef struct _IPHdr
 
 
 /*
- * IPv6 common header
+ * IPv6 common header [RFC 2460]
+ *
+ * thanks to all the folks at libpcap/tcpdump. You guys rule.
  */
 typedef struct {
 	union {
@@ -834,9 +836,73 @@ typedef struct {
 #define ipv6_next	ipv6_ctlunion.un.ip6_un_next
 #define ipv6_hlim	ipv6_ctlunion.un.ip6_un_hlim
 
+/*  */
 #define IPv6_VER(ipv6h) (((ipv6h)->ipv6_vfc & 0xf0) >> 4)
 #define IPv6_TCL(ipv6h) (((ipv6h)->ipv6_flow & 0x0ff00000) >> 20)
-#define IPv6_FLOW(ipv6h) ((ipv6h)->ipv6_flow & 0x000fffff)
+
+#define IPv6_FLOW_LABEL(ipv6h) ((ipv6h)->ipv6_flow & 0x000fffff)
+
+/*
+ * IPv6 options TLV
+ */
+typedef struct {
+	uint8_t ipv6_opt_type;
+	uint8_t ipv6_opt_len;
+} ipv6_options;
+
+
+/*
+ * IPv6 hop-by-hop options header
+ */
+typedef struct {
+	uint8_t ipv6_next;
+	uint8_t ipv6_len;
+	ipv6_options *opts;
+} ipv6_hbh;
+
+/*
+ * IPv6 destination options header
+ */
+typedef struct {
+	uint8_t ipv6_next;
+	uint8_t ipv6_len;
+	ipv6_options *opts;
+} ipv6_dest;
+
+/*
+ * IPv6 routing header
+ */
+typedef struct {
+	uint8_t ipv6_next;
+	uint8_t ipv6_len;
+	uint8_t ipv6_type;
+	uint8_t ipv6_segleft;
+	/* XXX +routing specific data.. */
+} ipv6_rthdr;
+
+/*
+ * IPv6 type 0 routing header
+ */
+typedef struct {
+	uint8_t ipv6_next,
+		ipv6_len,
+		ipv6_type,
+		ipv6_segleft,
+		ipv6_reserved,
+		ipv6_slmap[3];
+	uint8_t	*ipv6_src[16];
+} ipv6_rthdr0;
+
+/*
+ * IPv6 fragment header
+ */
+typedef struct {
+	uint8_t  ipv6_next,
+		 ipv6_reserved;
+	uint16_t ipv6_offlg;
+	uint32_t ipv6_ident;
+} ipv6_frag;
+
 
 /* Can't add any fields not in the real header here 
    because of how the decoder uses structure overlaying */
