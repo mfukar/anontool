@@ -33,11 +33,9 @@
 #if defined(WIN32) && !defined(IFNAMSIZ)
 #include "libnet/IPExport.h"
 #define IFNAMESIZ MAX_ADAPTER_NAME
-#endif /* WIN#@ && !IFNAMSIZ */
-//#include "ubi_SplayTree.h"
+#endif /* WIN32 && !IFNAMSIZ */
 
-
-/*  D E F I N E S  ************************************************************/
+/* DEFINITIONS */
 #define ETHERNET_MTU                  1500
 #define ETHERNET_TYPE_IP              0x0800
 #define ETHERNET_TYPE_ARP             0x0806
@@ -319,7 +317,7 @@ struct ppp_header {
 #define AC                  0x10
 #define LLC_FRAME           0x40
 
-#define TRMTU                      2000    /* 2000 bytes            */
+#define TRMTU                      2000    /* 2000 bytes */
 #define TR_RII                     0x80
 #define TR_RCF_DIR_BIT             0x80
 #define TR_RCF_LEN_MASK            0x1f00
@@ -808,6 +806,38 @@ typedef struct _IPHdr
 #endif
 
 
+/*
+ * IPv6 common header
+ */
+typedef struct {
+	union {
+		struct {
+			/*
+			 * version - 4 bits
+			 * traffic class - 8 bits
+			 * flow label - 20 bits
+			 */
+			uint32_t	ip6_un_flow;
+			uint16_t	ip6_un_plen;
+			uint8_t		ip6_un_next,
+					ip6_un_hlim;
+		} un;
+		uint8_t			ip6_un_vfc;
+	} ipv6_ctlunion;
+	uint8_t		ipv6_src[16];
+	uint8_t		ipv6_dst[16];
+} IPv6Hdr;
+
+#define ipv6_vfc	ipv6_ctlunion.ip6_un_vfc
+#define ipv6_flow	ipv6_ctlunion.un.ip6_un_flow
+#define ipv6_plen	ipv6_ctlunion.un.ip6_un_plen
+#define ipv6_next	ipv6_ctlunion.un.ip6_un_next
+#define ipv6_hlim	ipv6_ctlunion.un.ip6_un_hlim
+
+#define IPv6_VER(ipv6h) (((ipv6h)->ipv6_vfc & 0xf0) >> 4)
+#define IPv6_TCL(ipv6h) (((ipv6h)->ipv6_flow & 0x0ff00000) >> 20)
+#define IPv6_FLOW(ipv6h) ((ipv6h)->ipv6_flow & 0x000fffff)
+
 /* Can't add any fields not in the real header here 
    because of how the decoder uses structure overlaying */
 #ifdef WIN32
@@ -984,7 +1014,6 @@ typedef struct _ARPHdr
 }       ARPHdr;
 
 
-
 typedef struct _EtherARP
 {
     ARPHdr ea_hdr;      /* fixed-size header */
@@ -1155,14 +1184,5 @@ typedef struct _DecoderFlags
 } DecoderFlags;
 
 #define        ALERTMSG_LENGTH 256
-
-/* XXX not sure where this guy needs to live at the moment */
-typedef struct _PortList
-{
-    int ports[32];   /* 32 is kind of arbitrary */
-
-    int num_entries;
-
-} PortList;
 
 #endif                /* __DECODE_H__ */

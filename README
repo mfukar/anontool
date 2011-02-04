@@ -69,3 +69,5 @@ TODO
     being added constantly in mind, so it follows a very simple modular
     architecture to allow this without requiring
     extensive knowledge of the code, ie. you can also do it yourself.
+
+    A more detailed list is in the file TODO (duh).

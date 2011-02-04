@@ -17,14 +17,12 @@
   a non-PIC version and see what happens. (WTB TIME)
 
 * Configurable keys for AES/3DES (prefix-preserving anon)
-	- Implement in anonymization_functions.c
-	- Move the call to aes_set_key()/des3_set_3keys() to an appropriate spot, to only
-	  be called once.
-	- aes_init() -> update key in anonflow & call aes_set_key()
 	- If the recent attacks on 10-round 256-bit AES get any better, we might have to
 	  at least emit some warning?
 
 * Add support for SCTP (primarily for IPFIX transport), GRE, L2TP, GTP, etc.
+
+* Implement IPv6 and IPX decoding.
 
 * Implement some metric of assessing the achieved anonymization levels
 depending on the functions/parameters used. Bibliography?
