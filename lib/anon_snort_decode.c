@@ -40,7 +40,7 @@ void DecodeEthPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt
 	unsigned int    pkt_len;	/* suprisingly, the length of the packet */
 	unsigned int    cap_len;	/* caplen value */
 
-	bzero((char *)p, sizeof(anonpacket));
+	memset(p, 0, sizeof(*p));
 
 	p->pkth = pkthdr;
 	p->pkt = pkt;
@@ -113,7 +113,7 @@ void DecodeIEEE80211Pkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned cha
 	unsigned int    pkt_len;	/* suprisingly, the length of the packet */
 	unsigned int    cap_len;	/* caplen value */
 
-	bzero((char *)p, sizeof(anonpacket));
+	memset(p, 0, sizeof(*p));
 
 	p->pkth = pkthdr;
 	p->pkt = pkt;
@@ -278,7 +278,7 @@ void DecodeNullPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pk
 	unsigned int    len;
 	unsigned int    cap_len;
 
-	bzero((char *)p, sizeof(anonpacket));
+	memset(p, 0, sizeof(*p));
 
 	p->pkth = pkthdr;
 	p->pkt = pkt;
@@ -312,7 +312,7 @@ void DecodeTRPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt,
 	unsigned int    cap_len;	/* caplen value */
 	unsigned int    dataoff;	/* data offset is variable here */
 
-	bzero((char *)p, sizeof(anonpacket));
+	memset(p, 0, sizeof(*p));
 
 	p->pkth = pkthdr;
 	p->pkt = pkt;
@@ -420,7 +420,7 @@ void DecodeFDDIPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pk
 	unsigned int    cap_len;	/* capture length variable */
 	unsigned int    dataoff;	/* data offset is variable here */
 
-	bzero((char *)p, sizeof(anonpacket));
+	memset(p, 0, sizeof(*p));
 
 	p->pkth = pkthdr;
 	p->pkt = pkt;
@@ -506,7 +506,7 @@ void DecodeLinuxSLLPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char
 	unsigned int    pkt_len;	/* the length of the packet */
 	unsigned int    cap_len;	/* caplen value */
 
-	bzero((char *)p, sizeof(anonpacket));
+	memset(p, 0, sizeof(*p));
 
 	p->pkth = pkthdr;
 	p->pkt = pkt;
@@ -580,7 +580,7 @@ void DecodePflog(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt,
 	unsigned int    pkt_len;	/* suprisingly, the length of the packet */
 	unsigned int    cap_len;	/* caplen value */
 
-	bzero((char *)p, sizeof(anonpacket));
+	memset(p, 0, sizeof(*p));
 
 	p->pkth = pkthdr;
 	p->pkt = pkt;
@@ -645,14 +645,7 @@ void DecodePPPoEPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *p
 	PPPoE_Tag      *ppppoe_tag = 0;
 	PPPoE_Tag       tag;	/* needed to avoid alignment problems */
 
-/*
-#ifdef DEBUG
-    char *buf;
-    int i;
-#endif
-*/
-
-	bzero((char *)p, sizeof(anonpacket));
+	memset(p, 0, sizeof(*p));
 
 	p->pkth = pkthdr;
 	p->pkt = pkt;
@@ -722,12 +715,11 @@ void DecodePPPoEPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *p
  */
 void DecodePppPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-//    static int had_vj = 0;
 	unsigned int    len;
 	unsigned int    cap_len;
 	struct ppp_header *ppphdr;
 
-	bzero((char *)p, sizeof(anonpacket));
+	memset(p, 0, sizeof(*p));
 
 	p->pkth = pkthdr;
 	p->pkt = pkt;
@@ -785,7 +777,7 @@ void DecodeSlipPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pk
 	unsigned int    len;
 	unsigned int    cap_len;
 
-	bzero((char *)p, sizeof(anonpacket));
+	memset(p, 0, sizeof(*p));
 
 	p->pkth = pkthdr;
 	p->pkt = pkt;
@@ -817,7 +809,7 @@ void DecodeSlipPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pk
  */
 void DecodeRawPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-	bzero((char *)p, sizeof(anonpacket));
+	memset(p, 0, sizeof(*p));
 
 	p->pkth = pkthdr;
 	p->pkt = pkt;
@@ -843,7 +835,7 @@ void DecodeRawPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt
  */
 void DecodeI4LRawIPPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-	bzero((char *)p, sizeof(anonpacket));
+	memset(p, 0, sizeof(*p));
 
 	p->pkth = pkthdr;
 	p->pkt = pkt;
@@ -871,7 +863,7 @@ void DecodeI4LRawIPPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char
 void DecodeI4LCiscoIPPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt,
 			 int snaplen)
 {
-	bzero((char *)p, sizeof(anonpacket));
+	memset(p, 0, sizeof(*p));
 
 	p->pkth = pkthdr;
 	p->pkt = pkt;

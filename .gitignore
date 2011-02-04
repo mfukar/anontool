@@ -1,4 +1,6 @@
 # Editor drops
+tags
+cscope.out
 *.swp
 *~
 

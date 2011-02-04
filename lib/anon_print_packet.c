@@ -192,11 +192,10 @@ void PrintIPPkt(FILE * fp, int type, anonpacket * p)
 	}
 
 	if (!p) {
-		printf("PACKET=NULLLLLLLLLLLLLLLLL\n");
 		return;
 	}
 
-	bzero((char *)timestamp, TIMEBUF_SIZE);
+	memset(timestamp, 0, sizeof(timestamp) / sizeof(timestamp[0]));
 	ts_print((struct timeval *)&p->pkth->ts, timestamp);
 
 	/* dump the timestamp */
@@ -360,7 +359,7 @@ void PrintICMPHeader(FILE * fp, anonpacket * p)
 			anonpacket     *orig_p;
 			int             orig_iph_size;
 
-			bzero((char *)&op, sizeof(Packet));
+			memset(&op, 0, sizeof(op));
 			orig_p = &op;
 			orig_p->iph = p->orig_iph;
 			orig_p->tcph = p->orig_tcph;
@@ -442,7 +441,7 @@ void PrintICMPHeader(FILE * fp, anonpacket * p)
 			anonpacket     *orig_p;
 			int             orig_iph_size;
 
-			bzero((char *)&op, sizeof(Packet));
+			memset(&op, 0, sizeof(op));
 			orig_p = &op;
 
 			orig_p->iph = p->orig_iph;
@@ -956,7 +955,6 @@ void ts_print(register const struct timeval *tvp, char *timebuf)
 {
 	register int    s;
 	struct timeval  tv;
-	struct timezone tz;
 	struct tm      *lt;	/* place to stick the adjusted clock data */
 	int             thiszone;
 
@@ -964,9 +962,7 @@ void ts_print(register const struct timeval *tvp, char *timebuf)
 
 	/* if null was passed, we use current time */
 	if (!tvp) {
-		/* manual page (for linux) says tz is never used, so.. */
-		bzero((char *)&tz, sizeof(tz));
-		gettimeofday(&tv, &tz);
+		gettimeofday(&tv, NULL);
 		tvp = &tv;
 	}
 	lt = gmtime((time_t *) & tvp->tv_sec);
@@ -987,8 +983,8 @@ void PrintArpHeader(FILE * fp, anonpacket * p)
 	u_int8_t       *mac_src = NULL;
 	u_int8_t       *mac_dst = NULL;
 
-	bzero((struct in_addr *)&ip_addr, sizeof(struct in_addr));
-	bzero((char *)timestamp, TIMEBUF_SIZE);
+	memset(&ip_addr, 0, sizeof(ip_addr));
+	memset(timestamp, 0, sizeof(timestamp)/sizeof(timestamp[0]));
 	ts_print((struct timeval *)&p->pkth->ts, timestamp);
 
 	/* determine what to use as MAC src and dst */
@@ -1128,7 +1124,7 @@ void PrintWifiPkt(FILE * fp, anonpacket * p, int datalink)
 {
 	char            timestamp[TIMEBUF_SIZE];
 
-	bzero((char *)timestamp, TIMEBUF_SIZE);
+	memset(timestamp, 0, sizeof(timestamp)/sizeof(timestamp[0]));
 	ts_print((struct timeval *)&p->pkth->ts, timestamp);
 
 	/* dump the timestamp */
@@ -1423,7 +1419,7 @@ void PrintEapolPkt(FILE * fp, anonpacket * p, int datalink)
 {
 	char            timestamp[TIMEBUF_SIZE];
 
-	bzero((char *)timestamp, TIMEBUF_SIZE);
+	memset(timestamp, 0, sizeof(timestamp)/sizeof(timestamp[0]));
 	ts_print((struct timeval *)&p->pkth->ts, timestamp);
 
 	/* dump the timestamp */
