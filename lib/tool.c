@@ -26,6 +26,7 @@
 #include <netinet/in.h>
 #include <pcap.h>
 #include <stdarg.h>
+
 #include "anonymization.h"
 #include "internal.h"
 #include "pcap_input.h"

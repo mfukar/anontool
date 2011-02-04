@@ -895,8 +895,8 @@ typedef struct {
  * IPv6 hop-by-hop options header
  */
 typedef struct {
-	uint8_t ipv6_hbh_next;
-	uint8_t ipv6_hbh_len;
+	uint8_t ipv6_hbh_next,
+		ipv6_hbh_len;
 	ipv6_options *opts;
 } ipv6_hbh;
 
