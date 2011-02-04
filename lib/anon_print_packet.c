@@ -195,7 +195,7 @@ void PrintIPPkt(FILE * fp, int type, anonpacket * p)
 		return;
 	}
 
-	memset(timestamp, 0, sizeof(timestamp) / sizeof(timestamp[0]));
+	memset(timestamp, 0, sizeof(timestamp));
 	ts_print((struct timeval *)&p->pkth->ts, timestamp);
 
 	/* dump the timestamp */
@@ -984,7 +984,7 @@ void PrintArpHeader(FILE * fp, anonpacket * p)
 	u_int8_t       *mac_dst = NULL;
 
 	memset(&ip_addr, 0, sizeof(ip_addr));
-	memset(timestamp, 0, sizeof(timestamp)/sizeof(timestamp[0]));
+	memset(timestamp, 0, sizeof(timestamp));
 	ts_print((struct timeval *)&p->pkth->ts, timestamp);
 
 	/* determine what to use as MAC src and dst */
@@ -1124,7 +1124,7 @@ void PrintWifiPkt(FILE * fp, anonpacket * p, int datalink)
 {
 	char            timestamp[TIMEBUF_SIZE];
 
-	memset(timestamp, 0, sizeof(timestamp)/sizeof(timestamp[0]));
+	memset(timestamp, 0, sizeof(timestamp));
 	ts_print((struct timeval *)&p->pkth->ts, timestamp);
 
 	/* dump the timestamp */
@@ -1419,7 +1419,7 @@ void PrintEapolPkt(FILE * fp, anonpacket * p, int datalink)
 {
 	char            timestamp[TIMEBUF_SIZE];
 
-	memset(timestamp, 0, sizeof(timestamp)/sizeof(timestamp[0]));
+	memset(timestamp, 0, sizeof(timestamp));
 	ts_print((struct timeval *)&p->pkth->ts, timestamp);
 
 	/* dump the timestamp */
