@@ -850,6 +850,46 @@ typedef struct {
 	uint8_t ipv6_opt_len;
 } ipv6_options;
 
+/*
+ * IPv6 jumbo payload option
+ */
+typedef struct {
+	uint8_t ipv6_oj_type,
+		ipv6_oj_len,
+		ipv6_oj_jumbolen[4]
+} ipv6_options_jumbo;
+#define IPV6_OPT_JUMBO_LEN 6
+
+/*
+ * IPv6 NSAP address option
+ */
+typedef struct {
+	uint8_t ipv6_on_type,
+		ipv6_on_len,
+		ipv6_on_src_len,
+		ipv6_on_dst_len;
+	/* followed by source NSAP,
+	 * and destination NSAP
+	 */
+} ipv6_options_nsap;
+
+/*
+ * IPv6 Tunnel Limit option
+ */
+typedef struct {
+	uint8_t ipv6_ot_type,
+		ipv6_ot_len,
+		ipv6_ot_encap_limit;
+} ipv6_options_tunnel;
+
+/*
+ * IPv6 Router Alert option
+ */
+typedef struct {
+	uint8_t ipv6_or_type,
+		ipv6_or_len,
+		ipv6_or_value[2];
+} ipv6_options_router;
 
 /*
  * IPv6 hop-by-hop options header
@@ -869,6 +909,33 @@ typedef struct {
 	ipv6_options *opts;
 } ipv6_dest;
 
+/* Option types and related macros */
+#define IP6OPT_PAD1		0x00	/* 00 0 00000 */
+#define IP6OPT_PADN		0x01	/* 00 0 00001 */
+#define IP6OPT_JUMBO		0xC2	/* 11 0 00010 = 194 */
+#define IP6OPT_JUMBO_LEN	6
+#define IP6OPT_ROUTER_ALERT	0x05	/* 00 0 00101 */
+
+#define IP6OPT_RTALERT_LEN	4
+#define IP6OPT_RTALERT_MLD	0	/* Datagram contains an MLD message */
+#define IP6OPT_RTALERT_RSVP	1	/* Datagram contains an RSVP message */
+#define IP6OPT_RTALERT_ACTNET	2 	/* contains an Active Networks msg */
+#define IP6OPT_MINLEN		2
+
+#define IP6OPT_BINDING_UPDATE	0xc6	/* 11 0 00110 */
+#define IP6OPT_BINDING_ACK	0x07	/* 00 0 00111 */
+#define IP6OPT_BINDING_REQ	0x08	/* 00 0 01000 */
+#define IP6OPT_HOME_ADDRESS	0xc9	/* 11 0 01001 */
+#define IP6OPT_EID		0x8a	/* 10 0 01010 */
+
+#define IP6OPT_TYPE(o)		((o) & 0xC0)
+#define IP6OPT_TYPE_SKIP	0x00
+#define IP6OPT_TYPE_DISCARD	0x40
+#define IP6OPT_TYPE_FORCEICMP	0x80
+#define IP6OPT_TYPE_ICMP	0xC0
+
+#define IP6OPT_MUTABLE		0x20
+
 /*
  * IPv6 routing header
  */
@@ -877,7 +944,7 @@ typedef struct {
 	uint8_t ipv6_len;
 	uint8_t ipv6_type;
 	uint8_t ipv6_segleft;
-	/* XXX +routing specific data.. */
+	/* TODO +routing specific data.. */
 } ipv6_rthdr;
 
 /*
@@ -902,6 +969,11 @@ typedef struct {
 	uint16_t ipv6_offlg;
 	uint32_t ipv6_ident;
 } ipv6_frag;
+
+#define IP6F_OFF_MASK		0xfff8	/* mask of offset bits   in ipv6_offlg */
+#define IP6F_RESERVED_MASK	0x0006	/* mask of reserved bits in ipv6_offlg */
+#define IP6F_MORE_FRAG		0x0001	/* more-fragments flag */
+
 
 
 /* Can't add any fields not in the real header here 
