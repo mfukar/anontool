@@ -16,7 +16,7 @@
 #ifndef __DECODE_H__
 #define __DECODE_H__
 
-/*  I N C L U D E S  **********************************************************/
+#include <stdint.h>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -856,7 +856,7 @@ typedef struct {
 typedef struct {
 	uint8_t ipv6_oj_type,
 		ipv6_oj_len,
-		ipv6_oj_jumbolen[4]
+		ipv6_oj_jumbolen[4];
 } ipv6_options_jumbo;
 #define IPV6_OPT_JUMBO_LEN 6
 
@@ -895,8 +895,8 @@ typedef struct {
  * IPv6 hop-by-hop options header
  */
 typedef struct {
-	uint8_t ipv6_next;
-	uint8_t ipv6_len;
+	uint8_t ipv6_hbh_next;
+	uint8_t ipv6_hbh_len;
 	ipv6_options *opts;
 } ipv6_hbh;
 
@@ -904,8 +904,8 @@ typedef struct {
  * IPv6 destination options header
  */
 typedef struct {
-	uint8_t ipv6_next;
-	uint8_t ipv6_len;
+	uint8_t ipv6_dest_next;
+	uint8_t ipv6_dest_len;
 	ipv6_options *opts;
 } ipv6_dest;
 
@@ -940,10 +940,10 @@ typedef struct {
  * IPv6 routing header
  */
 typedef struct {
-	uint8_t ipv6_next;
-	uint8_t ipv6_len;
-	uint8_t ipv6_type;
-	uint8_t ipv6_segleft;
+	uint8_t ipv6_rthdr_next;
+	uint8_t ipv6_rthdr_len;
+	uint8_t ipv6_rthdr_type;
+	uint8_t ipv6_rthdr_segleft;
 	/* TODO +routing specific data.. */
 } ipv6_rthdr;
 
@@ -951,29 +951,28 @@ typedef struct {
  * IPv6 type 0 routing header
  */
 typedef struct {
-	uint8_t ipv6_next,
-		ipv6_len,
-		ipv6_type,
-		ipv6_segleft,
-		ipv6_reserved,
-		ipv6_slmap[3];
-	uint8_t	*ipv6_src[16];
+	uint8_t ipv6_rthdr0_next,
+		ipv6_rthdr0_len,
+		ipv6_rthdr0_type,
+		ipv6_rthdr0_segleft,
+		ipv6_rthdr0_reserved,
+		ipv6_rthdr0_slmap[3];
+	uint8_t	*ipv6_rthdr0_src[16];
 } ipv6_rthdr0;
 
 /*
  * IPv6 fragment header
  */
 typedef struct {
-	uint8_t  ipv6_next,
-		 ipv6_reserved;
-	uint16_t ipv6_offlg;
-	uint32_t ipv6_ident;
+	uint8_t  ipv6_frag_next,
+		 ipv6_frag_reserved;
+	uint16_t ipv6_frag_offlg;
+	uint32_t ipv6_frag_ident;
 } ipv6_frag;
 
 #define IP6F_OFF_MASK		0xfff8	/* mask of offset bits   in ipv6_offlg */
 #define IP6F_RESERVED_MASK	0x0006	/* mask of reserved bits in ipv6_offlg */
 #define IP6F_MORE_FRAG		0x0001	/* more-fragments flag */
-
 
 
 /* Can't add any fields not in the real header here 
