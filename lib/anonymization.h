@@ -102,6 +102,8 @@ typedef struct _anonPacket
     unsigned int ip_options_len;
     unsigned char *ip_options_data;
 
+    IPv6Hdr	*ipv6_hdr;
+
     TCPHdr *tcph, *orig_tcph;
     unsigned int tcp_options_len;
     unsigned char *tcp_options_data;

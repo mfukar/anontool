@@ -19,6 +19,7 @@ void            DecodeI4LCiscoIPPkt(anonpacket *, struct pcap_pkthdr *, unsigned
 				    int snaplen);
 void            DecodePflog(anonpacket *, struct pcap_pkthdr *, unsigned char *, int snaplen);
 void            DecodeIP(unsigned char *, const unsigned int, anonpacket *, int snaplen);
+void            DecodeIPv6(unsigned char *, const unsigned int, anonpacket *);
 void            DecodeARP(unsigned char *, unsigned int, anonpacket *, int snaplen);
 void            DecodeEapol(unsigned char *, unsigned int, anonpacket *, int snaplen);
 void            DecodeEapolKey(unsigned char *, unsigned int, anonpacket *, int snaplen);
@@ -1027,7 +1028,7 @@ void DecodeIPv6(unsigned char *pkt, const unsigned int len, anonpacket *p)
 	uint32_t	payload_len;
 
 	if(len < IPV6_HDR_LEN) {
-		p->ip6_hdr = NULL;
+		p->ipv6_hdr = NULL;
 		return;
 	}
 
@@ -1716,13 +1717,16 @@ grinder_t SetPktProcessor(int datalink)
 		grinder = DecodeIEEE80211Pkt;
 		break;
 #endif
+/* TODO IPsec encapsulated packet grinder
+ *
 #ifdef DLT_ENC
 	case DLT_ENC:
-		/* TODO IPsec encapsulated packet grinder */
 		break;
 #else
 	case 13:
 #endif
+*/
+	case 13:
 	case DLT_IEEE802:
 		/* Token Ring */
 		grinder = DecodeTRPkt;
