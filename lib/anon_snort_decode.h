@@ -836,6 +836,8 @@ typedef struct {
 #define ipv6_next	ipv6_ctlunion.un.ip6_un_next
 #define ipv6_hlim	ipv6_ctlunion.un.ip6_un_hlim
 
+#define IPV6_HDR_LEN	sizeof(IPv6Hdr)
+
 /*  */
 #define IPv6_VER(ipv6h) (((ipv6h)->ipv6_vfc & 0xf0) >> 4)
 #define IPv6_TCL(ipv6h) (((ipv6h)->ipv6_flow & 0x0ff00000) >> 20)
@@ -972,8 +974,11 @@ typedef struct {
 
 #define IP6F_OFF_MASK		0xfff8	/* mask of offset bits   in ipv6_offlg */
 #define IP6F_RESERVED_MASK	0x0006	/* mask of reserved bits in ipv6_offlg */
-#define IP6F_MORE_FRAG		0x0001	/* more-fragments flag */
+#define IP6F_MORE_FRAG_MASK	0x0001	/* more-fragments flag */
 
+#define IPv6_FH_OFFSET(fh) ((ntohs((fh)->ipv6_frag_offlg) & IP6F_OFF_MASK) >> 3)
+#define IPv6_FH_RES(fh) (fh)->ipv6_frag_reserved
+#define IPv6_FH_MF(fh) (ntohs((fh)->ipv6_frag_offlg) & IP6F_MORE_FRAG_MASK)
 
 /* Can't add any fields not in the real header here 
    because of how the decoder uses structure overlaying */

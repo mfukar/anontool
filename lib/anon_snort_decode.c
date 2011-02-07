@@ -794,18 +794,17 @@ void DecodeSlipPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pk
 }
 
 /*
- * Function: DecodeRawPkt(anonpacket *, char *, struct pcap_pkthdr*, unsigned char*)
+ * Function: DecodeRawPkt(anonpacket *, struct pcap_pkthdr *, unsigned char *, int)
  *
- * Purpose: Decodes packets coming in raw on layer 2, like PPP.  Coded and
- *          in by Jed Pickle (thanks Jed!) and modified for a few little tweaks
- *          by me.
+ * Purpose: Decodes packets coming in raw on layer 2, like PPP. Originally
+ * written by Jed Pickle.
  *
  * Arguments: p => pointer to decoded packet struct 
- *            user => Utility pointer, unused
  *            pkthdr => ptr to the packet header
  *            pkt => pointer to the real live packet data
+ *            snaplen => number of bytes in the packet from pcap hdr
  *
- * Returns: void function
+ * Returns: Nothing
  */
 void DecodeRawPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
@@ -815,6 +814,23 @@ void DecodeRawPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt
 	p->pkt = pkt;
 
 	DecodeIP(pkt, p->pkth->caplen, p, snaplen);
+
+	return;
+}
+
+/*
+ * DecodeRawPkt6(anonpacket *, struct pcap_pkthdr *, unsigned char *, int)
+ *
+ * Returns: Nothing
+ */
+void DecodeRawPkt6(anonpacket *p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
+{
+	memset(p, 0, sizeof(*p));
+
+	p->pkth = pkthdr;
+	p->pkt  = pkt;
+
+	DecodeIPv6(pkt, p->pkth->caplen, p);
 
 	return;
 }
@@ -997,6 +1013,27 @@ void DecodeIP(unsigned char *pkt, const unsigned int len, anonpacket * p, int sn
 		p->dsize = (unsigned int)ip_len;
 	}
 }
+
+/*
+ * Function: DecodeIPv6(unsigned char *, const unsigned int, anonpacket *)
+ *
+ * Purpose : Decode IPv6 headers.
+ *
+ * Returns : Nothing
+ */
+void DecodeIPv6(unsigned char *pkt, const unsigned int len, anonpacket *p)
+{
+	IPv6Hdr		*hdr = (IPv6Hdr *)pkt;
+	uint32_t	payload_len;
+
+	if(len < IPV6_HDR_LEN) {
+		p->ip6_hdr = NULL;
+		return;
+	}
+
+	/* TODO */
+}
+
 
 /*
  * Function: DecodeIPOnly(unsigned char *, const unsigned int, anonpacket *)
@@ -1659,12 +1696,18 @@ void DecodeIPOptions(unsigned char *o_list, unsigned int o_len, anonpacket * p, 
 	return;
 }
 
+/*
+ * Sets root decoder based on datalink.
+ *
+ * Returns the grinder on success, NULL on error.
+ */
 grinder_t SetPktProcessor(int datalink)
 {
 	grinder_t       grinder;
 
 	switch (datalink) {
-	case DLT_EN10MB:	/* Ethernet */
+	case DLT_EN10MB:
+		/* Ethernet */
 		grinder = DecodeEthPkt;
 		break;
 
@@ -1673,23 +1716,33 @@ grinder_t SetPktProcessor(int datalink)
 		grinder = DecodeIEEE80211Pkt;
 		break;
 #endif
+#ifdef DLT_ENC
+	case DLT_ENC:
+		/* TODO IPsec encapsulated packet grinder */
+		break;
+#else
 	case 13:
-	case DLT_IEEE802:	/* Token Ring */
+#endif
+	case DLT_IEEE802:
+		/* Token Ring */
 		grinder = DecodeTRPkt;
-
 		break;
 
-	case DLT_FDDI:		/* FDDI */
+	case DLT_FDDI:
+		/* FDDI */
 		grinder = DecodeFDDIPkt;
 		break;
 
-	case DLT_SLIP:		/* Serial Line Internet Protocol */
+	case DLT_SLIP:
+		/* Serial Line Internet Protocol */
 		grinder = DecodeSlipPkt;
 		break;
 
-	case DLT_PPP:		/* point-to-point protocol */
+	case DLT_PPP:
+		/* point-to-point protocol */
 		grinder = DecodePppPkt;
 		break;
+
 #ifdef DLT_LINUX_SLL
 	case DLT_LINUX_SLL:
 		grinder = DecodeLinuxSLLPkt;
@@ -1709,18 +1762,24 @@ grinder_t SetPktProcessor(int datalink)
 		grinder = DecodeNullPkt;
 		break;
 
-#ifdef DLT_RAW			/* Not supported in some arch or older pcap
-				 * versions */
+#ifdef DLT_RAW
 	case DLT_RAW:
+#endif
+	case DLT_IPV4:
 		grinder = DecodeRawPkt;
 		break;
-#endif
+
+/*	TODO In progress TODO
+	case DLT_IPV6:
+		grinder = DecodeRawPkt6;
+		break;
+*/
+
 #ifdef DLT_I4L_RAWIP
 	case DLT_I4L_RAWIP:
 		grinder = DecodeI4LRawIPPkt;
 		break;
 #endif
-
 #ifdef DLT_I4L_IP
 	case DLT_I4L_IP:
 		if (!pv.readmode_flag && !pv.quiet_flag)
@@ -1738,9 +1797,10 @@ grinder_t SetPktProcessor(int datalink)
 		break;
 #endif
 
-	default:		/* oops, don't know how to handle this one */
+	default:
+		/* Unhandled. */
+		fprintf(stderr, "Unable to decode data link type %d\n", datalink);
 		return NULL;
-
 	}
 
 	return grinder;
