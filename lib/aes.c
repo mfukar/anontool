@@ -53,7 +53,7 @@ uint32_t          RCON[10];
 
 /* tables generation flag */
 
-int             do_init = 1;
+static int             do_init = 1;
 
 /* tables generation routine */
 
@@ -400,7 +400,7 @@ static const uint32_t RCON[10] = {
 	0x1B000000, 0x36000000
 };
 
-int             do_init = 0;
+static int             do_init = 0;
 
 void aes_gen_tables(void)
 {
@@ -476,8 +476,9 @@ int aes_schedule_key(aes_context * ctx, uint8_t * key, int nbits)
 		for (i = 0; i < 10; i++, RK += 4) {
 			RK[4] = RK[0] ^ RCON[i] ^
 			    (FSb[(uint8_t) (RK[3] >> 16)] << 24) ^
-			    (FSb[(uint8_t) (RK[3] >> 8)] << 16) ^
-			    (FSb[(uint8_t) (RK[3])] << 8) ^ (FSb[(uint8_t) (RK[3] >> 24)]);
+			    (FSb[(uint8_t) (RK[3] >>  8)] << 16) ^
+			    (FSb[(uint8_t) (RK[3]      )] <<  8) ^
+			    (FSb[(uint8_t) (RK[3] >> 24)]);
 
 			RK[5] = RK[1] ^ RK[4];
 			RK[6] = RK[2] ^ RK[5];
@@ -490,8 +491,9 @@ int aes_schedule_key(aes_context * ctx, uint8_t * key, int nbits)
 		for (i = 0; i < 8; i++, RK += 6) {
 			RK[6] = RK[0] ^ RCON[i] ^
 			    (FSb[(uint8_t) (RK[5] >> 16)] << 24) ^
-			    (FSb[(uint8_t) (RK[5] >> 8)] << 16) ^
-			    (FSb[(uint8_t) (RK[5])] << 8) ^ (FSb[(uint8_t) (RK[5] >> 24)]);
+			    (FSb[(uint8_t) (RK[5] >>  8)] << 16) ^
+			    (FSb[(uint8_t) (RK[5]      )] <<  8) ^
+			    (FSb[(uint8_t) (RK[5] >> 24)]);
 
 			RK[7] = RK[1] ^ RK[6];
 			RK[8] = RK[2] ^ RK[7];
@@ -506,8 +508,9 @@ int aes_schedule_key(aes_context * ctx, uint8_t * key, int nbits)
 		for (i = 0; i < 7; i++, RK += 8) {
 			RK[8] = RK[0] ^ RCON[i] ^
 			    (FSb[(uint8_t) (RK[7] >> 16)] << 24) ^
-			    (FSb[(uint8_t) (RK[7] >> 8)] << 16) ^
-			    (FSb[(uint8_t) (RK[7])] << 8) ^ (FSb[(uint8_t) (RK[7] >> 24)]);
+			    (FSb[(uint8_t) (RK[7] >>  8)] << 16) ^
+			    (FSb[(uint8_t) (RK[7]      )] <<  8) ^
+			    (FSb[(uint8_t) (RK[7] >> 24)]);
 
 			RK[9] = RK[1] ^ RK[8];
 			RK[10] = RK[2] ^ RK[9];
@@ -516,7 +519,8 @@ int aes_schedule_key(aes_context * ctx, uint8_t * key, int nbits)
 			RK[12] = RK[4] ^
 			    (FSb[(uint8_t) (RK[11] >> 24)] << 24) ^
 			    (FSb[(uint8_t) (RK[11] >> 16)] << 16) ^
-			    (FSb[(uint8_t) (RK[11] >> 8)] << 8) ^ (FSb[(uint8_t) (RK[11])]);
+			    (FSb[(uint8_t) (RK[11] >>  8)] <<  8) ^
+			    (FSb[(uint8_t) (RK[11]      )]);
 
 			RK[13] = RK[5] ^ RK[12];
 			RK[14] = RK[6] ^ RK[13];
@@ -549,19 +553,27 @@ int aes_schedule_key(aes_context * ctx, uint8_t * key, int nbits)
 		RK -= 8;
 
 		*SK++ = KT0[(uint8_t) (*RK >> 24)] ^
-		    KT1[(uint8_t) (*RK >> 16)] ^ KT2[(uint8_t) (*RK >> 8)] ^ KT3[(uint8_t) (*RK)];
+			KT1[(uint8_t) (*RK >> 16)] ^
+			KT2[(uint8_t) (*RK >>  8)] ^
+			KT3[(uint8_t) (*RK)];
 		RK++;
 
 		*SK++ = KT0[(uint8_t) (*RK >> 24)] ^
-		    KT1[(uint8_t) (*RK >> 16)] ^ KT2[(uint8_t) (*RK >> 8)] ^ KT3[(uint8_t) (*RK)];
+			KT1[(uint8_t) (*RK >> 16)] ^
+			KT2[(uint8_t) (*RK >>  8)] ^
+			KT3[(uint8_t) (*RK)];
 		RK++;
 
 		*SK++ = KT0[(uint8_t) (*RK >> 24)] ^
-		    KT1[(uint8_t) (*RK >> 16)] ^ KT2[(uint8_t) (*RK >> 8)] ^ KT3[(uint8_t) (*RK)];
+			KT1[(uint8_t) (*RK >> 16)] ^
+			KT2[(uint8_t) (*RK >>  8)] ^
+			KT3[(uint8_t) (*RK)];
 		RK++;
 
 		*SK++ = KT0[(uint8_t) (*RK >> 24)] ^
-		    KT1[(uint8_t) (*RK >> 16)] ^ KT2[(uint8_t) (*RK >> 8)] ^ KT3[(uint8_t) (*RK)];
+			KT1[(uint8_t) (*RK >> 16)] ^
+			KT2[(uint8_t) (*RK >>  8)] ^
+			KT3[(uint8_t) (*RK)];
 		RK++;
 	}
 
@@ -642,16 +654,24 @@ void aes_encrypt(aes_context * ctx, uint8_t input[16], uint8_t output[16])
 	RK += 4;
 
 	X0 = RK[0] ^ (FSb[(uint8_t) (Y0 >> 24)] << 24) ^
-	    (FSb[(uint8_t) (Y1 >> 16)] << 16) ^ (FSb[(uint8_t) (Y2 >> 8)] << 8) ^ (FSb[(uint8_t) (Y3)]);
+		     (FSb[(uint8_t) (Y1 >> 16)] << 16) ^
+		     (FSb[(uint8_t) (Y2 >>  8)] <<  8) ^
+		     (FSb[(uint8_t) (Y3      )]);
 
 	X1 = RK[1] ^ (FSb[(uint8_t) (Y1 >> 24)] << 24) ^
-	    (FSb[(uint8_t) (Y2 >> 16)] << 16) ^ (FSb[(uint8_t) (Y3 >> 8)] << 8) ^ (FSb[(uint8_t) (Y0)]);
+		     (FSb[(uint8_t) (Y2 >> 16)] << 16) ^
+		     (FSb[(uint8_t) (Y3 >>  8)] <<  8) ^
+		     (FSb[(uint8_t) (Y0      )]);
 
 	X2 = RK[2] ^ (FSb[(uint8_t) (Y2 >> 24)] << 24) ^
-	    (FSb[(uint8_t) (Y3 >> 16)] << 16) ^ (FSb[(uint8_t) (Y0 >> 8)] << 8) ^ (FSb[(uint8_t) (Y1)]);
+		     (FSb[(uint8_t) (Y3 >> 16)] << 16) ^
+		     (FSb[(uint8_t) (Y0 >>  8)] <<  8) ^
+		     (FSb[(uint8_t) (Y1      )]);
 
 	X3 = RK[3] ^ (FSb[(uint8_t) (Y3 >> 24)] << 24) ^
-	    (FSb[(uint8_t) (Y0 >> 16)] << 16) ^ (FSb[(uint8_t) (Y1 >> 8)] << 8) ^ (FSb[(uint8_t) (Y2)]);
+		     (FSb[(uint8_t) (Y0 >> 16)] << 16) ^
+		     (FSb[(uint8_t) (Y1 >>  8)] <<  8) ^
+		     (FSb[(uint8_t) (Y2      )]);
 
 	PUT_UINT32(X0, output, 0);
 	PUT_UINT32(X1, output, 4);
@@ -726,52 +746,27 @@ void aes_decrypt(aes_context * ctx, uint8_t input[16], uint8_t output[16])
 	RK += 4;
 
 	X0 = RK[0] ^ (RSb[(uint8_t) (Y0 >> 24)] << 24) ^
-	    (RSb[(uint8_t) (Y3 >> 16)] << 16) ^ (RSb[(uint8_t) (Y2 >> 8)] << 8) ^ (RSb[(uint8_t) (Y1)]);
+		     (RSb[(uint8_t) (Y3 >> 16)] << 16) ^
+		     (RSb[(uint8_t) (Y2 >>  8)] <<  8) ^
+		     (RSb[(uint8_t) (Y1      )]);
 
 	X1 = RK[1] ^ (RSb[(uint8_t) (Y1 >> 24)] << 24) ^
-	    (RSb[(uint8_t) (Y0 >> 16)] << 16) ^ (RSb[(uint8_t) (Y3 >> 8)] << 8) ^ (RSb[(uint8_t) (Y2)]);
+		     (RSb[(uint8_t) (Y0 >> 16)] << 16) ^
+		     (RSb[(uint8_t) (Y3 >>  8)] <<  8) ^
+		     (RSb[(uint8_t) (Y2      )]);
 
 	X2 = RK[2] ^ (RSb[(uint8_t) (Y2 >> 24)] << 24) ^
-	    (RSb[(uint8_t) (Y1 >> 16)] << 16) ^ (RSb[(uint8_t) (Y0 >> 8)] << 8) ^ (RSb[(uint8_t) (Y3)]);
+		     (RSb[(uint8_t) (Y1 >> 16)] << 16) ^
+		     (RSb[(uint8_t) (Y0 >>  8)] <<  8) ^
+		     (RSb[(uint8_t) (Y3      )]);
 
 	X3 = RK[3] ^ (RSb[(uint8_t) (Y3 >> 24)] << 24) ^
-	    (RSb[(uint8_t) (Y2 >> 16)] << 16) ^ (RSb[(uint8_t) (Y1 >> 8)] << 8) ^ (RSb[(uint8_t) (Y0)]);
+		     (RSb[(uint8_t) (Y2 >> 16)] << 16) ^
+		     (RSb[(uint8_t) (Y1 >>  8)] <<  8) ^
+		     (RSb[(uint8_t) (Y0      )]);
 
 	PUT_UINT32(X0, output, 0);
 	PUT_UINT32(X1, output, 4);
 	PUT_UINT32(X2, output, 8);
 	PUT_UINT32(X3, output, 12);
 }
-
-#ifdef AESTEST
-/**
- * TODO: This together with the relevant main() will go into /test/
- */
-
-#include <string.h>
-#include <stdio.h>
-
-/*
- * Rijndael Monte Carlo Test: ECB mode
- * source: NIST - rijndael-vals.zip
- */
-
-static unsigned char AES_enc_test[3][16] = {
-	{0xA0, 0x43, 0x77, 0xAB, 0xE2, 0x59, 0xB0, 0xD0,
-	 0xB5, 0xBA, 0x2D, 0x40, 0xA5, 0x01, 0x97, 0x1B},
-	{0x4E, 0x46, 0xF8, 0xC5, 0x09, 0x2B, 0x29, 0xE2,
-	 0x9A, 0x97, 0x1A, 0x0C, 0xD1, 0xF6, 0x10, 0xFB},
-	{0x1F, 0x67, 0x63, 0xDF, 0x80, 0x7A, 0x7E, 0x70,
-	 0x96, 0x0D, 0x4C, 0xD3, 0x11, 0x8E, 0x60, 0x1A}
-};
-
-static unsigned char AES_dec_test[3][16] = {
-	{0xF5, 0xBF, 0x8B, 0x37, 0x13, 0x6F, 0x2E, 0x1F,
-	 0x6B, 0xEC, 0x6F, 0x57, 0x20, 0x21, 0xE3, 0xBA},
-	{0xF1, 0xA8, 0x1B, 0x68, 0xF6, 0xE5, 0xA6, 0x27,
-	 0x1A, 0x8C, 0xB2, 0x4E, 0x7D, 0x94, 0x91, 0xEF},
-	{0x4D, 0xE0, 0xC6, 0xDF, 0x7C, 0xB1, 0x69, 0x72,
-	 0x84, 0x60, 0x4D, 0x60, 0x27, 0x1B, 0xC5, 0x9A}
-};
-
-#endif
