@@ -3,7 +3,7 @@
 # @author	Michael Foukarakis
 # @version	0.1
 # @date 	Created:     Tue Jan 25, 2011 07:55 GTB Standard Time
-# 		Last Update: Tue Feb 08, 2011 10:18 EET
+# 		Last Update: Tue Feb 08, 2011 10:54 EET
 #------------------------------------------------------------------------
 # Description:	Unit test for anontool's AES implementation in ECB mode
 #------------------------------------------------------------------------
@@ -34,8 +34,6 @@ def AES_ECB_test():
 			[ 0x4D, 0xE0, 0xC6, 0xDF, 0x7C, 0xB1, 0x69, 0x72, 0x84, 0x60, 0x4D, 0x60, 0x27, 0x1B, 0xC5, 0x9A ]]
 	for mode in ["encryption", "decryption"]:
 		for keylen in [128, 192, 256]:
-			print("\n[+] Rijndael Monte Carlo Test (ECB mode) - {0}".format(mode))
-			print("[+] Key size - {0} bits".format(keylen))
 			buf = Buffer()
 			key = Key()
 			n = (keylen - 128) / 64
@@ -57,18 +55,16 @@ def AES_ECB_test():
 					key.b[j + (n << 3)] ^= buf.b[j]
 			result = [byte for byte in buf.b]
 			if mode == "encryption":
-				if result == AES_enc_result[n]:
-					print("[+] Passed")
-				else:
-					print("[-] Failed")
+				if result != AES_enc_result[n]:
+					raise AssertionError("[-] Rijndael Monte Carlo Test (ECB mode)\n{0} - Key size {1} bits: failed".format(mode, keylen))
 			else:
-				if result == AES_dec_result[n]:
-					print("[+] Passed")
-				else:
-					print("[-] Failed")
-
-def main():
-	AES_ECB_test()
+				if result != AES_dec_result[n]:
+					raise AssertionError("[-] Rijndael Monte Carlo Test (ECB mode)\n{0} - Key size {1} bits: failed".format(mode, keylen))
 
 if __name__ == '__main__':
-	main()
+	try:
+		AES_ECB_test()
+	except AssertionError, err:
+		print err
+	else:
+		print("[+] Rijndael Monte Carlo Test (ECB mode): Passed")
