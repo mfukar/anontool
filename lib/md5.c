@@ -36,7 +36,7 @@
     (b)[(i) + 3] = (uint8_t) ( (n) >> 24 );       \
 }
 
-void md5_starts(md5_context * ctx)
+static void md5_starts(md5_context * ctx)
 {
 	ctx->total[0] = 0;
 	ctx->total[1] = 0;
@@ -47,7 +47,7 @@ void md5_starts(md5_context * ctx)
 	ctx->state[3] = 0x10325476;
 }
 
-void md5_process(md5_context * ctx, uint8_t data[64])
+static void md5_process(md5_context * ctx, uint8_t data[64])
 {
 	uint32_t          X[16], A, B, C, D;
 
@@ -170,7 +170,7 @@ void md5_process(md5_context * ctx, uint8_t data[64])
 	ctx->state[3] += D;
 }
 
-void md5_update(md5_context * ctx, uint8_t * input, uint32_t length)
+static void md5_update(md5_context * ctx, uint8_t * input, uint32_t length)
 {
 	uint32_t          left, fill;
 
@@ -212,7 +212,7 @@ static uint8_t    md5_padding[64] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-void md5_finish(md5_context * ctx, uint8_t digest[16])
+static void md5_finish(md5_context * ctx, uint8_t digest[16])
 {
 	uint32_t          last, padn;
 	uint32_t          high, low;
@@ -237,36 +237,12 @@ void md5_finish(md5_context * ctx, uint8_t digest[16])
 	PUT_UINT32(ctx->state[3], digest, 12);
 }
 
-#ifdef MD5TEST
-/*
- * TODO: Migrate into tests.
- */
+void md5_sum(unsigned char *buffer, uint32_t buflen, unsigned char digest[16])
+{
+        md5_context	ctx;
 
-#include <stdlib.h>
-#include <stdio.h>
-
-/*
- * those are the standard RFC 1321 test vectors
- */
-
-static char    *msg[] = {
-	"",
-	"a",
-	"abc",
-	"message digest",
-	"abcdefghijklmnopqrstuvwxyz",
-	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
-	"12345678901234567890123456789012345678901234567890123456789012" "345678901234567890"
-};
-
-static char    *val[] = {
-	"d41d8cd98f00b204e9800998ecf8427e",
-	"0cc175b9c0f1b6a831c399e269772661",
-	"900150983cd24fb0d6963f7d28e17f72",
-	"f96b697d7cb7938d525a2f31aaf161d0",
-	"c3fcd3d76192e4007dfb496cca67e13b",
-	"d174ab98d277d9f5a5611c2c9f419d9f",
-	"57edf4a22be3c955ac49da2e2107b67a"
-};
-
-#endif
+        md5_starts(&ctx);
+        md5_update(&ctx, buffer, buflen);
+        md5_finish(&ctx, digest);
+        return;
+}

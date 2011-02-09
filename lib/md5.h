@@ -14,8 +14,5 @@ typedef struct
 }
 md5_context;
 
-void md5_starts( md5_context *ctx );
-void md5_update( md5_context *ctx, uint8_t *input, uint32_t length );
-void md5_finish( md5_context *ctx, uint8_t digest[16] );
-void md5_process( md5_context *ctx, uint8_t data[64] );
+void md5_sum(unsigned char *, uint32_t, unsigned char digest[16]);
 #endif /* md5.h */

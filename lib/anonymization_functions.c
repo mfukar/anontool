@@ -201,7 +201,6 @@ void hash_padding(unsigned char *field, int len, int padding_behavior, unsigned 
 int md5_hash(unsigned char *field, int len, int padding_behavior, anonpacket * p, int total_len,
 	     unsigned char *packet_end, int donotreplace)
 {
-	md5_context     ctx;
 	int             hash_length = 16;
 	unsigned char   md5sum[16];
 
@@ -211,9 +210,7 @@ int md5_hash(unsigned char *field, int len, int padding_behavior, anonpacket * p
 	if (len == 0)
 		return 0;
 
-	md5_starts(&ctx);
-	md5_update(&ctx, (uint8_t *) field, len);
-	md5_finish(&ctx, md5sum);
+        md5_sum(field, len, md5sum);
 
 	hash_padding(field, len, padding_behavior, md5sum, hash_length, p, total_len, packet_end,
 		     donotreplace);
