@@ -1032,6 +1032,32 @@ void DecodeIPv6(unsigned char *pkt, const unsigned int len, anonpacket *p)
 		return;
 	}
 
+	if(hdr->ipv6_vfc >> 4 != 6) {
+		p->ipv6_hdr = NULL;
+		return;
+	}
+
+	if(hdr->ipv6_next == IPPROTO_IPIP
+	|| hdr->ipv6_next == IPPROTO_IPV6
+	|| hdr->ipv6_next == IPPROTO_GRE) {
+		/* Multiple encapsulation in packet */
+		return;
+	} else {
+		/*
+		 * Encapsulated packet.
+		 * Save the 'outer' headers and proceed.
+		 */
+	}
+
+	payload_len = ntohs(hdr->ipv6_plen) + IPV6_HDR_LEN;
+
+	if(payload_len > len) {
+		return;
+	}
+
+	/* Lay the IP struct over data */
+	p->ipv6_hdr = (IPv6Hdr *) pkt;
+
 	/* TODO */
 }
 

@@ -58,7 +58,7 @@ TODO
     however, you can point me to a usable, stable and free alternative,
     I'd be more than happy to take a look at it.
 
-    Support for L2TP, GRE, GTP, IPsec and other protocols is on the way.
+    Support for L2TP, GRE, GTP, IPv6, IPsec and other protocols is on the way.
 
     A TCP reassembly processor (so we can get rid of libnids),
     affectionately named stream6, is also on the way.

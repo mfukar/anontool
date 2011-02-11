@@ -838,7 +838,7 @@ typedef struct {
 
 #define IPV6_HDR_LEN	sizeof(IPv6Hdr)
 
-/*  */
+/* IPv6 definitions and convenience macros */
 #define IPv6_VER(ipv6h) (((ipv6h)->ipv6_vfc & 0xf0) >> 4)
 #define IPv6_TCL(ipv6h) (((ipv6h)->ipv6_flow & 0x0ff00000) >> 20)
 
