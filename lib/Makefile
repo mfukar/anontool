@@ -9,7 +9,7 @@ LIBRARIES=-lpcap -lpcre -lm
 TARGETS=libnids.a anonlib.so
 all: $(TARGETS)
 
-anonlib.so:tool.o bpf.o pcap_input.o cooking.o flist.o strsearch.o mstring.o callback.o printpacket.o anonymize.o decoders.o anon_snort_decode.o anon_print_packet.o anon_checksums.o anon_prefix_preserving.o prefix_preserving_map.o md5.o sha1.o sha256.o anonymization_functions.o crc32.o des.o aes.o uncook.o binaryPayload.o util.o
+anonlib.so:tool.o bpf.o pcap_input.o cooking.o flist.o strsearch.o mstring.o callback.o printpacket.o anonymize.o decoders.o anon_snort_decode.o anon_print_packet.o anon_checksums.o anon_prefix_preserving.o prefix_preserving_map.o md5.o sha1.o sha256.o sha512.o anonymization_functions.o crc32.o des.o aes.o uncook.o binaryPayload.o util.o
 	gcc $(CFLAGS) -shared -o $@ $^ -L.. -L. $(LIBRARIES)
 
 libnids.a: 
@@ -72,6 +72,9 @@ sha1.o: sha1.c sha1.h
 	gcc $(CFLAGS) -c $<
 
 sha256.o: sha256.c sha256.h
+	gcc $(CFLAGS) -c $<
+
+sha512.o: sha512.c sha512.h
 	gcc $(CFLAGS) -c $<
 
 crc32.o: crc32.c crc32.h
