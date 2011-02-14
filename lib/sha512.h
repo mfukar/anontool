@@ -4,7 +4,7 @@
  * @version     0.5
  * @date
  *      Created:     Mon Feb 14, 2011 09:41 EET
- *      Last Update: Mon Feb 14, 2011 17:10 EET
+ *      Last Update: Mon Feb 14, 2011 17:51 EET
  *------------------------------------------------------------------------
  * Description: SHA512 implementation headers for anontool
  *
@@ -58,7 +58,7 @@ static void     SHA2_starts(SHA2_context *, sha2_block_e block_size);
  *
  * Returns:     Nothing
  */
-static void	SHA2_update(SHA2_context *ctx, const unsigned char *input, int ilen);
+static void     SHA2_update(SHA2_context *ctx, const unsigned char *input, int ilen);
 
 /*
  * SHA-2 final digest
