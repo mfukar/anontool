@@ -25,7 +25,6 @@
 #include <stdarg.h>
 #include <sys/time.h>
 #include <string.h>
-#include <ctype.h>
 #include <pcre.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -34,16 +33,16 @@
 #include "flist.h"
 #include "prefix_preserving_map.h"
 
-#define ON 1
-#define OFF 0
+#define ON                      1
+#define OFF                     0
 
-#define MAX_UPPER_PROTOCOLS 10
-#define MAX_CONT 20
+#define MAX_UPPER_PROTOCOLS     10
+#define MAX_CONT                20
 
-#define MAX_NUM_OF_SETS 1024
-#define NONE 0
-#define TCPDUMP_TRACE 1
-#define ETHERNET_NIC  2
+#define MAX_NUM_OF_SETS         1024
+#define NONE                    0
+#define TCPDUMP_TRACE           1
+#define ETHERNET_NIC            2
 
 // Bit twiddling stuff
 #define setBit(a, n) a |= (1 << (n));
@@ -52,133 +51,133 @@
 #define testBit(d, n) ((d) & (1 << (n)))
 
 typedef struct {
-        unsigned int caplen;
-        unsigned int wlen;
-        struct timeval ts;
+        unsigned int            caplen;
+        unsigned int            wlen;
+        struct timeval          ts;
 } anon_pkthdr_t;
 
 struct orig_headers {
-        void *data;
-        struct orig_headers *next;
+        void                   *data;
+        struct orig_headers    *next;
 };
 
 struct headers_data {
-        unsigned char *header;
-        int header_len;
-        unsigned int caplen;
-        unsigned int wlen;
-        struct timeval ts;
-        void *decoded_pkt;
+        unsigned char          *header;
+        int                     header_len;
+        unsigned int            caplen;
+        unsigned int            wlen;
+        struct timeval          ts;
+        void                   *decoded_pkt;
 };
 
 
-typedef struct _anonPacket
-{
-    struct pcap_pkthdr *pkth;   /* BPF data */
-    unsigned char *pkt;         /* base pointer to the raw packet data */
+typedef struct {
+        struct pcap_pkthdr         *pkth;           /* BPF data */
+        unsigned char              *pkt;            /* base pointer to the raw packet data */
 
-    Fddi_hdr *fddihdr;          /* FDDI support headers */
-    Fddi_llc_saps *fddisaps;
-    Fddi_llc_sna *fddisna;
-    Fddi_llc_iparp *fddiiparp;
-    Fddi_llc_other *fddiother;
-    Trh_hdr *trh;               /* Token Ring support headers */
-    Trh_llc *trhllc;
-    Trh_mr *trhmr;
-    SLLHdr *sllh;               /* Linux cooked sockets header */
-    PflogHdr *pfh;              /* OpenBSD pflog interface header */
-    EtherHdr *eh;               /* standard TCP/IP/Ethernet/ARP headers */
-    VlanTagHdr *vh;
-    EthLlc   *ehllc;
-    EthLlcOther *ehllcother;
-    WifiHdr *wifih;             /* wireless LAN header */
-    EtherARP *ah;
-    EtherEapol *eplh;           /* 802.1x EAPOL header */
-    EAPHdr *eaph;
-    unsigned char *eaptype;
-    EapolKey *eapolk;
+        Fddi_hdr                   *fddihdr;        /* FDDI support headers */
+        Fddi_llc_saps              *fddisaps;
+        Fddi_llc_sna               *fddisna;
+        Fddi_llc_iparp             *fddiiparp;
+        Fddi_llc_other             *fddiother;
+        Trh_hdr                    *trh;            /* Token Ring support headers */
+        Trh_llc                    *trhllc;
+        Trh_mr                     *trhmr;
+        SLLHdr                     *sllh;           /* Linux cooked sockets header */
+        PflogHdr                   *pfh;            /* OpenBSD pflog interface header */
+        EtherHdr                   *eh;             /* standard TCP/IP/Ethernet/ARP headers */
+        VlanTagHdr                 *vh;
+        EthLlc                     *ehllc;
+        EthLlcOther                *ehllcother;
+        WifiHdr                    *wifih;          /* wireless LAN header */
+        EtherARP                   *ah;
+        EtherEapol                 *eplh;           /* 802.1x EAPOL header */
+        EAPHdr                     *eaph;
+        unsigned char              *eaptype;
+        EapolKey                   *eapolk;
 
-    IPHdr *iph, *orig_iph;   /* and orig. headers for ICMP_*_UNREACH family */
-    unsigned int ip_options_len;
-    unsigned char *ip_options_data;
+        IPHdr                      *iph,
+                                   *orig_iph;       /* and orig. headers for ICMP_*_UNREACH family */
+        unsigned int                ip_options_len;
+        unsigned char              *ip_options_data;
 
-    IPv6Hdr     *ipv6_hdr;
+        IPv6Hdr                    *ipv6_hdr,
+                                   *orig_ipv6_hdr;
 
-    TCPHdr *tcph, *orig_tcph;
-    unsigned int tcp_options_len;
-    unsigned char *tcp_options_data;
+        TCPHdr                     *tcph,
+                                   *orig_tcph;
+        unsigned int                tcp_options_len;
+        unsigned char              *tcp_options_data;
 
-    UDPHdr *udph, *orig_udph;
-    ICMPHdr *icmph, *orig_icmph;
+        UDPHdr                     *udph,
+                                   *orig_udph;
+        ICMPHdr                    *icmph,
+                                   *orig_icmph;
 
-    echoext *ext;       /* ICMP echo extension struct */
+        echoext                    *ext;            /* ICMP echo extension struct */
 
-    unsigned char *data;     /* packet payload pointer */
-    unsigned int dsize;        /* packet payload size */
-    unsigned int alt_dsize; /* the dsize of a packet before munging
-                            (used for log)*/
+        unsigned char              *data;           /* packet payload pointer */
+        unsigned int                dsize;          /* packet payload size */
 
-    unsigned char frag_flag;     /* flag to indicate a fragmented packet */
-    unsigned short int frag_offset;  /* fragment offset number */
-    unsigned char mf;            /* more fragments flag */
-    unsigned char df;            /* don't fragment flag */
-    unsigned char rf;                  /* IP reserved bit */
+        unsigned char               frag_flag;      /* flag to indicate a fragmented packet */
+        unsigned short int          frag_offset;    /* fragment offset number */
+        unsigned char               mf,             /* more fragments flag */
+                                    df,             /* don't fragment flag */
+                                    rf;             /* IP reserved bit */
 
-    unsigned short int sp;       /* source port (TCP/UDP) */
-    unsigned short int dp;       /* dest port (TCP/UDP) */
-    unsigned short int orig_sp;      /* source port (TCP/UDP) of original datagram */
-    unsigned short int orig_dp;      /* dest port (TCP/UDP) of original datagram */
-    unsigned int caplen;
+        unsigned short int          sp,             /* source port (TCP/UDP) */
+                                    dp,             /* dest port (TCP/UDP) */
+                                    orig_sp,        /* source port (TCP/UDP) of original datagram */
+                                    orig_dp;        /* dest port (TCP/UDP) of original datagram */
+        unsigned int                caplen;
 
-    unsigned char uri_count;   /* number of URIs in this packet */
+        unsigned char               uri_count;      /* number of URIs in this packet */
 
+        Options                     ip_options[40]; /* ip options decode structure */
+        unsigned int                ip_option_count;/* number of options in this packet */
+        unsigned char               ip_lastopt_bad; /* flag to indicate that option decoding was halted due to a bad option */
+        Options                     tcp_options[40];/* tcp options decode struct */
+        unsigned int                tcp_option_count;
+        unsigned char               tcp_lastopt_bad;/* flag to indicate that option decoding was halted due to a bad option */
 
-    Options ip_options[40]; /* ip options decode structure */
-    unsigned int ip_option_count;  /* number of options in this packet */
-    u_char ip_lastopt_bad;  /* flag to indicate that option decoding was halted due to a bad option */
-    Options tcp_options[40];    /* tcp options decode struct */
-    unsigned int tcp_option_count;
-    u_char tcp_lastopt_bad;  /* flag to indicate that option decoding was halted due to a bad option */
+        unsigned char               csum_flags;     /* checksum flags */
+        unsigned int                packet_flags;   /* special flags for the packet */
 
-    unsigned char csum_flags;        /* checksum flags */
-    unsigned int packet_flags;     /* special flags for the packet */
-
-        void *upper_layer_protocol_headers[MAX_UPPER_PROTOCOLS];
-        int upper_layer_names[MAX_UPPER_PROTOCOLS];
-        int num_of_upper_layer_protocols;
-
+        void                       *upper_layer_protocol_headers[MAX_UPPER_PROTOCOLS];
+        int                         upper_layer_names[MAX_UPPER_PROTOCOLS];
+        int                         num_of_upper_layer_protocols;
 } anonpacket;
 
 
 struct anonflow {
-        char modifies;
+        char                    modifies;
 
-        //cooking specific
-        unsigned char *mod_pkt;
-        unsigned char *server_mod_pkt;
-        anon_pkthdr_t mod_pkt_head;
-        anon_pkthdr_t server_mod_pkt_head;
-        flist_t *client_headers;
-        flist_t *server_headers;
-        unsigned int client_size;
-        unsigned int server_size;
-        flist_t *ret_client_headers;
-        flist_t *ret_server_headers;
-        unsigned char* ret_client_data;
-        unsigned char* ret_server_data;
-        //end of cooking data
+        /* Cooking specific fields */
+        unsigned char          *mod_pkt,
+                               *server_mod_pkt;
+        anon_pkthdr_t           mod_pkt_head,
+                                server_mod_pkt_head;
+        flist_t                *client_headers,
+                               *server_headers;
+        unsigned int            client_size,
+                                server_size;
+        flist_t                *ret_client_headers,
+                               *ret_server_headers;
+        unsigned char          *ret_client_data,
+                               *ret_server_data;
+        /* end of cooking fields */
 
-        anonpacket *decoded_packet;
-        int link_type;
-        int cap_length;
-        char uncook_ready;
-        int output_type;
-        char *output_filename;
-        void *output_handler;
-        struct function *function_list;
-        int cont_set ; // continuation set?
-        int give_output[MAX_CONT] ; // give output to other sets
-        void *output_info;
+        anonpacket             *decoded_packet;
+        int                     link_type,
+                                cap_length;
+        char                    uncook_ready;
+        int                     output_type;
+        char                   *output_filename;
+        void                   *output_handler;
+        struct function        *function_list;
+        int                     cont_set;               /* continuation set */
+        int                     give_output[MAX_CONT];  /* give output to other sets */
+        void                   *output_info;
 
         /* AES / DES keys */
         /*
@@ -187,25 +186,25 @@ struct anonflow {
         */
 
         // For Netflow v9.
-        flist_t *nf9_templates;
-        flist_t *nf9_option_templates;
+        flist_t                *nf9_templates,
+                               *nf9_option_templates,
         // For IPFIX
-        flist_t *ipfix_templates;
-        flist_t *ipfix_options;
+                               *ipfix_templates,
+                               *ipfix_options;
 };
 
 struct finfo {
-        char *name;
-        char *description;
-        int (*init)(va_list vl,void *f,struct anonflow *flow);
-        int (*process)(struct anonflow *flow,void *internal_data,unsigned char* dev_pkt,anon_pkthdr_t* pkt_head);
+        char                   *name;
+        char                   *description;
+        int     (*init)         (va_list vl,void *f,struct anonflow *flow);
+        int     (*process)      (struct anonflow *flow,void *internal_data,unsigned char* dev_pkt,anon_pkthdr_t* pkt_head);
 };
 
 struct function {
-        int fid;
-        void *internal_data;
-        struct finfo *function_info;
-        struct function *next;
+        int                     fid;
+        void                   *internal_data;
+        struct finfo           *function_info;
+        struct function        *next;
 };
 
 typedef enum {
@@ -214,7 +213,6 @@ typedef enum {
 } patternTypes;
 
 typedef enum  {
-
         //ACCEPTED PROTOCOLS
         IP=1  ,
         TCP  ,
@@ -229,7 +227,6 @@ typedef enum  {
         RPC,
         BINARY_PAYLOAD,
 
-
         //ANONYMIZATION FUNCTIONS
         UNCHANGED         ,
         MAP               ,
@@ -242,7 +239,7 @@ typedef enum  {
         ZERO              ,
         REPLACE           ,
         PREFIX_PRESERVING ,
-        PREFIX_PRESERVING_MAP ,
+        PREFIX_PRESERVING_MAP,
         CHECKSUM_ADJUST   ,
         FILENAME_RANDOM   ,
         VALUE_SHIFT       ,
@@ -1038,23 +1035,23 @@ extern nodehdr_t addr_propagate;
 #define NIC_PKTCAP_LEN 1540
 
 struct sourceinfo {
-        int type;
+        int                     type;
 
-        int (*open_input)(char *name);
-        void (*init_input)(struct anonflow *flow);
-        void *(*init_output)(char *name, int linktype);
-        void (*dump_packet)(void *handler,unsigned char *packet,anon_pkthdr_t *header);
-        void (*process_packets)();
+        int     (*open_input)   (char *name);
+        void    (*init_input)   (struct anonflow *flow);
+        void *  (*init_output)  (char *name, int linktype);
+        void    (*dump_packet)  (void *handler,unsigned char *packet,anon_pkthdr_t *header);
+        void    (*process_packets)();
 
 };
 
 
-//prototypes
-int create_set();
-int set_source(int type,char *filename);
-int add_function(int sd,char *funcName,...);
-void start_processing();
-int set_output(int sd,int type,char *filename);
+/* API prototypes */
+int     create_set      ();
+int     set_source      (int type, char *filename);
+int     add_function    (int sd, char *funcName, ...);
+void    start_processing();
+int     set_output      (int sd, int type, char *filename);
 
 
 #endif

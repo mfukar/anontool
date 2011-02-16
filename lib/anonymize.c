@@ -358,7 +358,7 @@ static int anonymize_init(va_list vl, void *fu, struct anonflow *fl)
         }
 
         if (sanity_checks(data->protocol, data->field, data->function) != 0) {
-                fprintf("[-] Sanity checks failed\n");
+                fprintf(stderr, "[-] Sanity checks failed\n");
         }
 
         f->internal_data = (void *)data;

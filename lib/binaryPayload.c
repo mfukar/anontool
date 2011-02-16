@@ -19,6 +19,7 @@
  * use or performance of this software.
  */
 #include <arpa/inet.h>
+#include <ctype.h>
 
 #include "anonymization.h"
 
