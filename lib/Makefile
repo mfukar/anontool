@@ -6,14 +6,14 @@ OPTIMIZATIONFLAGS=-O3
 CFLAGS=$(OPTIMIZATIONFLAGS) $(WARNINGS) $(INCLUDE) $(SHAREDFLAGS) -D_GNU_SOURCE
 LIBRARIES=-lpcap -lpcre -lm
 
-TARGETS=libnids.a anonlib.so
+TARGETS=libnids.so anonlib.so
 all: $(TARGETS)
 
 anonlib.so:tool.o bpf.o pcap_input.o cooking.o flist.o strsearch.o mstring.o callback.o printpacket.o anonymize.o decoders.o anon_snort_decode.o anon_print_packet.o anon_checksums.o anon_prefix_preserving.o prefix_preserving_map.o md5.o sha1.o sha256.o sha512.o anonymization_functions.o crc32.o des.o aes.o uncook.o binaryPayload.o util.o
 	gcc $(CFLAGS) -shared -o $@ $^ -L.. -L. $(LIBRARIES)
 
-libnids.a: 
-	cd libnids && ./configure --disable-libnet --enable-shared && make
+libnids.so:
+	cd libnids && ./configure --disable-libnet --enable-shared && make shared
 	if [ -e libnids.so ]; then unlink libnids.so; fi
 	ln -s libnids/src/libnids.so.1.21 libnids.so
 
