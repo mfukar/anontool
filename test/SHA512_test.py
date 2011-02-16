@@ -30,7 +30,7 @@ class SHA2_Sum(Structure):
         _fields_ = [("buffer", c_ubyte * 64)]
 
 def main():
-        '''FIPS 180-3 test vectors'''
+        '''FIPS 180-2 test vectors (appendices C & D)'''
         SHA2_test_vectors = [
                 ("abc",
                 [0xCB, 0x00, 0x75, 0x3F, 0x45, 0xA3, 0x5E, 0x8B,
@@ -62,7 +62,7 @@ def main():
                  0x33, 0x1B, 0x99, 0xDE, 0xC4, 0xB5, 0x43, 0x3A,
                  0xC7, 0xD3, 0x29, 0xEE, 0xB6, 0xDD, 0x26, 0x54,
                  0x5E, 0x96, 0xE5, 0x5B, 0x87, 0x4B, 0xE9, 0x09]),
-                ("".join(['a' for i in range(1000)]),
+                ("".join(['a' for i in range(1000000)]),
                 [0x9D, 0x0E, 0x18, 0x09, 0x71, 0x64, 0x74, 0xCB,
                  0x08, 0x6E, 0x83, 0x4E, 0x31, 0x0A, 0x4A, 0x1C,
                  0xED, 0x14, 0x9E, 0x9C, 0x00, 0xF2, 0x48, 0x52,
@@ -152,7 +152,7 @@ def main():
                   0x1D, 0x41, 0x79, 0xBC, 0x89, 0x1D, 0x87, 0xA6]
                 ),
                 ("Test Using Larger Than Block-Size Key - Hash Key First",
-                 "\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA",
+                 ''.join(['\xAA' for i in range(131)]),
                  [0x4E, 0xCE, 0x08, 0x44, 0x85, 0x81, 0x3E, 0x90,
                   0x88, 0xD2, 0xC6, 0x3A, 0x04, 0x1B, 0xC5, 0xB4,
                   0x4F, 0x9E, 0xF1, 0x01, 0x2A, 0x2B, 0x58, 0x8F,
@@ -168,7 +168,7 @@ def main():
                   0x95, 0xE6, 0x4F, 0x73, 0xF6, 0x3F, 0x0A, 0xEC,
                   0x8B, 0x91, 0x5A, 0x98, 0x5D, 0x78, 0x65, 0x98]),
                 ("This is a test using a larger than block-size key and a larger than block-size data. The key needs to be hashed before being used by the HMAC algorithm.",
-                "\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA",
+                 ''.join(['\xAA' for i in range(131)]),
                 [0x66, 0x17, 0x17, 0x8E, 0x94, 0x1F, 0x02, 0x0D,
                  0x35, 0x1E, 0x2F, 0x25, 0x4E, 0x8F, 0xD3, 0x2C,
                  0x60, 0x24, 0x20, 0xFE, 0xB0, 0xB8, 0xFB, 0x9A,
@@ -184,33 +184,30 @@ def main():
                  0x13, 0x46, 0x76, 0xFB, 0x6D, 0xE0, 0x44, 0x60,
                  0x65, 0xC9, 0x74, 0x40, 0xFA, 0x8C, 0x6A, 0x58])
                                  ]
-        sha2_ctx = SHA2_Context()
         digest = SHA2_Sum()
         for block_size in [384, 512]:
                 for buffer, sha384sum, sha512sum in SHA2_test_vectors:
-                        anonlib.SHA2_starts(byref(sha2_ctx), c_int(block_size))
-                        if len(buffer) == 1000:
-                                for i in range(1000):
-                                        anonlib.SHA2_update(byref(sha2_ctx), c_char_p(buffer), len(buffer))
-                        else:
-                                anonlib.SHA2_update(byref(sha2_ctx), c_char_p(buffer), len(buffer))
-                        anonlib.SHA2_finish(byref(sha2_ctx), byref(digest))
+                        anonlib.SHA2(c_char_p(buffer), len(buffer), byref(digest), c_int(block_size))
 
                         result = [byte for byte in digest.buffer]
-                        if block_size == 384:
-                                result = result[:48]
-                                if result != sha384sum:
-                                        raise AssertionError('[-] SHA2 test failed.')
-                        else:
-                                if result != sha512sum:
-                                        raise AssertionError('[-] SHA2 test failed.')
-        # HMAC SHA-2 tests
+                        result = result[:block_size/8]
+                        if result != sha384sum and result != sha512sum:
+                                raise AssertionError('[-] SHA2 test failed.')
+        # HMAC-SHA-2 tests [RFC4231]
         for block_size in [384, 512]:
                 for buffer, key, sha384sum, sha512sum in SHA2_HMAC_test_vectors:
-                        # TODO
-                        pass
-        print('[+] SHA2 test passed.')
+                        anonlib.SHA2_hmac(c_char_p(key), len(key), c_char_p(buffer), len(buffer), byref(digest), c_int(block_size))
 
+                        result = [byte for byte in digest.buffer]
+                        # To truncate or not to truncate?
+                        if key[0] == '\x0C':
+                                result = result[:16]
+                        else:
+                                result = result[:block_size/8]
+                        if result != sha384sum and result != sha512sum:
+                                raise AssertionError('[-] SHA2 test failed.')
+
+        print('[+] SHA2 test passed.')
 
 if __name__ == '__main__':
         main()

@@ -4,7 +4,7 @@
  * @version     0.5
  * @date
  *      Created:     Mon Feb 14, 2011 09:41 EET
- *      Last Update: Mon Feb 14, 2011 17:51 EET
+ *      Last Update: Wed Feb 16, 2011 08:56 EET
  *------------------------------------------------------------------------
  * Description: SHA512 implementation headers for anontool
  *
@@ -46,7 +46,7 @@ typedef struct {
  *
  * Returns:     Nothing
  */
-static void     SHA2_starts(SHA2_context *, sha2_block_e block_size);
+static void     SHA2_start(SHA2_context *, sha2_block_e block_size);
 
 /*
  * SHA-2 process buffer
@@ -93,7 +93,7 @@ void            SHA2(const unsigned char *input, int, unsigned char digest[64], 
  *
  * Returns:     Nothing
  */
-void            SHA2_hmac_start(SHA2_context *ctx, const unsigned char *key, int keylen, sha2_block_e block_size);
+static void     SHA2_hmac_start(SHA2_context *ctx, const unsigned char *key, int keylen, sha2_block_e block_size);
 
 /*
  * Update SHA-512 HMAC buffer
@@ -105,7 +105,7 @@ void            SHA2_hmac_start(SHA2_context *ctx, const unsigned char *key, int
  *
  * Returns:     Nothing
  */
-void            SHA2_hmac_update(SHA2_context *ctx, const unsigned char *input, int ilen);
+static void     SHA2_hmac_update(SHA2_context *ctx, const unsigned char *input, int ilen);
 
 /*
  * Produces SHA-512 HMAC final digest
@@ -116,7 +116,7 @@ void            SHA2_hmac_update(SHA2_context *ctx, const unsigned char *input, 
  *
  * Returns:     Nothing
  */
-void            SHA2_hmac_finish(SHA2_context *ctx, unsigned char digest[64]);
+static void     SHA2_hmac_finish(SHA2_context *ctx, unsigned char digest[64]);
 
 /*
  * Reset SHA-512 HMAC context
