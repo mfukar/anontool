@@ -13,7 +13,7 @@ anonlib.so:tool.o bpf.o pcap_input.o cooking.o flist.o strsearch.o mstring.o cal
 	gcc $(CFLAGS) -shared -o $@ $^ -L.. -L. $(LIBRARIES)
 
 libnids.so:
-	cd libnids && ./configure --disable-libnet --enable-shared && make shared
+	cd libnids && ./configure --disable-libnet --disable-libglib --enable-shared && make shared
 	if [ -e libnids.so ]; then unlink libnids.so; fi
 	ln -s libnids/src/libnids.so.1.21 libnids.so
 
@@ -75,7 +75,7 @@ sha256.o: sha256.c sha256.h
 	gcc $(CFLAGS) -c $<
 
 sha512.o: sha512.c sha512.h
-	gcc $(CFLAGS) -c $<
+	gcc $(CFLAGS) -std=c99 -c $<
 
 crc32.o: crc32.c crc32.h
 	gcc $(CFLAGS) -c $<

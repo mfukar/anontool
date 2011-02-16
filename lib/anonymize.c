@@ -206,8 +206,8 @@ int can_field_be_applied_to_protocol(int protocol, int field)
 			return 0;
 		break;
 	case NETFLOW_V9:
-		if (((field < PAYLOAD || (field > DST_PORT && field < NETFLOW_VERSION))
-		     || field > TEMPLATE) && field != UDP_DATAGRAM_LENGTH)
+		if (((field < PAYLOAD || (field > DST_PORT && field <= BASE_NETFLOW_V9_DEFS))
+		     || field >= END_NETFLOW_V9_SCOPES) && field != UDP_DATAGRAM_LENGTH)
 			return 0;
 		break;
 	case NETFLOW_V5:
@@ -229,32 +229,35 @@ int can_field_be_applied_to_protocol(int protocol, int field)
 
 int can_field_be_applied_to_function(int anonymization_function, int field)
 {
-	if (anonymization_function == PREFIX_PRESERVING && field != SRC_IP
-	    && field != DST_IP && field != IPV4_SRC_ADDR
-	    && field != IPV4_DST_ADDR && field != NF5_SRCADDR && field != NF5_DSTADDR
-	    && field != NF5_NEXTHOP && field != IPV4_NEXT_HOP && field != IPV6_NEXT_HOP
-	    && field != BGP_IPV4_NEXT_HOP && field != BGP_IPV6_NEXT_HOP) {
+	if (anonymization_function == PREFIX_PRESERVING
+        && field != SRC_IP && field != DST_IP
+        && field != NF9_IPV4_SRC_ADDR && field != NF9_IPV4_DST_ADDR
+        && field != NF5_SRCADDR && field != NF5_DSTADDR
+	&& field != NF5_NEXTHOP
+        && field != NF9_IPV4_NEXT_HOP && field != NF9_IPV6_NEXT_HOP
+	&& field != NF9_BGP_IPV4_NEXT_HOP && field != NF9_BGP_IPV6_NEXT_HOP) {
 		printf("PREFIX_PRESERVING can only be applied to IP addresses\n");
 		return 0;
 	}
 
-	if (anonymization_function == PREFIX_PRESERVING_MAP && field != SRC_IP
-	    && field != DST_IP && field != IPV4_SRC_ADDR
-	    && field != IPV4_DST_ADDR && field != NF5_SRCADDR && field != NF5_DSTADDR
-	    && field != NF5_NEXTHOP && field != IPV4_NEXT_HOP && field != IPV6_NEXT_HOP
-	    && field != BGP_IPV4_NEXT_HOP && field != BGP_IPV6_NEXT_HOP) {
+	if (anonymization_function == PREFIX_PRESERVING_MAP
+        && field != SRC_IP && field != DST_IP
+        && field != NF9_IPV4_SRC_ADDR && field != NF9_IPV4_DST_ADDR
+        && field != NF5_SRCADDR && field != NF5_DSTADDR
+	&& field != NF5_NEXTHOP && field != NF9_IPV4_NEXT_HOP && field != NF9_IPV6_NEXT_HOP
+        && field != NF9_BGP_IPV4_NEXT_HOP && field != NF9_BGP_IPV6_NEXT_HOP) {
 		printf("PREFIX_PRESERVING_MAP can only be applied to IP addresses\n");
 		return 0;
 	}
 
 	if ((anonymization_function == MAP || anonymization_function == MAP_DISTRIBUTION)
 	    && (field < CHECKSUM || field > CODE || field == OPTIONS || field == TCP_OPTIONS)
-	    && field != IPV4_SRC_ADDR && field != IPV4_DST_ADDR 
+	    && field != NF9_IPV4_SRC_ADDR && field != NF9_IPV4_DST_ADDR
+            && field != NF9_L4_SRC_PORT && field != NF9_L4_DST_PORT
 	    && field != NF5_SRCADDR && field != NF5_DSTADDR
-	    && field != NF5_NEXTHOP && field != IPV4_NEXT_HOP && field != IPV6_NEXT_HOP
-	    && field != BGP_IPV4_NEXT_HOP && field != BGP_IPV6_NEXT_HOP) {
-		printf
-		    ("MAP/MAP_DISTRIBUTION can only be applied to IP,TCP,UDP and ICMP headers (except IP and TCP options) & Netflows\n");
+	    && field != NF5_NEXTHOP && field != NF9_IPV4_NEXT_HOP && field != NF9_IPV6_NEXT_HOP
+	    && field != NF9_BGP_IPV4_NEXT_HOP && field != NF9_BGP_IPV6_NEXT_HOP) {
+		printf("MAP/MAP_DISTRIBUTION can only be applied to IP,TCP,UDP and ICMP headers (except IP and TCP options) & Netflows\n");
 		return 0;
 	}
 
@@ -262,8 +265,7 @@ int can_field_be_applied_to_function(int anonymization_function, int field)
 	    && (field != OPTIONS) && (field != TCP_OPTIONS)
 	    && (field <= BASE_HTTP_DEFS) && (field >= END_HTTP_DEFS)
 	    && (field <= BASE_FTP_DEFS) && (field <= END_FTP_DEFS)) {
-		printf
-		    ("STRIP can only be applied to IP and TCP options, PAYLOAD and all HTTP, FTP headers\n");
+		printf("STRIP can only be applied to IP and TCP options, PAYLOAD and all HTTP, FTP headers\n");
 		return 0;
 	}
 
@@ -1184,32 +1186,32 @@ anonymize_field(int protocol, int field, int function, anonpacket * packet,
 
 		switch (field) {
 			// Header fields.
-		case NETFLOW_VERSION:
+		case NF9_VERSION:
 			field_pointer = (unsigned char *)&(netflow->header->version);
 			len = sizeof(uint16_t);
 			break;
-		case COUNT:
+		case NF9_COUNT:
 			field_pointer = (unsigned char *)&(netflow->header->count);
 			len = sizeof(uint16_t);
 			break;
-		case UPTIME:
+		case NF9_UPTIME:
 			field_pointer = (unsigned char *)&(netflow->header->uptime);
 			len = sizeof(uint32_t);
 			break;
-		case UNIXSECS:
+		case NF9_UNIXSECS:
 			field_pointer = (unsigned char *)&(netflow->header->seconds);
 			len = sizeof(uint32_t);
 			break;
-		case PACKAGESEQ:
+		case NF9_PACKAGESEQ:
 			field_pointer = (unsigned char *)&(netflow->header->sequence);
 			len = sizeof(uint32_t);
 			break;
-		case SOURCEID:
+		case NF9_SOURCEID:
 			field_pointer = (unsigned char *)&(netflow->header->source_id);
 			len = sizeof(uint32_t);
 			break;
 			// Fields common to all flowsets.
-		case FLOWSET_ID:
+		case NF9_FLOWSET_ID:
 		{
 			int             i = 0;
 			len = sizeof(uint16_t);
@@ -1240,7 +1242,7 @@ anonymize_field(int protocol, int field, int function, anonpacket * packet,
 			}
 		}
 			break;
-		case LENGTH:
+		case NF9_LENGTH:
 		{
 			int             i = 0;
 			len = sizeof(uint16_t);
@@ -1480,7 +1482,7 @@ anonymize_field(int protocol, int field, int function, anonpacket * packet,
 		}
 		free(netflow);
 		// Escape.
-		if (field > SOURCEID && field < END_NETFLOW_V9_FIELDS) {	// Already anonymized. We know where we're going. Out.
+		if (field > NF9_SOURCEID && field < END_NETFLOW_V9_FIELDS) {	// Already anonymized. We know where we're going. Out.
 			return;
 		}
 		break;
