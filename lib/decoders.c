@@ -116,40 +116,6 @@ void print_substring(unsigned char *start, unsigned char *end)
 	}
 }
 
-/*
- * mfukar
- * Auxiliary functions converting 
- * character representation of binary data (as in packets)
- * to 16-bit and 32-bit integers.
- */
-uint16_t ato16(char *string)
-{
-	uint16_t        num = 0;
-	memcpy(&num, string, sizeof(uint16_t));
-	return (num);
-}
-
-uint32_t ato32(char *string)
-{
-	uint32_t        num = 0;
-	memcpy(&num, string, sizeof(uint32_t));
-	return (num);
-}
-
-uint16_t dump16(char *s)
-{
-	uint16_t        n;
-	memcpy(&n, s, sizeof(uint16_t));
-	return (n);
-}
-
-uint32_t dump32(char *s)
-{
-	uint32_t        n;
-	memcpy(&n, s, sizeof(uint32_t));
-	return (n);
-}
-
 int match_http_keyword(char *keyword)
 {
 	int             i;
