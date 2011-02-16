@@ -132,7 +132,7 @@ int anonymize_unmarshal(va_list vl, struct anonymize_data *data)
                         data->pattern = (char *)strdup(tmps);
                         break;
                 default:
-                        printf("UNKNOWN PATTERN TYPE\n");
+                        fprintf(stderr, "UNKNOWN PATTERN TYPE\n");
                         return -1;
                 }
                 break;
@@ -236,7 +236,7 @@ int can_field_be_applied_to_function(int anonymization_function, int field)
         && field != NF5_NEXTHOP
         && field != NF9_IPV4_NEXT_HOP && field != NF9_IPV6_NEXT_HOP
         && field != NF9_BGP_IPV4_NEXT_HOP && field != NF9_BGP_IPV6_NEXT_HOP) {
-                printf("PREFIX_PRESERVING can only be applied to IP addresses\n");
+                fprintf(stderr, "PREFIX_PRESERVING can only be applied to IP addresses\n");
                 return 0;
         }
 
@@ -246,7 +246,7 @@ int can_field_be_applied_to_function(int anonymization_function, int field)
         && field != NF5_SRCADDR && field != NF5_DSTADDR
         && field != NF5_NEXTHOP && field != NF9_IPV4_NEXT_HOP && field != NF9_IPV6_NEXT_HOP
         && field != NF9_BGP_IPV4_NEXT_HOP && field != NF9_BGP_IPV6_NEXT_HOP) {
-                printf("PREFIX_PRESERVING_MAP can only be applied to IP addresses\n");
+                fprintf(stderr, "PREFIX_PRESERVING_MAP can only be applied to IP addresses\n");
                 return 0;
         }
 
@@ -257,7 +257,7 @@ int can_field_be_applied_to_function(int anonymization_function, int field)
             && field != NF5_SRCADDR && field != NF5_DSTADDR
             && field != NF5_NEXTHOP && field != NF9_IPV4_NEXT_HOP && field != NF9_IPV6_NEXT_HOP
             && field != NF9_BGP_IPV4_NEXT_HOP && field != NF9_BGP_IPV6_NEXT_HOP) {
-                printf("MAP/MAP_DISTRIBUTION can only be applied to IP,TCP,UDP and ICMP headers (except IP and TCP options) & Netflows\n");
+                fprintf(stderr, "MAP/MAP_DISTRIBUTION can only be applied to IP,TCP,UDP and ICMP headers (except IP and TCP options) & Netflows\n");
                 return 0;
         }
 
@@ -265,7 +265,7 @@ int can_field_be_applied_to_function(int anonymization_function, int field)
             && (field != OPTIONS) && (field != TCP_OPTIONS)
             && (field <= BASE_HTTP_DEFS) && (field >= END_HTTP_DEFS)
             && (field <= BASE_FTP_DEFS) && (field <= END_FTP_DEFS)) {
-                printf("STRIP can only be applied to IP and TCP options, PAYLOAD and all HTTP, FTP headers\n");
+                fprintf(stderr, "STRIP can only be applied to IP and TCP options, PAYLOAD and all HTTP, FTP headers\n");
                 return 0;
         }
 
@@ -275,18 +275,17 @@ int can_field_be_applied_to_function(int anonymization_function, int field)
            } */
 
         if (anonymization_function == REPLACE && (field >= CHECKSUM && field <= CODE)) {
-                printf("REPLACE cannot be performed on headers\n");
+                fprintf(stderr, "REPLACE cannot be performed on headers\n");
                 return 0;
         }
 
         if (anonymization_function == CHECKSUM_ADJUST && field != CHECKSUM) {
-                printf("CHECKSUM_ADJUST can only be applied to CHECKSUM field\n");
+                fprintf(stderr, "CHECKSUM_ADJUST can only be applied to CHECKSUM field\n");
                 return 0;
         }
 
         if (field == VERSION || field == IHL) {
-                printf
-                    ("Anonymization of IP fields Version & Internet Header Length is not supported to maintain usability of anonymized data.\n");
+                fprintf(stderr, "Anonymization of IP fields Version & Internet Header Length is not supported to maintain usability of anonymized data.\n");
                 return 0;
         }
 
@@ -315,17 +314,17 @@ static int sanity_checks(int protocol, int field_description, int anonymization_
         }
 
         if (anonymization_function < UNCHANGED || anonymization_function > REGEXP) {
-                printf("UNKNOWN FUNCTION\n");
+                fprintf(stderr, "UNKNOWN FUNCTION\n");
                 return MFUNCT_INVALID_ARGUMENT_3;
         }
 
         if (!can_field_be_applied_to_protocol(protocol, field_description)) {
-                printf("FIELD CANNOT BE APPLIED TO SPECIFIC PROTOCOL\n");
+                fprintf(stderr, "FIELD CANNOT BE APPLIED TO SPECIFIC PROTOCOL\n");
                 return MFUNCT_INVALID_ARGUMENT_2;
         }
 
         if (!can_field_be_applied_to_function(anonymization_function, field_description)) {
-                printf("FIELD CANNOT BE APPLIED TO SPECIFIC FUNCTION\n");
+                fprintf(stderr, "FIELD CANNOT BE APPLIED TO SPECIFIC FUNCTION\n");
                 return MFUNCT_INVALID_ARGUMENT_2;
         }
 
@@ -354,12 +353,12 @@ static int anonymize_init(va_list vl, void *fu, struct anonflow *fl)
         data = (struct anonymize_data *)
             malloc(sizeof(struct anonymize_data));
         if (anonymize_unmarshal(vl, data) == -1) {
-                printf("Unmarshaling failed\n");
+                fprintf(stderr, "[-] Unmarshaling failed\n");
                 return -1;
         }
 
         if (sanity_checks(data->protocol, data->field, data->function) != 0) {
-                printf("Sanity checks failed\n");
+                fprintf("[-] Sanity checks failed\n");
         }
 
         f->internal_data = (void *)data;
@@ -516,7 +515,7 @@ apply_function_to_field(int function, int protocol, int field,
                                  (unsigned char *)AES_keys, 8 * sizeof(AES_keys), params->padding_behavior, packet);
                         break;
                 default:
-                        printf("Fatal Error!\n");
+                        fprintf(stderr, "[-] Fatal Error, unknown hash algorithm\n");
                         exit(0);
                 }
                 break;
@@ -621,7 +620,7 @@ anonymize_field(int protocol, int field, int function, anonpacket * packet,
         unsigned int    total_len;
 
         if (!packet) {
-                printf("WARNING: NULL packet\n");
+                fprintf(stderr, "WARNING: NULL packet\n");
                 return;
         }
 
@@ -1161,7 +1160,7 @@ anonymize_field(int protocol, int field, int function, anonpacket * packet,
         {
                 struct NETFLOW_V9 *netflow;
                 if ((netflow = malloc(sizeof(struct NETFLOW_V9))) == NULL) {
-                        fprintf(stderr, "Allocation of NETFLOW_V9 failed\n");
+                        fprintf(stderr, "Allocation of struct NETFLOW_V9 failed\n");
                         return;
                 }
                 // Decode NetFlow header. Keeps template records in a list.
@@ -1499,7 +1498,7 @@ anonymize_field(int protocol, int field, int function, anonpacket * packet,
                 if ((ipfix = malloc(sizeof(struct IPFIX))) == NULL
                     || (templateset = malloc(sizeof(struct ipfix_template_set)))
                     == NULL) {
-                        fprintf(stderr, "Could not allocate IPFIX structures.\n");
+                        fprintf(stderr, "Allocation of struct IPFIX failed\n");
                         return;
                 }
                 memset(ipfix, 0, sizeof(struct IPFIX));
@@ -2130,7 +2129,7 @@ anonymize_field(int protocol, int field, int function, anonpacket * packet,
                                  (unsigned char *)AES_keys, 8 * sizeof(AES_keys), params->padding_behavior, packet);
                         break;
                 default:
-                        printf("Fatal Error!\n");
+                        fprintf(stderr, "Fatal Error, unknown hash algorithm\n");
                         exit(0);
                 }
                 break;
