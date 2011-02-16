@@ -21,17 +21,10 @@
 #ifndef _ANONYMIZATION_H_
 #define _ANONYMIZATION_H_
 
-#include <pcap.h>
-#include <stdarg.h>
 #include <sys/time.h>
-#include <string.h>
-#include <pcre.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include "anon_snort_decode.h"
+
 #include "flist.h"
-#include "prefix_preserving_map.h"
+#include "anon_snort_decode.h"
 
 #define ON                      1
 #define OFF                     0
@@ -889,21 +882,20 @@ struct IPFIX
         struct ipfix_data_set **data;
 };
 
+#include <pcre.h>
 /*
  * Generic XOR
  */
-typedef struct _XORPcreHelper
-{
-        char *PCRE;
-        char *Name;
-        uint16_t options;
+typedef struct {
+        char           *PCRE;
+        char           *Name;
+        uint16_t        options;
 } XORPcreHelper;
 
-typedef struct _XORPcreContext
-{
-        pcre *PCRE;
-        char *Name;
-        uint16_t options;
+typedef struct {
+        pcre           *PCRE;
+        char           *Name;
+        uint16_t        options;
 } XORPcreContext;
 
 #define XF_NONE                 0x00001
@@ -911,92 +903,100 @@ typedef struct _XORPcreContext
 #define XF_INVERSE_ORDER        0x00004
 
 // The structure returneth for decoded payloads
-typedef struct _XORPayloadContent
-{
-        char    keysize;
-        char    key;    uint32_t        longkey;
-        unsigned char   *IP;    uint16_t        IPLen;
-        unsigned char   *host;  uint16_t        hostLen;
+typedef struct {
+        char            keysize;
+        char            key;
+        uint32_t        longkey;
+        unsigned char  *IP;
+        uint16_t        IPLen;
+        unsigned char  *host;
+        uint16_t        hostLen;
 } XORPayloadContent;
 
 /*
  * Generic wget
  */
-struct genericWgetURL
-{
-        uint32_t        startOffset, endOffset;
-        char *decodedurl;
-        unsigned char *protocol; uint16_t protocolLen;
-        unsigned char *user;    uint16_t userLen;
-        unsigned char *pass;    uint16_t passLen;
-        unsigned char *host;    uint16_t hostLen;
-        unsigned char *port;    uint16_t portLen;
-        unsigned char *path;    uint16_t pathLen;
-        unsigned char *dir;     uint16_t dirLen;
-        unsigned char *file;    uint16_t fileLen;
+struct genericWgetURL {
+        uint32_t        startOffset,
+                        endOffset;
+        char           *decodedurl;
+        unsigned char  *protocol;
+        uint16_t        protocolLen;
+        unsigned char  *user;
+        uint16_t        userLen;
+        unsigned char  *pass;
+        uint16_t        passLen;
+        unsigned char  *host;
+        uint16_t        hostLen;
+        unsigned char  *port;
+        uint16_t        portLen;
+        unsigned char  *path;
+        uint16_t        pathLen;
+        unsigned char  *dir;
+        uint16_t        dirLen;
+        unsigned char  *file;
+        uint16_t        fileLen;
 };
 
 /*
  * stuttgart-shellcode link
  */
-typedef struct _stuttgartLink
-{
-        char    *host;          // 32bits
-        char    *port;          // 16bits
-        char    *authkey;       // 32bits
+typedef struct {
+        char           *host,          // 32bits
+                       *port,          // 16bits
+                       *authkey;       // 32bits
 } stuttgartLink;
 
 /*
  * wuerzburg-shellcode link
  */
-typedef struct _wuerzburgLink
-{
-        char    *ip;
-        char    *port;
+typedef struct {
+        char           *ip,
+                       *port;
 } wuerzburgLink;
 
 /*
  * konstanz-decoder link
  */
-typedef struct _konstanzLink
-{
-        unsigned char   *IP;    uint16_t        IPLen;
-        unsigned char   *host;  uint16_t        hostLen;
+typedef struct {
+        unsigned char  *IP;
+        uint16_t        IPLen;
+        unsigned char  *host;
+        uint16_t        hostLen;
 } konstanzLink;
 
 /* for mapping functions */
 
 typedef struct _mapNode {
-        unsigned int value;
-        unsigned int mapped_value;
+        unsigned int    value;
+        unsigned int    mapped_value;
         struct _mapNode *next;
 } mapNode;
 
-#define MAPPING_ENTRIES 1024
+#define MAPPING_ENTRIES         1024
 
 /* ANONYMIZATION PROTOTYPES */
-int decode_packet(int datalink,int snaplen,struct pcap_pkthdr *pkthdr,unsigned char *p,anonpacket *pkt);
-int http_decode(anonpacket *p, struct httpheader *h);
-int ftp_decode(anonpacket *p, struct ftpheader *h);
-int netflow_v9_decode(anonpacket *, struct NETFLOW_V9 *, struct anonflow *);
-int netflow_v5_decode(anonpacket *, struct NETFLOW_V5 *);
-int ipfix_decode(anonpacket *, struct IPFIX *, struct anonflow *);
-//int rpc_decode(anonpacket *, struct rpcheader *);
+int decode_packet               (int datalink,int snaplen,struct pcap_pkthdr *pkthdr,unsigned char *p,anonpacket *pkt);
+int http_decode                 (anonpacket *p, struct httpheader *h);
+int ftp_decode                  (anonpacket *p, struct ftpheader *h);
+int netflow_v9_decode           (anonpacket *, struct NETFLOW_V9 *, struct anonflow *);
+int netflow_v5_decode           (anonpacket *, struct NETFLOW_V5 *);
+int ipfix_decode                (anonpacket *, struct IPFIX *, struct anonflow *);
+//int rpc_decode                (anonpacket *, struct rpcheader *);
 
 int binaryGenericXORInit        (void);
 int binaryGenericWgetInit       (void);
 int binaryStuttgartInit         (void);
 int binaryWuerzburgInit         (void);
-//---------------------------------------------------------------
 int binaryGenericXORDecode      (anonpacket *, struct anonflow *, XORPayloadContent *);
 int binaryGenericWgetDecode     (anonpacket *, struct anonflow *, struct genericWgetURL *);
 int binaryStuttgartDecode       (anonpacket *, struct anonflow *, stuttgartLink *);
 int binaryWuerzburgDecode       (anonpacket *, struct anonflow *, wuerzburgLink *);
 int binaryKonstanzDecode        (anonpacket *, struct anonflow *, konstanzLink *);
 
-typedef void (*grinder_t)(anonpacket *, struct pcap_pkthdr *, u_char *,int snaplen);
+typedef void (*grinder_t)       (anonpacket *, struct pcap_pkthdr *, u_char *,int snaplen);
 
-extern void PrintIPPkt(FILE * fp, int type, anonpacket * p);
+extern void           PrintIPPkt(FILE * fp, int type, anonpacket * p);
 extern unsigned short calculate_ip_sum(anonpacket *p);
 extern unsigned short calculate_tcp_sum(anonpacket *p);
 extern unsigned short calculate_udp_sum(anonpacket *p);
@@ -1011,21 +1011,19 @@ extern void hide_addr(unsigned char *raw_addr);
 extern void random_field(unsigned char *field, int len);
 extern void filename_random_field(unsigned char *p, int len);
 extern void map_distribution(unsigned char *field, short len, int distribution_type, int arg1, int arg2);
-extern int aes_hash(unsigned char *field, int len, unsigned char *key, unsigned int keylen, int padding_behavior, anonpacket *p);
-extern int des_hash(unsigned char *field, int len, unsigned char *key, int padding_behavior, anonpacket *p);
+extern int  aes_hash(unsigned char *field, int len, unsigned char *key, unsigned int keylen, int padding_behavior, anonpacket *p);
+extern int  des_hash(unsigned char *field, int len, unsigned char *key, int padding_behavior, anonpacket *p);
 extern void map_field(unsigned char *field, short len, mapNode **map_table,int *count);
-extern int replace_field(unsigned char *field,  int len, unsigned char * pattern, int pattern_len,anonpacket *p, int total_len, unsigned char *packet_end);
-extern int md5_hash(unsigned char *field, int len, int padding_behavior, anonpacket *p, int total_len, unsigned char * packet_end,int donotreplace);
+extern int  replace_field(unsigned char *field,  int len, unsigned char * pattern, int pattern_len,anonpacket *p, int total_len, unsigned char *packet_end);
+extern int  md5_hash(unsigned char *field, int len, int padding_behavior, anonpacket *p, int total_len, unsigned char * packet_end,int donotreplace);
 
 extern void strip (anonpacket *p, unsigned char *field, int len,int keep_bytes, int total_len, unsigned char* packet_end);
-extern int sha1_hash(unsigned char *field, int len, int padding_behavior, anonpacket *p, int total_len, unsigned char * packet_end,int donotreplace);
-extern int sha256_hash(unsigned char *field, int len, int padding_behavior, anonpacket *p, int total_len, unsigned char * packet_end,int donotreplace);
-extern int crc32_hash(unsigned char *field, int len, int padding_behavior, anonpacket *p, int total_len, unsigned char * packet_end,int donotreplace);
-extern int reg_exp_substitute(unsigned char *field, int len, char *regular_expression, char **replacement_vector, int num_of_matches,anonpacket *p,int total_len,unsigned char *packet_end);
-extern int value_shift(unsigned char *, unsigned int);
+extern int  sha1_hash(unsigned char *field, int len, int padding_behavior, anonpacket *p, int total_len, unsigned char * packet_end,int donotreplace);
+extern int  sha256_hash(unsigned char *field, int len, int padding_behavior, anonpacket *p, int total_len, unsigned char * packet_end,int donotreplace);
+extern int  crc32_hash(unsigned char *field, int len, int padding_behavior, anonpacket *p, int total_len, unsigned char * packet_end,int donotreplace);
+extern int  reg_exp_substitute(unsigned char *field, int len, char *regular_expression, char **replacement_vector, int num_of_matches,anonpacket *p,int total_len,unsigned char *packet_end);
+extern int  value_shift(unsigned char *, unsigned int);
 
-extern void lookup_init(nodehdr_p hdr);
-extern nodehdr_t addr_propagate;
 
 #define MFUNCT_INVALID_ARGUMENT_1 -2
 #define MFUNCT_INVALID_ARGUMENT_2 -3

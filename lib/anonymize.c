@@ -29,6 +29,10 @@
 #include <assert.h>
 #include "anonymization.h"
 #include "internal.h"
+#include "prefix_preserving_map.h"
+
+/* Prefix-preserving map table initialization */
+extern nodehdr_t                addr_propagate;
 
 int             can_field_be_applied_to_protocol(int protocol, int field);
 int             can_field_be_applied_to_function(int anonymization_function, int field);
@@ -332,7 +336,6 @@ static int sanity_checks(int protocol, int field_description, int anonymization_
 };
 
 /* Initialisation functions */
-int             various_inited = 0;
 
 void init_mapping_tables()
 {
@@ -342,6 +345,8 @@ void init_mapping_tables()
         memset(generalMapping16Table, 0, MAPPING_ENTRIES * sizeof(mapNode *));
         memset(generalMapping8Table, 0, MAPPING_ENTRIES * sizeof(mapNode *));
 }
+
+static int                      components_initialized = 0;
 
 static int anonymize_init(va_list vl, void *fu, struct anonflow *fl)
 {
@@ -363,13 +368,13 @@ static int anonymize_init(va_list vl, void *fu, struct anonflow *fl)
 
         f->internal_data = (void *)data;
 
-        if (!various_inited) {
+        if (!components_initialized) {
                 init_mapping_tables();
                 gen_table();
                 srandom(time(NULL));
                 srand48((long int)time(NULL));
                 lookup_init(&addr_propagate);
-                various_inited = 1;
+                components_initialized = 1;
         }
 
         return 1;
