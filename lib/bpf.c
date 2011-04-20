@@ -49,7 +49,7 @@ int bpf_init(va_list vl, void *fu, struct anonflow *flow)
 	pcap = pcap_open_dead(flow->link_type, flow->cap_length);
 
 	if (pcap_compile(pcap, &(data->compiled), data->expression, 1, 0)) {
-		printf("BPF filter compilation error\n");
+		fprintf(stderr, "BPF filter compilation error\n");
 		return 0;
 	}
 
