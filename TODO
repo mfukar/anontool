@@ -17,6 +17,7 @@
   a non-PIC version and see what happens. (WTB TIME)
 
 * Configurable keys for AES/3DES (prefix-preserving anon)
+        - Current setup is just plain shit.
 	- If the recent attacks on 10-round 256-bit AES get any better, we might have to
 	  at least emit some warning?
 
@@ -25,7 +26,4 @@
 * Implement IPv6 and IPX decoding.
 
 * Implement some metric of assessing the achieved anonymization levels
-depending on the functions/parameters used. Bibliography?
-
-* I might need to get a domain for this. FORTH has completely ditched this as a project,
-  and they're not willing to maintain/develop it any further.
+depending on the functions/parameters used. Reading bibliography..
