@@ -1,4 +1,3 @@
-/* $Id: mstring.c,v 1.1.1.1 2006/11/14 13:35:28 antonat Exp $ */
 /*
  * Copyright (C) 1998-2002 Martin Roesch <roesch@sourcefire.com>
  * This program is free software; you can redistribute it and/or modify

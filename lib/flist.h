@@ -25,33 +25,34 @@
  * Implementation of a single-linked list.
  */
 
-typedef struct flist_node
-{
-  int id;
-  void *data;
-  struct flist_node* next;
+typedef struct flist_node {
+        int     id;
+        void   *data;
+        struct flist_node *next;
 } flist_node_t;
 
-typedef struct flist
-{
-  flist_node_t *head; //Pointer to head of list
-  flist_node_t *tail; //Pointer to tail of list
-  unsigned size; //Number of elements in the list
+typedef struct flist {
+        flist_node_t *head;
+        flist_node_t *tail;
+        unsigned      size;
 } flist_t;
 
-//! Macro to get the head node of a list l
+//! Macro to get the head node of a list
 #define flist_head(l) (l)->head
-//! Macro to get the tail node of a list l
+//! Macro to get the tail node of a list
 #define flist_tail(l) (l)->tail
-//! Macro to get the size of a list l
+//! Macro to get the size of a list
 #define flist_size(l) (l)->size
-//! Macro to get the next node of l
+//! Macro to get the next node of a list
 #define flist_next(n) (n)->next
-//! Macro to get the data of node l
+//! Macro to get the data of a node
 #define flist_data(n) (n)->data
 #define flist_id(n) (n)->id
 
-typedef enum { FLIST_LEAVE_DATA = 0, FLIST_FREE_DATA } flist_destroy_t;
+typedef enum {
+        FLIST_LEAVE_DATA = 0,
+        FLIST_FREE_DATA
+} flist_destroy_t;
 
 void flist_init(flist_t *);
 void flist_destroy(flist_t *,flist_destroy_t);

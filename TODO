@@ -3,6 +3,8 @@
 	- XML config was a bad idea from the start. Something more usable like a JSON
 	format would be nicer.
 
+* If flist is used in the fastpath, use a pool allocator rather than malloc [although
+  I might be able to rely on malloc to be somewhat clever]
 * Get rid of all the magic numbers in the code.
 * Get rid of all the non-standard types, use exact width types from stdint.h where needed.
 * Get rid of all the standard random functions. Instead, use MT (already

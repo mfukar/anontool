@@ -845,8 +845,8 @@ int ipfix_decode(anonpacket * p, struct IPFIX *ipfix, struct anonflow *flow)
 	while ((uint16_t) (payload - p->data) < p->dsize) {
 		i = ntohs(*(uint16_t *) payload);
 
-		if (i == 2)	// Template set
-		{
+		if (i == 2) {
+                /* template set */
 			ipfix->templates =
 			    realloc(ipfix->templates,
 				    (++ipfix->ntemplates) * sizeof(struct ipfix_template_set *));
