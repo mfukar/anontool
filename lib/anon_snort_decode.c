@@ -23,7 +23,6 @@ void            DecodeIPv6(unsigned char *, const unsigned int, anonpacket *);
 void            DecodeARP(unsigned char *, unsigned int, anonpacket *, int snaplen);
 void            DecodeEapol(unsigned char *, unsigned int, anonpacket *, int snaplen);
 void            DecodeEapolKey(unsigned char *, unsigned int, anonpacket *, int snaplen);
-void            DecodeIPV6(unsigned char *, unsigned int, int snaplen);
 void            DecodeIPX(unsigned char *, unsigned int, int snaplen);
 void		DecodeSCTP(unsigned char *pkt, const unsigned int len, anonpacket *p, int snaplen);
 void            DecodeTCP(unsigned char *, const unsigned int, anonpacket *, int snaplen);
@@ -78,7 +77,7 @@ void DecodeEthPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt
 		return;
 
 	case ETHERNET_TYPE_IPV6:
-		DecodeIPV6(p->pkt + ETHERNET_HEADER_LEN, (cap_len - ETHERNET_HEADER_LEN), snaplen);
+		DecodeIPv6(p->pkt + ETHERNET_HEADER_LEN, (cap_len - ETHERNET_HEADER_LEN), snaplen);
 		return;
 
 	case ETHERNET_TYPE_IPX:
@@ -97,7 +96,7 @@ void DecodeEthPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt
 }
 
 /*
- * Function: DecodeIEEE80211Pkt(anonpacket *, char *, struct pcap_pkthdr*, 
+ * Function: DecodeIEEE80211Pkt(anonpacket *, char *, struct pcap_pkthdr*,
  *                               unsigned char*)
  *
  * Purpose: Decode those fun loving wireless LAN packets, one at a time!
@@ -489,7 +488,7 @@ void DecodeFDDIPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pk
 /*
  * Function: DecodeLinuxSLLPkt(anonpacket *, char *, struct pcap_pkthdr*, unsigned char*)
  *
- * Purpose: Decode those fun loving LinuxSLL (linux cooked sockets) 
+ * Purpose: Decode those fun loving LinuxSLL (linux cooked sockets)
  *          packets, one at a time!
  *
  * Arguments: p => pointer to the decoded packet struct
@@ -538,7 +537,7 @@ void DecodeLinuxSLLPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char
 		return;
 
 	case ETHERNET_TYPE_IPV6:
-		DecodeIPV6(p->pkt + SLL_HDR_LEN, (cap_len - SLL_HDR_LEN), snaplen);
+		DecodeIPv6(p->pkt + SLL_HDR_LEN, (cap_len - SLL_HDR_LEN), snaplen);
 		return;
 
 	case ETHERNET_TYPE_IPX:
@@ -614,8 +613,8 @@ void DecodePflog(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt,
 #endif
 
 	default:
-		/* To my knowledge, pflog devices can only 
-		 * pass IP and IP6 packets. -fleck 
+		/* To my knowledge, pflog devices can only
+		 * pass IP and IP6 packets. -fleck
 		 */
 		return;
 	}
@@ -707,7 +706,7 @@ void DecodePPPoEPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *p
  *
  * Purpose: Decoded PPP traffic
  *
- * Arguments: p => pointer to decoded packet struct 
+ * Arguments: p => pointer to decoded packet struct
  *            user => Utility pointer, unused
  *            pkthdr => ptr to the packet header
  *            pkt => pointer to the real live packet data
@@ -734,7 +733,7 @@ void DecodePppPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt
 		return;
 	}
 
-	/* 
+	/*
 	 * We only handle uncompressed packets. Handling VJ compression would mean
 	 * to implement a PPP state machine.
 	 */
@@ -766,7 +765,7 @@ void DecodePppPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt
  *
  * Purpose: Decode SLIP traffic
  *
- * Arguments: p => pointer to decoded packet struct 
+ * Arguments: p => pointer to decoded packet struct
  *            user => Utility pointer, unused
  *            pkthdr => ptr to the packet header
  *            pkt => pointer to the real live packet data
@@ -800,7 +799,7 @@ void DecodeSlipPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pk
  * Purpose: Decodes packets coming in raw on layer 2, like PPP. Originally
  * written by Jed Pickle.
  *
- * Arguments: p => pointer to decoded packet struct 
+ * Arguments: p => pointer to decoded packet struct
  *            pkthdr => ptr to the packet header
  *            pkt => pointer to the real live packet data
  *            snaplen => number of bytes in the packet from pcap hdr
@@ -863,14 +862,14 @@ void DecodeI4LRawIPPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char
 }
 
 /*
- * Function: DecodeI4LCiscoIPPkt(anonpacket *, char *, 
+ * Function: DecodeI4LCiscoIPPkt(anonpacket *, char *,
  *                               struct pcap_pkthdr*, unsigned char*)
  *
  * Purpose: Decodes packets coming in raw on layer 2, like PPP.  Coded and
  *          in by Jed Pickle (thanks Jed!) and modified for a few little tweaks
  *          by me.
  *
- * Arguments: p => pointer to decoded packet struct 
+ * Arguments: p => pointer to decoded packet struct
  *            user => Utility pointer, unused
  *            pkthdr => ptr to the packet header
  *            pkt => pointer to the real live packet data
@@ -968,9 +967,9 @@ void DecodeIP(unsigned char *pkt, const unsigned int len, anonpacket * p, int sn
 	/* check for fragmented packets */
 	p->frag_offset = ntohs(p->iph->ip_off);
 
-	/* 
-	 * get the values of the reserved, more 
-	 * fragments and don't fragment flags 
+	/*
+	 * get the values of the reserved, more
+	 * fragments and don't fragment flags
 	 */
 	p->rf = (unsigned char)((p->frag_offset & 0x8000) >> 15);
 	p->df = (unsigned char)((p->frag_offset & 0x4000) >> 14);
@@ -1015,12 +1014,16 @@ void DecodeIP(unsigned char *pkt, const unsigned int len, anonpacket * p, int sn
 	}
 }
 
-/*
- * Function: DecodeIPv6(unsigned char *, const unsigned int, anonpacket *)
+/**
+ * @name DecodeIPv6
  *
- * Purpose : Decode IPv6 headers.
+ * @brief Decodes IPv6 headers.
  *
- * Returns : Nothing
+ * @param pkt [in] pointer to the packet data
+ * @param len [in] length of packet data buffer
+ * @param p   [in] pointer to anonpacket structure
+ *
+ * @return Nothing
  */
 void DecodeIPv6(unsigned char *pkt, const unsigned int len, anonpacket *p)
 {
@@ -1120,8 +1123,8 @@ int DecodeIPOnly(unsigned char *pkt, const unsigned int len, anonpacket * p, int
 	/* check for fragmented packets */
 	p->frag_offset = ntohs(p->orig_iph->ip_off);
 
-	/* get the values of the reserved, more 
-	 * fragments and don't fragment flags 
+	/* get the values of the reserved, more
+	 * fragments and don't fragment flags
 	 */
 	p->rf = (unsigned char)(p->frag_offset & 0x8000) >> 15;
 	p->df = (unsigned char)(p->frag_offset & 0x4000) >> 14;
@@ -1268,7 +1271,7 @@ void DecodeTCP(unsigned char *pkt, const unsigned int len, anonpacket * p, int s
  *
  * Arguments: pkt => ptr to the packet data
  *            len => length from here to the end of the packet
- *            p   => pointer to decoded packet struct  
+ *            p   => pointer to decoded packet struct
  *
  * Returns: void function
  */
@@ -1382,9 +1385,9 @@ void DecodeICMP(unsigned char *pkt, const unsigned int len, anonpacket * p, int 
 
 	case ICMP_ECHO:
 		/* setup the pkt id and seq numbers */
-		p->dsize -= sizeof(struct idseq);	/* add the size of the 
+		p->dsize -= sizeof(struct idseq);	/* add the size of the
 							 * echo ext to the data
-							 * ptr and subtract it 
+							 * ptr and subtract it
 							 * from the data size */
 		p->data += sizeof(struct idseq);
 		break;
@@ -1514,21 +1517,6 @@ void DecodeEAP(unsigned char *pkt, const unsigned int len, anonpacket * p, int s
 	if (p->eaph->code == EAP_CODE_REQUEST || p->eaph->code == EAP_CODE_RESPONSE) {
 		p->eaptype = pkt + sizeof(EAPHdr);
 	}
-	return;
-}
-
-/*
- * Function: DecodeIPV6(unsigned char *, unsigned int)
- *
- * Purpose: Just like IPX, it's just for counting.
- *
- * Arguments: pkt => ptr to the packet data
- *            len => length from here to the end of the packet
- *
- * Returns: void function
- */
-void DecodeIPV6(unsigned char *pkt, unsigned int len, int snaplen)
-{
 	return;
 }
 
@@ -1694,8 +1682,8 @@ void DecodeIPOptions(unsigned char *o_list, unsigned int o_len, anonpacket * p, 
 			if (p->ip_options[current_option].len > 40) {
 				p->ip_options[current_option].len = 40;
 			} else if (p->ip_options[current_option].len == 0) {
-				/* 
-				 * this shouldn't happen, indicates a bad option list 
+				/*
+				 * this shouldn't happen, indicates a bad option list
 				 * so we bail
 				 */
 				done = 1;
