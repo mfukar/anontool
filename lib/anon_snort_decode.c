@@ -1,5 +1,4 @@
 #include <string.h>
-#include <strings.h>
 #include <pcap.h>
 #include "anonymization.h"
 

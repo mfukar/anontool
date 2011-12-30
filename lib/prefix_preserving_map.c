@@ -1,17 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
 #include <arpa/inet.h>
-#include "prefix_preserving_map.h"
 #include <time.h>
+#include "prefix_preserving_map.h"
 
-//#define PP_DEBUG 
-
-#ifdef PP_DEBUG
-#include <pcap.h>
-#include <netinet/ip.h>
-#include <netinet/in.h>
-#endif
 
 nodehdr_t       addr_propagate = { NH_FL_RANDOM_PROPAGATE, 0xffffffff, 0x01000000 };
 
@@ -46,26 +39,24 @@ int bi_ffs(u_long value)
 	return add + bvals[value & 0xf];
 }
 
-static node_p newnode(void)
+static node_t *newnode(void)
 {
-	node_p          node;
+	node_t *node = malloc(sizeof(*node));
 
-	node = (node_p) malloc(sizeof *node);
-
-	if (node == 0) {
+	if(NULL == node) {
 		fprintf(stderr, "malloc failed %s:%d\n", __FILE__, __LINE__);
 		exit(2);
 	}
 	return node;
 }
 
-static void freetree(node_p node)
+static void freetree(node_t *node)
 {
-	node_p          next;
+	node_t *next;
 
-	while (node) {
+	while(node) {
 		next = node->down[0];
-		if (node->down[1]) {
+		if(node->down[1]) {
 			freetree(node->down[1]);
 		}
 		free(node);
@@ -73,7 +64,7 @@ static void freetree(node_p node)
 	}
 }
 
-static inline u_long make_output(u_long value, int flip, nodehdr_p hdr)
+static inline u_long make_output(u_long value, int flip, nodehdr_t *hdr)
 {
 	if (hdr->flags & NH_FL_RANDOM_PROPAGATE) {
 		/*
@@ -92,17 +83,16 @@ static inline u_long make_output(u_long value, int flip, nodehdr_p hdr)
 	return (0);
 }
 
-static inline node_p make_peer(u_long input, node_p old, nodehdr_p hdr)
+static inline node_t *make_peer(u_long input, node_t *old, nodehdr_t *hdr)
 {
-	node_p          down[2];
-	int             swivel, bitvalue;
+	node_t *down[2];
+	int     swivel, bitvalue;
 
 	/*
 	 * become a peer
 	 * algo: create two nodes, the two peers.  leave orig node as
 	 * the parent of the two new ones.
 	 */
-
 	down[0] = newnode();
 	down[1] = newnode();
 
@@ -123,12 +113,12 @@ static inline node_p make_peer(u_long input, node_p old, nodehdr_p hdr)
 	return down[bitvalue];
 }
 
-void lookup_init(nodehdr_p hdr)
+void lookup_init(nodehdr_t *hdr)
 {
-	node_p          node;
-	int             opt_class = 32;
+	node_t *node;
+	int     opt_class = 32;
 
-	if (hdr->head) {
+	if(hdr->head) {
 		freetree(hdr->head);
 		hdr->head = 0;
 	}
@@ -137,10 +127,10 @@ void lookup_init(nodehdr_p hdr)
 	node = hdr->head;
 
 	/* if this is high order address byte, prime classness if needed */
-	if (hdr->addr_mask) {
+	if(hdr->addr_mask) {
 		/* compute bump as lsb of addr_mask */
 		hdr->bump = 1 << (ffs(hdr->addr_mask) - 1);	/* NOTE -- traditional ffs() */
-		if (hdr->flags == NH_FL_COUNTER) {
+		if(hdr->flags == NH_FL_COUNTER) {
 			node->output = hdr->bump;
 		} else {
 			/* whatever we do, don't pick up any bits outside of addr_mask */
@@ -149,7 +139,7 @@ void lookup_init(nodehdr_p hdr)
 			/* no bits outside of addr_mask */
 			node->output &= hdr->addr_mask;
 		}
-		if (opt_class) {
+		if(opt_class) {
 			/* extract bits in addr_mask covered by opt_class */
 			hdr->addr_mask = hdr->addr_mask >> (32 - opt_class);
 			hdr->addr_mask = hdr->addr_mask << (32 - opt_class);
@@ -172,26 +162,26 @@ void lookup_init(nodehdr_p hdr)
 	node->down[0] = node->down[1] = 0;
 }
 
-u_long lookup(u_long input, nodehdr_p hdr)
+u_long lookup(u_long input, nodehdr_t *hdr)
 {
-	node_p          node;
-	int             swivel;
+	node_t *node;
+	int     swivel;
 
 	node = hdr->head;	/* non-zero, 'cause lookup_init() already called */
-	if (hdr->head == 0) {	/* (but...) */
+	if(hdr->head == 0) {	/* (but...) */
 		fprintf(stderr, "unexpected zero head %s:%d\n", __FILE__, __LINE__);
 	}
 
-	while (node) {
-		if (input == node->input) {	/* we found our node! */
+	while(node) {
+		if(input == node->input) {	/* we found our node! */
 			return node->output;
 		}
-		if (node->down[0] == 0) {	/* need to descend, but can't */
+		if(node->down[0] == 0) {	/* need to descend, but can't */
 			node = make_peer(input, node, hdr);	/* create a peer */
 		} else {
 			/* swivel is the first bit the left and right children differ in */
 			swivel = bi_ffs(node->down[0]->input ^ node->down[1]->input);
-			if (bi_ffs(input ^ node->input) < swivel) {	/* input differs earlier */
+			if(bi_ffs(input ^ node->input) < swivel) {	/* input differs earlier */
 				node = make_peer(input, node, hdr);	/* make a peer */
 			} else if (input & (1 << (32 - swivel))) {
 				node = node->down[1];	/* NB: 1s to the right */
@@ -208,7 +198,7 @@ u_long lookup(u_long input, nodehdr_p hdr)
 
 void hide_addr(unsigned char *raw_addr)
 {
-	u_long          r_addr = ntohl(*((u_long *) raw_addr));
+	u_long r_addr = ntohl(*((u_long *) raw_addr));
 	addr_propagate.cur_input = r_addr;
 	r_addr = htonl(lookup(r_addr, &addr_propagate));
 	*((u_long *) raw_addr) = r_addr;
