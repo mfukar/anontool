@@ -19,13 +19,13 @@
   a non-PIC version and see what happens. (WTB TIME)
 
 * Configurable keys for AES/3DES (prefix-preserving anon)
-        - Current setup is just plain shit.
+    - Current setup is just plain shit.
 	- If the recent attacks on 10-round 256-bit AES get any better, we might have to
 	  at least emit some warning?
 
 * Add support for SCTP (primarily for IPFIX transport), GRE, L2TP, GTP, etc.
 
-* Implement IPv6 and IPX decoding.
+* Implement IPv6 and IPsec decoding. (IPX? Is that used *at all* anymore?)
 
 * Implement some metric of assessing the achieved anonymization levels
 depending on the functions/parameters used. Reading bibliography..

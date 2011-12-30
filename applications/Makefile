@@ -1,9 +1,10 @@
 WITH_FUNCT_STATS=1
 INCLUDE=-I. -I../lib/
-OPTIMIZATIONS=-O3
+OPTIMIZATIONS=-O2
+SHAREDFLAGS=-fPIE
 DEBUGFLAGS=-ggdb
 WARNINGS=-Wall -Wsign-compare -Wpointer-arith -Wnested-externs -Wcast-align
-CFLAGS=$(DEBUGFLAGS) $(WARNINGS) $(OPTIMIZATIONS) -D_GNU_SOURCE $(INCLUDE)
+CFLAGS=$(DEBUGFLAGS) $(WARNINGS) $(OPTIMIZATIONS) $(SHAREDFLAGS) -D_GNU_SOURCE $(INCLUDE)
 LIBRARIES=-lrt -lpcre -lpcap -lnet -lm
 
 TARGETS=anonymize_tool anonymize_ipfix anonymize_netflow_v5 anonymize_netflow_v9

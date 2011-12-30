@@ -7,24 +7,22 @@ void            DecodeTRPkt(anonpacket *, struct pcap_pkthdr *, unsigned char *,
 void            DecodeFDDIPkt(anonpacket *, struct pcap_pkthdr *, unsigned char *, int snaplen);
 void            DecodeLinuxSLLPkt(anonpacket *, struct pcap_pkthdr *, unsigned char *, int snaplen);
 void            DecodeEthPkt(anonpacket *, struct pcap_pkthdr *, unsigned char *, int snaplen);
-void            DecodeIEEE80211Pkt(anonpacket *, struct pcap_pkthdr *, unsigned char *,
-				   int snaplen);
+void            DecodeIEEE80211Pkt(anonpacket *, struct pcap_pkthdr *, unsigned char *, int snaplen);
 void            DecodeVlan(unsigned char *, const unsigned int, anonpacket *, int snaplen);
 void            DecodePppPkt(anonpacket *, struct pcap_pkthdr *, unsigned char *, int snaplen);
 void            DecodeSlipPkt(anonpacket *, struct pcap_pkthdr *, unsigned char *, int snaplen);
 void            DecodeNullPkt(anonpacket *, struct pcap_pkthdr *, unsigned char *, int snaplen);
 void            DecodeRawPkt(anonpacket *, struct pcap_pkthdr *, unsigned char *, int snaplen);
 void            DecodeI4LRawIPPkt(anonpacket *, struct pcap_pkthdr *, unsigned char *, int snaplen);
-void            DecodeI4LCiscoIPPkt(anonpacket *, struct pcap_pkthdr *, unsigned char *,
-				    int snaplen);
+void            DecodeI4LCiscoIPPkt(anonpacket *, struct pcap_pkthdr *, unsigned char *, int snaplen);
 void            DecodePflog(anonpacket *, struct pcap_pkthdr *, unsigned char *, int snaplen);
 void            DecodeIP(unsigned char *, const unsigned int, anonpacket *, int snaplen);
-void            DecodeIPv6(unsigned char *, const unsigned int, anonpacket *);
+void            DecodeIPv6(unsigned char *, const unsigned int, anonpacket *, int snaplen);
 void            DecodeARP(unsigned char *, unsigned int, anonpacket *, int snaplen);
 void            DecodeEapol(unsigned char *, unsigned int, anonpacket *, int snaplen);
 void            DecodeEapolKey(unsigned char *, unsigned int, anonpacket *, int snaplen);
 void            DecodeIPX(unsigned char *, unsigned int, int snaplen);
-void		DecodeSCTP(unsigned char *pkt, const unsigned int len, anonpacket *p, int snaplen);
+void            DecodeSCTP(unsigned char *pkt, const unsigned int len, anonpacket *p, int snaplen);
 void            DecodeTCP(unsigned char *, const unsigned int, anonpacket *, int snaplen);
 void            DecodeUDP(unsigned char *, const unsigned int, anonpacket *, int snaplen);
 void            DecodeEAP(unsigned char *, const unsigned int, anonpacket *, int snaplen);
@@ -37,62 +35,61 @@ grinder_t       SetPktProcessor(int datalink);
 
 void DecodeEthPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-	unsigned int    pkt_len;	/* suprisingly, the length of the packet */
-	unsigned int    cap_len;	/* caplen value */
+    unsigned int    pkt_len;    /* suprisingly, the length of the packet */
+    unsigned int    cap_len;    /* caplen value */
 
-	memset(p, 0, sizeof(*p));
+    memset(p, 0, sizeof(*p));
 
-	p->pkth = pkthdr;
-	p->pkt = pkt;
+    p->pkth = pkthdr;
+    p->pkt = pkt;
 
-	/* set the lengths we need */
-	pkt_len = pkthdr->len;	/* total packet length */
-	cap_len = pkthdr->caplen;	/* captured packet length */
+    /* set the lengths we need */
+    pkt_len = pkthdr->len;  /* total packet length */
+    cap_len = pkthdr->caplen;   /* captured packet length */
 
-	if ((unsigned int)snaplen < pkt_len)
-		pkt_len = cap_len;
+    if ((unsigned int)snaplen < pkt_len)
+        pkt_len = cap_len;
 
-	/* do a little validation */
-	if (p->pkth->caplen < ETHERNET_HEADER_LEN) {
-		return;
-	}
+    /* do a little validation */
+    if (p->pkth->caplen < ETHERNET_HEADER_LEN) {
+        return;
+    }
 
-	/* lay the ethernet structure over the packet data */
-	p->eh = (EtherHdr *) pkt;
-	/* grab out the network type */
-	switch (ntohs(p->eh->ether_type)) {
-	case ETHERNET_TYPE_PPPoE_DISC:
-	case ETHERNET_TYPE_PPPoE_SESS:
-		DecodePPPoEPkt(p, pkthdr, pkt, snaplen);
-		return;
+    /* lay the ethernet structure over the packet data */
+    p->eh = (EtherHdr *) pkt;
+    /* grab out the network type */
+    switch (ntohs(p->eh->ether_type)) {
+    case ETHERNET_TYPE_PPPoE_DISC:
+    case ETHERNET_TYPE_PPPoE_SESS:
+        DecodePPPoEPkt(p, pkthdr, pkt, snaplen);
+        break;
 
-	case ETHERNET_TYPE_IP:
-		DecodeIP(p->pkt + ETHERNET_HEADER_LEN, cap_len - ETHERNET_HEADER_LEN, p, snaplen);
+    case ETHERNET_TYPE_IP:
+        DecodeIP(p->pkt + ETHERNET_HEADER_LEN, cap_len - ETHERNET_HEADER_LEN, p, snaplen);
+        break;
 
-		return;
+    case ETHERNET_TYPE_ARP:
+    case ETHERNET_TYPE_REVARP:
+        DecodeARP(p->pkt + ETHERNET_HEADER_LEN, cap_len - ETHERNET_HEADER_LEN, p, snaplen);
+        break;
 
-	case ETHERNET_TYPE_ARP:
-	case ETHERNET_TYPE_REVARP:
-		DecodeARP(p->pkt + ETHERNET_HEADER_LEN, cap_len - ETHERNET_HEADER_LEN, p, snaplen);
-		return;
+    case ETHERNET_TYPE_IPV6:
+        DecodeIPv6(p->pkt + ETHERNET_HEADER_LEN, (cap_len - ETHERNET_HEADER_LEN), p, snaplen);
+        break;
 
-	case ETHERNET_TYPE_IPV6:
-		DecodeIPv6(p->pkt + ETHERNET_HEADER_LEN, (cap_len - ETHERNET_HEADER_LEN), snaplen);
-		return;
+    case ETHERNET_TYPE_IPX:
+        DecodeIPX(p->pkt + ETHERNET_HEADER_LEN, (cap_len - ETHERNET_HEADER_LEN), snaplen);
+        break;
 
-	case ETHERNET_TYPE_IPX:
-		DecodeIPX(p->pkt + ETHERNET_HEADER_LEN, (cap_len - ETHERNET_HEADER_LEN), snaplen);
-		return;
+    case ETHERNET_TYPE_8021Q:
+        DecodeVlan(p->pkt + ETHERNET_HEADER_LEN, cap_len - ETHERNET_HEADER_LEN, p, snaplen);
+        break;
 
-	case ETHERNET_TYPE_8021Q:
-		DecodeVlan(p->pkt + ETHERNET_HEADER_LEN, cap_len - ETHERNET_HEADER_LEN, p, snaplen);
-		return;
+    default:
+        break;
+    }
 
-	default:
-		return;
-	}
-
-	return;
+    return;
 }
 
 /*
@@ -110,155 +107,155 @@ void DecodeEthPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt
  */
 void DecodeIEEE80211Pkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-	unsigned int    pkt_len;	/* suprisingly, the length of the packet */
-	unsigned int    cap_len;	/* caplen value */
+    unsigned int    pkt_len;    /* suprisingly, the length of the packet */
+    unsigned int    cap_len;    /* caplen value */
 
-	memset(p, 0, sizeof(*p));
+    memset(p, 0, sizeof(*p));
 
-	p->pkth = pkthdr;
-	p->pkt = pkt;
+    p->pkth = pkthdr;
+    p->pkt = pkt;
 
-	/* set the lengths we need */
-	pkt_len = pkthdr->len;	/* total packet length */
-	cap_len = pkthdr->caplen;	/* captured packet length */
+    /* set the lengths we need */
+    pkt_len = pkthdr->len;  /* total packet length */
+    cap_len = pkthdr->caplen;   /* captured packet length */
 
-	if ((unsigned int)snaplen < pkt_len)
-		pkt_len = cap_len;
+    if ((unsigned int)snaplen < pkt_len)
+        pkt_len = cap_len;
 
-	/* do a little validation */
-	if (p->pkth->caplen < MINIMAL_IEEE80211_HEADER_LEN) {
-		return;
-	}
-	/* lay the wireless structure over the packet data */
-	p->wifih = (WifiHdr *) pkt;
+    /* do a little validation */
+    if (p->pkth->caplen < MINIMAL_IEEE80211_HEADER_LEN) {
+        return;
+    }
+    /* lay the wireless structure over the packet data */
+    p->wifih = (WifiHdr *) pkt;
 
-	/* determine frame type */
-	switch (p->wifih->frame_control & 0x00ff) {
-		/* management frames */
-	case WLAN_TYPE_MGMT_ASREQ:
-	case WLAN_TYPE_MGMT_ASRES:
-	case WLAN_TYPE_MGMT_REREQ:
-	case WLAN_TYPE_MGMT_RERES:
-	case WLAN_TYPE_MGMT_PRREQ:
-	case WLAN_TYPE_MGMT_PRRES:
-	case WLAN_TYPE_MGMT_BEACON:
-	case WLAN_TYPE_MGMT_ATIM:
-	case WLAN_TYPE_MGMT_DIS:
-	case WLAN_TYPE_MGMT_AUTH:
-	case WLAN_TYPE_MGMT_DEAUTH:
-		break;
+    /* determine frame type */
+    switch (p->wifih->frame_control & 0x00ff) {
+        /* management frames */
+    case WLAN_TYPE_MGMT_ASREQ:
+    case WLAN_TYPE_MGMT_ASRES:
+    case WLAN_TYPE_MGMT_REREQ:
+    case WLAN_TYPE_MGMT_RERES:
+    case WLAN_TYPE_MGMT_PRREQ:
+    case WLAN_TYPE_MGMT_PRRES:
+    case WLAN_TYPE_MGMT_BEACON:
+    case WLAN_TYPE_MGMT_ATIM:
+    case WLAN_TYPE_MGMT_DIS:
+    case WLAN_TYPE_MGMT_AUTH:
+    case WLAN_TYPE_MGMT_DEAUTH:
+        break;
 
-		/* Control frames */
-	case WLAN_TYPE_CONT_PS:
-	case WLAN_TYPE_CONT_RTS:
-	case WLAN_TYPE_CONT_CTS:
-	case WLAN_TYPE_CONT_ACK:
-	case WLAN_TYPE_CONT_CFE:
-	case WLAN_TYPE_CONT_CFACK:
-		break;
-		/* Data packets without data */
-	case WLAN_TYPE_DATA_NULL:
-	case WLAN_TYPE_DATA_CFACK:
-	case WLAN_TYPE_DATA_CFPL:
-	case WLAN_TYPE_DATA_ACKPL:
+        /* Control frames */
+    case WLAN_TYPE_CONT_PS:
+    case WLAN_TYPE_CONT_RTS:
+    case WLAN_TYPE_CONT_CTS:
+    case WLAN_TYPE_CONT_ACK:
+    case WLAN_TYPE_CONT_CFE:
+    case WLAN_TYPE_CONT_CFACK:
+        break;
+        /* Data packets without data */
+    case WLAN_TYPE_DATA_NULL:
+    case WLAN_TYPE_DATA_CFACK:
+    case WLAN_TYPE_DATA_CFPL:
+    case WLAN_TYPE_DATA_ACKPL:
 
-		break;
-		/* data packets with data */
-	case WLAN_TYPE_DATA_DTCFACK:
-	case WLAN_TYPE_DATA_DTCFPL:
-	case WLAN_TYPE_DATA_DTACKPL:
-	case WLAN_TYPE_DATA_DATA:
-		p->ehllc = (EthLlc *) (pkt + IEEE802_11_DATA_HDR_LEN);
+        break;
+        /* data packets with data */
+    case WLAN_TYPE_DATA_DTCFACK:
+    case WLAN_TYPE_DATA_DTCFPL:
+    case WLAN_TYPE_DATA_DTACKPL:
+    case WLAN_TYPE_DATA_DATA:
+        p->ehllc = (EthLlc *) (pkt + IEEE802_11_DATA_HDR_LEN);
 
-		if (p->ehllc->dsap == ETH_DSAP_IP && p->ehllc->ssap == ETH_SSAP_IP) {
-			p->ehllcother =
-			    (EthLlcOther *) (pkt + IEEE802_11_DATA_HDR_LEN + sizeof(EthLlc));
+        if (p->ehllc->dsap == ETH_DSAP_IP && p->ehllc->ssap == ETH_SSAP_IP) {
+            p->ehllcother =
+                (EthLlcOther *) (pkt + IEEE802_11_DATA_HDR_LEN + sizeof(EthLlc));
 
-			switch (ntohs(p->ehllcother->proto_id)) {
-			case ETHERNET_TYPE_IP:
-				DecodeIP(p->pkt + IEEE802_11_DATA_HDR_LEN + sizeof(EthLlc) +
-					 sizeof(EthLlcOther),
-					 pkt_len - IEEE802_11_DATA_HDR_LEN - sizeof(EthLlc) -
-					 sizeof(EthLlcOther), p, snaplen);
-				return;
+            switch (ntohs(p->ehllcother->proto_id)) {
+            case ETHERNET_TYPE_IP:
+                DecodeIP(p->pkt + IEEE802_11_DATA_HDR_LEN + sizeof(EthLlc) +
+                     sizeof(EthLlcOther),
+                     pkt_len - IEEE802_11_DATA_HDR_LEN - sizeof(EthLlc) -
+                     sizeof(EthLlcOther), p, snaplen);
+                return;
 
-			case ETHERNET_TYPE_ARP:
-			case ETHERNET_TYPE_REVARP:
-				DecodeARP(p->pkt + IEEE802_11_DATA_HDR_LEN + sizeof(EthLlc) +
-					  sizeof(EthLlcOther),
-					  pkt_len - IEEE802_11_DATA_HDR_LEN - sizeof(EthLlc) -
-					  sizeof(EthLlcOther), p, snaplen);
-				return;
-			case ETHERNET_TYPE_EAPOL:
-				DecodeEapol(p->pkt + IEEE802_11_DATA_HDR_LEN + sizeof(EthLlc) +
-					    sizeof(EthLlcOther),
-					    pkt_len - IEEE802_11_DATA_HDR_LEN - sizeof(EthLlc) -
-					    sizeof(EthLlcOther), p, snaplen);
-				return;
-			case ETHERNET_TYPE_8021Q:
-				DecodeVlan(p->pkt + IEEE802_11_DATA_HDR_LEN,
-					   cap_len - IEEE802_11_DATA_HDR_LEN, p, snaplen);
-				return;
+            case ETHERNET_TYPE_ARP:
+            case ETHERNET_TYPE_REVARP:
+                DecodeARP(p->pkt + IEEE802_11_DATA_HDR_LEN + sizeof(EthLlc) +
+                      sizeof(EthLlcOther),
+                      pkt_len - IEEE802_11_DATA_HDR_LEN - sizeof(EthLlc) -
+                      sizeof(EthLlcOther), p, snaplen);
+                return;
+            case ETHERNET_TYPE_EAPOL:
+                DecodeEapol(p->pkt + IEEE802_11_DATA_HDR_LEN + sizeof(EthLlc) +
+                        sizeof(EthLlcOther),
+                        pkt_len - IEEE802_11_DATA_HDR_LEN - sizeof(EthLlc) -
+                        sizeof(EthLlcOther), p, snaplen);
+                return;
+            case ETHERNET_TYPE_8021Q:
+                DecodeVlan(p->pkt + IEEE802_11_DATA_HDR_LEN,
+                       cap_len - IEEE802_11_DATA_HDR_LEN, p, snaplen);
+                return;
 
-			default:
-				return;
-			}
-		}
-		break;
-	default:
-		break;
-	}
+            default:
+                return;
+            }
+        }
+        break;
+    default:
+        break;
+    }
 
-	return;
+    return;
 }
 
 void DecodeVlan(unsigned char *pkt, const unsigned int len, anonpacket * p, int snaplen)
 {
-	unsigned short int pri;
-	p->vh = (VlanTagHdr *) pkt;
+    unsigned short int pri;
+    p->vh = (VlanTagHdr *) pkt;
 
-	pri = VTH_PRIORITY(p->vh);
+    pri = VTH_PRIORITY(p->vh);
 
-	/* check to see if we've got an encapsulated LLC layer */
-	if (pri != 0) {
-		p->ehllc = (EthLlc *) (pkt + sizeof(VlanTagHdr));
+    /* check to see if we've got an encapsulated LLC layer */
+    if (pri != 0) {
+        p->ehllc = (EthLlc *) (pkt + sizeof(VlanTagHdr));
 
-		if (p->ehllc->dsap == ETH_DSAP_IP && p->ehllc->ssap == ETH_SSAP_IP) {
-			p->ehllcother = (EthLlcOther *)
-			    (pkt + sizeof(VlanTagHdr) + sizeof(EthLlc));
+        if (p->ehllc->dsap == ETH_DSAP_IP && p->ehllc->ssap == ETH_SSAP_IP) {
+            p->ehllcother = (EthLlcOther *)
+                (pkt + sizeof(VlanTagHdr) + sizeof(EthLlc));
 
-			switch (ntohs(p->ehllcother->proto_id)) {
-			case ETHERNET_TYPE_IP:
-				DecodeIP(p->pkt + sizeof(VlanTagHdr) + sizeof(EthLlc) +
-					 sizeof(EthLlcOther), len - sizeof(VlanTagHdr), p, snaplen);
-				return;
+            switch (ntohs(p->ehllcother->proto_id)) {
+            case ETHERNET_TYPE_IP:
+                DecodeIP(p->pkt + sizeof(VlanTagHdr) + sizeof(EthLlc) +
+                     sizeof(EthLlcOther), len - sizeof(VlanTagHdr), p, snaplen);
+                return;
 
-			case ETHERNET_TYPE_ARP:
-			case ETHERNET_TYPE_REVARP:
-				DecodeARP(p->pkt + sizeof(VlanTagHdr) + sizeof(EthLlc) +
-					  sizeof(EthLlcOther), len - sizeof(VlanTagHdr), p,
-					  snaplen);
-				return;
+            case ETHERNET_TYPE_ARP:
+            case ETHERNET_TYPE_REVARP:
+                DecodeARP(p->pkt + sizeof(VlanTagHdr) + sizeof(EthLlc) +
+                      sizeof(EthLlcOther), len - sizeof(VlanTagHdr), p,
+                      snaplen);
+                return;
 
-			default:
-				return;
-			}
-		}
-	} else {
-		switch (ntohs(p->vh->vth_proto)) {
-		case ETHERNET_TYPE_IP:
-			DecodeIP(pkt + sizeof(VlanTagHdr), len - sizeof(VlanTagHdr), p, snaplen);
-			return;
+            default:
+                return;
+            }
+        }
+    } else {
+        switch (ntohs(p->vh->vth_proto)) {
+        case ETHERNET_TYPE_IP:
+            DecodeIP(pkt + sizeof(VlanTagHdr), len - sizeof(VlanTagHdr), p, snaplen);
+            return;
 
-		case ETHERNET_TYPE_ARP:
-		case ETHERNET_TYPE_REVARP:
-			DecodeARP(pkt + sizeof(VlanTagHdr), len - sizeof(VlanTagHdr), p, snaplen);
-			return;
+        case ETHERNET_TYPE_ARP:
+        case ETHERNET_TYPE_REVARP:
+            DecodeARP(pkt + sizeof(VlanTagHdr), len - sizeof(VlanTagHdr), p, snaplen);
+            return;
 
-		default:
-			return;
-		}
-	}
+        default:
+            return;
+        }
+    }
 }
 
 /*
@@ -275,23 +272,23 @@ void DecodeVlan(unsigned char *pkt, const unsigned int len, anonpacket * p, int 
  */
 void DecodeNullPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-	unsigned int    len;
-	unsigned int    cap_len;
+    unsigned int    len;
+    unsigned int    cap_len;
 
-	memset(p, 0, sizeof(*p));
+    memset(p, 0, sizeof(*p));
 
-	p->pkth = pkthdr;
-	p->pkt = pkt;
+    p->pkth = pkthdr;
+    p->pkt = pkt;
 
-	len = pkthdr->len;
-	cap_len = pkthdr->caplen;
+    len = pkthdr->len;
+    cap_len = pkthdr->caplen;
 
-	/* do a little validation */
-	if (cap_len < NULL_HDRLEN) {
-		return;
-	}
+    /* do a little validation */
+    if (cap_len < NULL_HDRLEN) {
+        return;
+    }
 
-	DecodeIP(p->pkt + NULL_HDRLEN, cap_len - NULL_HDRLEN, p, snaplen);
+    DecodeIP(p->pkt + NULL_HDRLEN, cap_len - NULL_HDRLEN, p, snaplen);
 }
 
 /*
@@ -308,98 +305,98 @@ void DecodeNullPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pk
  */
 void DecodeTRPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-	unsigned int    pkt_len;	/* suprisingly, the length of the packet */
-	unsigned int    cap_len;	/* caplen value */
-	unsigned int    dataoff;	/* data offset is variable here */
+    unsigned int    pkt_len;    /* suprisingly, the length of the packet */
+    unsigned int    cap_len;    /* caplen value */
+    unsigned int    dataoff;    /* data offset is variable here */
 
-	memset(p, 0, sizeof(*p));
+    memset(p, 0, sizeof(*p));
 
-	p->pkth = pkthdr;
-	p->pkt = pkt;
+    p->pkth = pkthdr;
+    p->pkt = pkt;
 
-	/* set the lengths we need */
-	pkt_len = pkthdr->len;	/* total packet length */
-	cap_len = pkthdr->caplen;	/* captured packet length */
+    /* set the lengths we need */
+    pkt_len = pkthdr->len;  /* total packet length */
+    cap_len = pkthdr->caplen;   /* captured packet length */
 
-	if ((unsigned int)snaplen < pkt_len)
-		pkt_len = cap_len;
+    if ((unsigned int)snaplen < pkt_len)
+        pkt_len = cap_len;
 
-	/* do a little validation */
-	if (p->pkth->caplen < TR_HLEN) {
-		return;
-	}
+    /* do a little validation */
+    if (p->pkth->caplen < TR_HLEN) {
+        return;
+    }
 
-	/* lay the tokenring header structure over the packet data */
-	p->trh = (Trh_hdr *) pkt;
+    /* lay the tokenring header structure over the packet data */
+    p->trh = (Trh_hdr *) pkt;
 
-	/*
-	 * according to rfc 1042:
-	 The presence of a Routing Information Field is indicated by the Most
-	 Significant Bit (MSB) of the source address, called the Routing
-	 Information Indicator (RII).  If the RII equals zero, a RIF is
-	 not present.  If the RII equals 1, the RIF is present.
-	 ..
-	 However the MSB is already zeroed by this moment, so there's no
-	 real way to figure out whether RIF is presented in packet, so we are
-	 doing some tricks to find IPARP signature..
-	 */
+    /*
+     * according to rfc 1042:
+     The presence of a Routing Information Field is indicated by the Most
+     Significant Bit (MSB) of the source address, called the Routing
+     Information Indicator (RII).  If the RII equals zero, a RIF is
+     not present.  If the RII equals 1, the RIF is present.
+     ..
+     However the MSB is already zeroed by this moment, so there's no
+     real way to figure out whether RIF is presented in packet, so we are
+     doing some tricks to find IPARP signature..
+     */
 
-	/*
-	 * first I assume that we have single-ring network with no RIF
-	 * information presented in frame
-	 */
-	p->trhllc = (Trh_llc *) (pkt + sizeof(Trh_hdr));
+    /*
+     * first I assume that we have single-ring network with no RIF
+     * information presented in frame
+     */
+    p->trhllc = (Trh_llc *) (pkt + sizeof(Trh_hdr));
 
-	if (p->trhllc->dsap != IPARP_SAP && p->trhllc->ssap != IPARP_SAP) {
-		/*
-		 * DSAP != SSAP != 0xAA .. either we are having frame which doesn't
-		 * carry IP datagrams or has RIF information present. We assume
-		 * lattest ...
-		 */
-		p->trhmr = (Trh_mr *) (pkt + sizeof(Trh_hdr));
-		p->trhllc = (Trh_llc *) (pkt + sizeof(Trh_hdr) + TRH_MR_LEN(p->trhmr));
-		dataoff = sizeof(Trh_hdr) + TRH_MR_LEN(p->trhmr) + sizeof(Trh_llc);
-	} else {
-		p->trhllc = (Trh_llc *) (pkt + sizeof(Trh_hdr));
-		dataoff = sizeof(Trh_hdr) + sizeof(Trh_llc);
-	}
+    if (p->trhllc->dsap != IPARP_SAP && p->trhllc->ssap != IPARP_SAP) {
+        /*
+         * DSAP != SSAP != 0xAA .. either we are having frame which doesn't
+         * carry IP datagrams or has RIF information present. We assume
+         * lattest ...
+         */
+        p->trhmr = (Trh_mr *) (pkt + sizeof(Trh_hdr));
+        p->trhllc = (Trh_llc *) (pkt + sizeof(Trh_hdr) + TRH_MR_LEN(p->trhmr));
+        dataoff = sizeof(Trh_hdr) + TRH_MR_LEN(p->trhmr) + sizeof(Trh_llc);
+    } else {
+        p->trhllc = (Trh_llc *) (pkt + sizeof(Trh_hdr));
+        dataoff = sizeof(Trh_hdr) + sizeof(Trh_llc);
+    }
 
-	/*
-	 * ideally we would need to check both SSAP, DSAP, and protoid fields: IP
-	 * datagrams and ARP requests and replies are transmitted in standard
-	 * 802.2 LLC Type 1 Unnumbered Information format, control code 3, with
-	 * the DSAP and the SSAP fields of the 802.2 header set to 170, the
-	 * assigned global SAP value for SNAP [6].  The 24-bit Organization Code
-	 * in the SNAP is zero, and the remaining 16 bits are the EtherType from
-	 * Assigned Numbers [7] (IP = 2048, ARP = 2054). .. but we would check
-	 * SSAP and DSAP and assume this would be enough to trust.
-	 */
-	if (p->trhllc->dsap != IPARP_SAP && p->trhllc->ssap != IPARP_SAP) {
-		p->trhllc = NULL;
-		return;
-	}
-	pkt_len -= dataoff;
-	cap_len -= dataoff;
+    /*
+     * ideally we would need to check both SSAP, DSAP, and protoid fields: IP
+     * datagrams and ARP requests and replies are transmitted in standard
+     * 802.2 LLC Type 1 Unnumbered Information format, control code 3, with
+     * the DSAP and the SSAP fields of the 802.2 header set to 170, the
+     * assigned global SAP value for SNAP [6].  The 24-bit Organization Code
+     * in the SNAP is zero, and the remaining 16 bits are the EtherType from
+     * Assigned Numbers [7] (IP = 2048, ARP = 2054). .. but we would check
+     * SSAP and DSAP and assume this would be enough to trust.
+     */
+    if (p->trhllc->dsap != IPARP_SAP && p->trhllc->ssap != IPARP_SAP) {
+        p->trhllc = NULL;
+        return;
+    }
+    pkt_len -= dataoff;
+    cap_len -= dataoff;
 
-	switch (htons(p->trhllc->ethertype)) {
-	case ETHERNET_TYPE_IP:
+    switch (htons(p->trhllc->ethertype)) {
+    case ETHERNET_TYPE_IP:
 
-		DecodeIP(p->pkt + dataoff, cap_len, p, snaplen);
-		return;
+        DecodeIP(p->pkt + dataoff, cap_len, p, snaplen);
+        return;
 
-	case ETHERNET_TYPE_ARP:
-	case ETHERNET_TYPE_REVARP:
-		return;
+    case ETHERNET_TYPE_ARP:
+    case ETHERNET_TYPE_REVARP:
+        return;
 
-	case ETHERNET_TYPE_8021Q:
-		DecodeVlan(p->pkt + dataoff, cap_len, p, snaplen);
-		return;
+    case ETHERNET_TYPE_8021Q:
+        DecodeVlan(p->pkt + dataoff, cap_len, p, snaplen);
+        return;
 
-	default:
-		return;
-	}
+    default:
+        return;
+    }
 
-	return;
+    return;
 }
 
 /*
@@ -416,73 +413,73 @@ void DecodeTRPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt,
  */
 void DecodeFDDIPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-	unsigned int    pkt_len;	/* length of the packet */
-	unsigned int    cap_len;	/* capture length variable */
-	unsigned int    dataoff;	/* data offset is variable here */
+    unsigned int    pkt_len;    /* length of the packet */
+    unsigned int    cap_len;    /* capture length variable */
+    unsigned int    dataoff;    /* data offset is variable here */
 
-	memset(p, 0, sizeof(*p));
+    memset(p, 0, sizeof(*p));
 
-	p->pkth = pkthdr;
-	p->pkt = pkt;
+    p->pkth = pkthdr;
+    p->pkt = pkt;
 
-	pkt_len = pkthdr->len;
-	cap_len = pkthdr->caplen;
+    pkt_len = pkthdr->len;
+    cap_len = pkthdr->caplen;
 
-	if ((unsigned int)snaplen < pkt_len) {
-		pkt_len = cap_len;
-	}
-	/* Bounds checking (might not be right yet -worm5er) */
-	if (p->pkth->caplen < FDDI_MIN_HLEN) {
-		return;
-	}
-	/* let's put this in as the fddi header structure */
-	p->fddihdr = (Fddi_hdr *) pkt;
+    if ((unsigned int)snaplen < pkt_len) {
+        pkt_len = cap_len;
+    }
+    /* Bounds checking (might not be right yet -worm5er) */
+    if (p->pkth->caplen < FDDI_MIN_HLEN) {
+        return;
+    }
+    /* let's put this in as the fddi header structure */
+    p->fddihdr = (Fddi_hdr *) pkt;
 
-	p->fddisaps = (Fddi_llc_saps *) (pkt + sizeof(Fddi_hdr));
+    p->fddisaps = (Fddi_llc_saps *) (pkt + sizeof(Fddi_hdr));
 
-	if ((p->fddisaps->dsap == FDDI_DSAP_IP) && (p->fddisaps->ssap == FDDI_SSAP_IP)) {
-		p->fddiiparp = (Fddi_llc_iparp *) (pkt + sizeof(Fddi_hdr) + sizeof(Fddi_llc_saps));
+    if ((p->fddisaps->dsap == FDDI_DSAP_IP) && (p->fddisaps->ssap == FDDI_SSAP_IP)) {
+        p->fddiiparp = (Fddi_llc_iparp *) (pkt + sizeof(Fddi_hdr) + sizeof(Fddi_llc_saps));
 
-		dataoff = sizeof(Fddi_hdr) + sizeof(Fddi_llc_saps) + sizeof(Fddi_llc_iparp);
-	} else if ((p->fddisaps->dsap == FDDI_DSAP_SNA) && (p->fddisaps->ssap == FDDI_SSAP_SNA)) {
-		p->fddisna = (Fddi_llc_sna *) (pkt + sizeof(Fddi_hdr) + sizeof(Fddi_llc_saps));
-		dataoff = sizeof(Fddi_hdr) + sizeof(Fddi_llc_saps) + sizeof(Fddi_llc_sna);
-	} else {
-		p->fddiother = (Fddi_llc_other *) (pkt + sizeof(Fddi_hdr) + sizeof(Fddi_llc_other));
+        dataoff = sizeof(Fddi_hdr) + sizeof(Fddi_llc_saps) + sizeof(Fddi_llc_iparp);
+    } else if ((p->fddisaps->dsap == FDDI_DSAP_SNA) && (p->fddisaps->ssap == FDDI_SSAP_SNA)) {
+        p->fddisna = (Fddi_llc_sna *) (pkt + sizeof(Fddi_hdr) + sizeof(Fddi_llc_saps));
+        dataoff = sizeof(Fddi_hdr) + sizeof(Fddi_llc_saps) + sizeof(Fddi_llc_sna);
+    } else {
+        p->fddiother = (Fddi_llc_other *) (pkt + sizeof(Fddi_hdr) + sizeof(Fddi_llc_other));
 
-		dataoff = sizeof(Fddi_hdr) + sizeof(Fddi_llc_saps) + sizeof(Fddi_llc_other);
-	}
+        dataoff = sizeof(Fddi_hdr) + sizeof(Fddi_llc_saps) + sizeof(Fddi_llc_other);
+    }
 
-	/*
-	 * Now let's see if we actually care about the packet... If we don't,
-	 * throw it out!!!
-	 */
-	if ((p->fddisaps->dsap != FDDI_DSAP_IP) && (p->fddisaps->ssap != FDDI_SSAP_IP)) {
-		return;
-	}
+    /*
+     * Now let's see if we actually care about the packet... If we don't,
+     * throw it out!!!
+     */
+    if ((p->fddisaps->dsap != FDDI_DSAP_IP) && (p->fddisaps->ssap != FDDI_SSAP_IP)) {
+        return;
+    }
 
-	pkt_len -= dataoff;
-	cap_len -= dataoff;
+    pkt_len -= dataoff;
+    cap_len -= dataoff;
 
-	switch (htons(p->fddiiparp->ethertype)) {
-	case ETHERNET_TYPE_IP:
+    switch (htons(p->fddiiparp->ethertype)) {
+    case ETHERNET_TYPE_IP:
 
-		DecodeIP(p->pkt + dataoff, cap_len, p, snaplen);
-		return;
+        DecodeIP(p->pkt + dataoff, cap_len, p, snaplen);
+        return;
 
-	case ETHERNET_TYPE_ARP:
-	case ETHERNET_TYPE_REVARP:
-		return;
+    case ETHERNET_TYPE_ARP:
+    case ETHERNET_TYPE_REVARP:
+        return;
 
-	case ETHERNET_TYPE_8021Q:
-		DecodeVlan(p->pkt + dataoff, cap_len, p, snaplen);
-		return;
+    case ETHERNET_TYPE_8021Q:
+        DecodeVlan(p->pkt + dataoff, cap_len, p, snaplen);
+        return;
 
-	default:
-		return;
-	}
+    default:
+        return;
+    }
 
-	return;
+    return;
 }
 
 /*
@@ -503,65 +500,65 @@ void DecodeFDDIPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pk
 
 void DecodeLinuxSLLPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-	unsigned int    pkt_len;	/* the length of the packet */
-	unsigned int    cap_len;	/* caplen value */
+    unsigned int    pkt_len;    /* the length of the packet */
+    unsigned int    cap_len;    /* caplen value */
 
-	memset(p, 0, sizeof(*p));
+    memset(p, 0, sizeof(*p));
 
-	p->pkth = pkthdr;
-	p->pkt = pkt;
+    p->pkth = pkthdr;
+    p->pkt = pkt;
 
-	/* set the lengths we need */
-	pkt_len = pkthdr->len;	/* total packet length */
-	cap_len = pkthdr->caplen;	/* captured packet length */
+    /* set the lengths we need */
+    pkt_len = pkthdr->len;  /* total packet length */
+    cap_len = pkthdr->caplen;   /* captured packet length */
 
-	if ((unsigned int)snaplen < pkt_len)
-		pkt_len = cap_len;
+    if ((unsigned int)snaplen < pkt_len)
+        pkt_len = cap_len;
 
-	/* do a little validation */
-	if (p->pkth->caplen < SLL_HDR_LEN) {
-		return;
-	}
-	/* lay the ethernet structure over the packet data */
-	p->sllh = (SLLHdr *) pkt;
+    /* do a little validation */
+    if (p->pkth->caplen < SLL_HDR_LEN) {
+        return;
+    }
+    /* lay the ethernet structure over the packet data */
+    p->sllh = (SLLHdr *) pkt;
 
-	/* grab out the network type */
-	switch (ntohs(p->sllh->sll_protocol)) {
-	case ETHERNET_TYPE_IP:
-		DecodeIP(p->pkt + SLL_HDR_LEN, cap_len - SLL_HDR_LEN, p, snaplen);
-		return;
+    /* grab out the network type */
+    switch (ntohs(p->sllh->sll_protocol)) {
+    case ETHERNET_TYPE_IP:
+        DecodeIP(p->pkt + SLL_HDR_LEN, cap_len - SLL_HDR_LEN, p, snaplen);
+        return;
 
-	case ETHERNET_TYPE_ARP:
-	case ETHERNET_TYPE_REVARP:
-		DecodeARP(p->pkt + SLL_HDR_LEN, cap_len - SLL_HDR_LEN, p, snaplen);
-		return;
+    case ETHERNET_TYPE_ARP:
+    case ETHERNET_TYPE_REVARP:
+        DecodeARP(p->pkt + SLL_HDR_LEN, cap_len - SLL_HDR_LEN, p, snaplen);
+        return;
 
-	case ETHERNET_TYPE_IPV6:
-		DecodeIPv6(p->pkt + SLL_HDR_LEN, (cap_len - SLL_HDR_LEN), snaplen);
-		return;
+    case ETHERNET_TYPE_IPV6:
+        DecodeIPv6(p->pkt + SLL_HDR_LEN, (cap_len - SLL_HDR_LEN), p, snaplen);
+        return;
 
-	case ETHERNET_TYPE_IPX:
-		DecodeIPX(p->pkt + SLL_HDR_LEN, (cap_len - SLL_HDR_LEN), snaplen);
-		return;
+    case ETHERNET_TYPE_IPX:
+        DecodeIPX(p->pkt + SLL_HDR_LEN, (cap_len - SLL_HDR_LEN), snaplen);
+        return;
 
-	case LINUX_SLL_P_802_3:
-		return;
+    case LINUX_SLL_P_802_3:
+        return;
 
-	case LINUX_SLL_P_802_2:
-		return;
+    case LINUX_SLL_P_802_2:
+        return;
 
-	case ETHERNET_TYPE_8021Q:
-		DecodeVlan(p->pkt + SLL_HDR_LEN, cap_len - SLL_HDR_LEN, p, snaplen);
-		return;
+    case ETHERNET_TYPE_8021Q:
+        DecodeVlan(p->pkt + SLL_HDR_LEN, cap_len - SLL_HDR_LEN, p, snaplen);
+        return;
 
-	default:
-		return;
-	}
+    default:
+        return;
+    }
 
-	return;
+    return;
 }
 
-#endif				/* DLT_LINUX_SLL */
+#endif              /* DLT_LINUX_SLL */
 
 /*
  * Function: DecodePflog(anonpacket *, struct pcap_pkthdr *, unsigned char *)
@@ -577,49 +574,49 @@ void DecodeLinuxSLLPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char
  */
 void DecodePflog(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-	unsigned int    pkt_len;	/* suprisingly, the length of the packet */
-	unsigned int    cap_len;	/* caplen value */
+    unsigned int    pkt_len;    /* suprisingly, the length of the packet */
+    unsigned int    cap_len;    /* caplen value */
 
-	memset(p, 0, sizeof(*p));
+    memset(p, 0, sizeof(*p));
 
-	p->pkth = pkthdr;
-	p->pkt = pkt;
+    p->pkth = pkthdr;
+    p->pkt = pkt;
 
-	/* set the lengths we need */
-	pkt_len = pkthdr->len;	/* total packet length */
-	cap_len = pkthdr->caplen;	/* captured packet length */
+    /* set the lengths we need */
+    pkt_len = pkthdr->len;  /* total packet length */
+    cap_len = pkthdr->caplen;   /* captured packet length */
 
-	if ((unsigned int)snaplen < pkt_len)
-		pkt_len = cap_len;
+    if ((unsigned int)snaplen < pkt_len)
+        pkt_len = cap_len;
 
-	/* do a little validation */
-	if (p->pkth->caplen < PFLOG_HDRLEN) {
-		return;
-	}
+    /* do a little validation */
+    if (p->pkth->caplen < PFLOG_HDRLEN) {
+        return;
+    }
 
-	/* lay the pf header structure over the packet data */
-	p->pfh = (PflogHdr *) pkt;
+    /* lay the pf header structure over the packet data */
+    p->pfh = (PflogHdr *) pkt;
 
-	/*  get the network type - should only be AF_INET or AF_INET6 */
-	switch (ntohl(p->pfh->af)) {
-	case AF_INET:		/* IPv4 */
+    /*  get the network type - should only be AF_INET or AF_INET6 */
+    switch (ntohl(p->pfh->af)) {
+    case AF_INET:       /* IPv4 */
 
-		DecodeIP(p->pkt + PFLOG_HDRLEN, cap_len - PFLOG_HDRLEN, p, snaplen);
-		return;
+        DecodeIP(p->pkt + PFLOG_HDRLEN, cap_len - PFLOG_HDRLEN, p, snaplen);
+        return;
 
 #ifdef AF_INET6
-	case AF_INET6:		/* IPv6 */
-		return;
+    case AF_INET6:      /* IPv6 */
+        return;
 #endif
 
-	default:
-		/* To my knowledge, pflog devices can only
-		 * pass IP and IP6 packets. -fleck
-		 */
-		return;
-	}
+    default:
+        /* To my knowledge, pflog devices can only
+         * pass IP and IP6 packets. -fleck
+         */
+        return;
+    }
 
-	return;
+    return;
 }
 
 /*
@@ -639,66 +636,66 @@ void DecodePflog(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt,
  */
 void DecodePPPoEPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-	unsigned int    pkt_len;	/* suprisingly, the length of the packet */
-	unsigned int    cap_len;	/* caplen value */
-	PPPoEHdr       *ppppoep = 0;
-	PPPoE_Tag      *ppppoe_tag = 0;
-	PPPoE_Tag       tag;	/* needed to avoid alignment problems */
+    unsigned int    pkt_len;    /* suprisingly, the length of the packet */
+    unsigned int    cap_len;    /* caplen value */
+    PPPoEHdr       *ppppoep = 0;
+    PPPoE_Tag      *ppppoe_tag = 0;
+    PPPoE_Tag       tag;    /* needed to avoid alignment problems */
 
-	memset(p, 0, sizeof(*p));
+    memset(p, 0, sizeof(*p));
 
-	p->pkth = pkthdr;
-	p->pkt = pkt;
+    p->pkth = pkthdr;
+    p->pkt = pkt;
 
-	/* set the lengths we need */
-	pkt_len = pkthdr->len;	/* total packet length */
-	cap_len = pkthdr->caplen;	/* captured packet length */
+    /* set the lengths we need */
+    pkt_len = pkthdr->len;  /* total packet length */
+    cap_len = pkthdr->caplen;   /* captured packet length */
 
-	if ((unsigned int)snaplen < pkt_len)
-		pkt_len = cap_len;
+    if ((unsigned int)snaplen < pkt_len)
+        pkt_len = cap_len;
 
-	/* do a little validation */
-	if (p->pkth->caplen < ETHERNET_HEADER_LEN) {
+    /* do a little validation */
+    if (p->pkth->caplen < ETHERNET_HEADER_LEN) {
 
-		return;
-	}
+        return;
+    }
 
-	p->eh = (EtherHdr *) pkt;
+    p->eh = (EtherHdr *) pkt;
 
-	ppppoep = (PPPoEHdr *) pkt;
+    ppppoep = (PPPoEHdr *) pkt;
 
-	/* grab out the network type */
-	switch (ntohs(p->eh->ether_type)) {
-	case ETHERNET_TYPE_PPPoE_DISC:
+    /* grab out the network type */
+    switch (ntohs(p->eh->ether_type)) {
+    case ETHERNET_TYPE_PPPoE_DISC:
 
-		break;
+        break;
 
-	case ETHERNET_TYPE_PPPoE_SESS:
-		DecodePPPoEPkt(p, pkthdr, pkt, snaplen);
-		break;
+    case ETHERNET_TYPE_PPPoE_SESS:
+        DecodePPPoEPkt(p, pkthdr, pkt, snaplen);
+        break;
 
-	default:
-		return;
-	}
+    default:
+        return;
+    }
 
-	if (ntohs(p->eh->ether_type) != ETHERNET_TYPE_PPPoE_DISC) {
-		DecodePppPkt(p, pkthdr, pkt + 18, snaplen);
-		return;
-	}
+    if (ntohs(p->eh->ether_type) != ETHERNET_TYPE_PPPoE_DISC) {
+        DecodePppPkt(p, pkthdr, pkt + 18, snaplen);
+        return;
+    }
 
-	ppppoe_tag = (PPPoE_Tag *) (pkt + sizeof(PPPoEHdr));
+    ppppoe_tag = (PPPoE_Tag *) (pkt + sizeof(PPPoEHdr));
 
-	while (ppppoe_tag < (PPPoE_Tag *) (pkt + pkthdr->caplen)) {
-		/* no guarantee in PPPoE spec that ppppoe_tag is aligned at all... */
-		memcpy(&tag, ppppoe_tag, sizeof(tag));
+    while (ppppoe_tag < (PPPoE_Tag *) (pkt + pkthdr->caplen)) {
+        /* no guarantee in PPPoE spec that ppppoe_tag is aligned at all... */
+        memcpy(&tag, ppppoe_tag, sizeof(tag));
 
-		if (ntohs(tag.length) > 0) {
-		}
+        if (ntohs(tag.length) > 0) {
+        }
 
-		ppppoe_tag = (PPPoE_Tag *) ((char *)(ppppoe_tag + 1) + ntohs(tag.length));
-	}
+        ppppoe_tag = (PPPoE_Tag *) ((char *)(ppppoe_tag + 1) + ntohs(tag.length));
+    }
 
-	return;
+    return;
 }
 
 /*
@@ -715,49 +712,49 @@ void DecodePPPoEPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *p
  */
 void DecodePppPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-	unsigned int    len;
-	unsigned int    cap_len;
-	struct ppp_header *ppphdr;
+    unsigned int    len;
+    unsigned int    cap_len;
+    struct ppp_header *ppphdr;
 
-	memset(p, 0, sizeof(*p));
+    memset(p, 0, sizeof(*p));
 
-	p->pkth = pkthdr;
-	p->pkt = pkt;
-	ppphdr = (struct ppp_header *)pkt;
+    p->pkth = pkthdr;
+    p->pkt = pkt;
+    ppphdr = (struct ppp_header *)pkt;
 
-	len = pkthdr->len;
-	cap_len = pkthdr->caplen;
+    len = pkthdr->len;
+    cap_len = pkthdr->caplen;
 
-	/* do a little validation */
-	if (cap_len < PPP_HDRLEN) {
-		return;
-	}
+    /* do a little validation */
+    if (cap_len < PPP_HDRLEN) {
+        return;
+    }
 
-	/*
-	 * We only handle uncompressed packets. Handling VJ compression would mean
-	 * to implement a PPP state machine.
-	 */
-	switch (ntohs(ppphdr->protocol)) {
-	case PPP_VJ_COMP:
-		break;
-	case PPP_VJ_UCOMP:
-		/* VJ compression modifies the protocol field. It must be set
-		 * to tcp (only TCP packets can be VJ compressed) */
-		if (cap_len < PPP_HDRLEN + IP_HEADER_LEN) {
-			return;
-		}
+    /*
+     * We only handle uncompressed packets. Handling VJ compression would mean
+     * to implement a PPP state machine.
+     */
+    switch (ntohs(ppphdr->protocol)) {
+    case PPP_VJ_COMP:
+        break;
+    case PPP_VJ_UCOMP:
+        /* VJ compression modifies the protocol field. It must be set
+         * to tcp (only TCP packets can be VJ compressed) */
+        if (cap_len < PPP_HDRLEN + IP_HEADER_LEN) {
+            return;
+        }
 
-		((IPHdr *) (p->pkt + PPP_HDRLEN))->ip_proto = IPPROTO_TCP;
-		/* fall through */
+        ((IPHdr *) (p->pkt + PPP_HDRLEN))->ip_proto = IPPROTO_TCP;
+        /* fall through */
 
-	case PPP_IP:
-		DecodeIP(p->pkt + PPP_HDRLEN, cap_len - PPP_HDRLEN, p, snaplen);
-		break;
+    case PPP_IP:
+        DecodeIP(p->pkt + PPP_HDRLEN, cap_len - PPP_HDRLEN, p, snaplen);
+        break;
 
-	case PPP_IPX:
-		DecodeIPX(p->pkt + PPP_HDRLEN, cap_len - PPP_HDRLEN, snaplen);
-		break;
-	}
+    case PPP_IPX:
+        DecodeIPX(p->pkt + PPP_HDRLEN, cap_len - PPP_HDRLEN, snaplen);
+        break;
+    }
 }
 
 /*
@@ -774,23 +771,23 @@ void DecodePppPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt
  */
 void DecodeSlipPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-	unsigned int    len;
-	unsigned int    cap_len;
+    unsigned int    len;
+    unsigned int    cap_len;
 
-	memset(p, 0, sizeof(*p));
+    memset(p, 0, sizeof(*p));
 
-	p->pkth = pkthdr;
-	p->pkt = pkt;
+    p->pkth = pkthdr;
+    p->pkt = pkt;
 
-	len = pkthdr->len;
-	cap_len = pkthdr->caplen;
+    len = pkthdr->len;
+    cap_len = pkthdr->caplen;
 
-	/* do a little validation */
-	if (cap_len < SLIP_HEADER_LEN) {
-		return;
-	}
+    /* do a little validation */
+    if (cap_len < SLIP_HEADER_LEN) {
+        return;
+    }
 
-	DecodeIP(p->pkt + SLIP_HEADER_LEN, cap_len - SLIP_HEADER_LEN, p, snaplen);
+    DecodeIP(p->pkt + SLIP_HEADER_LEN, cap_len - SLIP_HEADER_LEN, p, snaplen);
 }
 
 /*
@@ -808,14 +805,14 @@ void DecodeSlipPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pk
  */
 void DecodeRawPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-	memset(p, 0, sizeof(*p));
+    memset(p, 0, sizeof(*p));
 
-	p->pkth = pkthdr;
-	p->pkt = pkt;
+    p->pkth = pkthdr;
+    p->pkt = pkt;
 
-	DecodeIP(pkt, p->pkth->caplen, p, snaplen);
+    DecodeIP(pkt, p->pkth->caplen, p, snaplen);
 
-	return;
+    return;
 }
 
 /*
@@ -825,14 +822,14 @@ void DecodeRawPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt
  */
 void DecodeRawPkt6(anonpacket *p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-	memset(p, 0, sizeof(*p));
+    memset(p, 0, sizeof(*p));
 
-	p->pkth = pkthdr;
-	p->pkt  = pkt;
+    p->pkth = pkthdr;
+    p->pkt  = pkt;
 
-	DecodeIPv6(pkt, p->pkth->caplen, p);
+    DecodeIPv6(pkt, p->pkth->caplen, p, snaplen);
 
-	return;
+    return;
 }
 
 /*
@@ -851,14 +848,14 @@ void DecodeRawPkt6(anonpacket *p, struct pcap_pkthdr *pkthdr, unsigned char *pkt
  */
 void DecodeI4LRawIPPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt, int snaplen)
 {
-	memset(p, 0, sizeof(*p));
+    memset(p, 0, sizeof(*p));
 
-	p->pkth = pkthdr;
-	p->pkt = pkt;
+    p->pkth = pkthdr;
+    p->pkt = pkt;
 
-	DecodeIP(pkt + 2, p->pkth->len - 2, p, snaplen);
+    DecodeIP(pkt + 2, p->pkth->len - 2, p, snaplen);
 
-	return;
+    return;
 }
 
 /*
@@ -877,16 +874,16 @@ void DecodeI4LRawIPPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char
  * Returns: void function
  */
 void DecodeI4LCiscoIPPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned char *pkt,
-			 int snaplen)
+             int snaplen)
 {
-	memset(p, 0, sizeof(*p));
+    memset(p, 0, sizeof(*p));
 
-	p->pkth = pkthdr;
-	p->pkt = pkt;
+    p->pkth = pkthdr;
+    p->pkt = pkt;
 
-	DecodeIP(pkt + 4, p->pkth->caplen - 4, p, snaplen);
+    DecodeIP(pkt + 4, p->pkth->caplen - 4, p, snaplen);
 
-	return;
+    return;
 }
 
 /*
@@ -902,116 +899,116 @@ void DecodeI4LCiscoIPPkt(anonpacket * p, struct pcap_pkthdr *pkthdr, unsigned ch
  */
 void DecodeIP(unsigned char *pkt, const unsigned int len, anonpacket * p, int snaplen)
 {
-	unsigned int    ip_len;	/* length from the start of the ip hdr to the
-				 * pkt end */
-	unsigned int    hlen;	/* ip header length */
+    unsigned int    ip_len; /* length from the start of the ip hdr to the
+                 * pkt end */
+    unsigned int    hlen;   /* ip header length */
 //    unsigned short int csum;             /* checksum */
 
-	/* lay the IP struct over the raw data */
-	p->iph = (IPHdr *) pkt;
+    /* lay the IP struct over the raw data */
+    p->iph = (IPHdr *) pkt;
 
-	/* do a little validation */
-	if (len < IP_HEADER_LEN) {
-		p->iph = NULL;
+    /* do a little validation */
+    if (len < IP_HEADER_LEN) {
+        p->iph = NULL;
 
-		return;
-	}
+        return;
+    }
 
-	/*
-	 * with datalink DLT_RAW it's impossible to differ ARP datagrams from IP.
-	 * So we are just ignoring non IP datagrams
-	 */
-	if (IP_VER(p->iph) != 4) {
-		p->iph = NULL;
-		return;
-	}
+    /*
+     * with datalink DLT_RAW it's impossible to differ ARP datagrams from IP.
+     * So we are just ignoring non IP datagrams
+     */
+    if (IP_VER(p->iph) != 4) {
+        p->iph = NULL;
+        return;
+    }
 
-	/* set the IP datagram length */
-	ip_len = ntohs(p->iph->ip_len);
-	/* set the IP header length */
-	hlen = IP_HLEN(p->iph) << 2;
+    /* set the IP datagram length */
+    ip_len = ntohs(p->iph->ip_len);
+    /* set the IP header length */
+    hlen = IP_HLEN(p->iph) << 2;
 
-	/* header length sanity check */
-	if (hlen < IP_HEADER_LEN) {
-		/* XXX: this is a bogus packet, perhaps we should generate an alert */
+    /* header length sanity check */
+    if (hlen < IP_HEADER_LEN) {
+        /* XXX: this is a bogus packet, perhaps we should generate an alert */
 
-		p->iph = NULL;
-		return;
-	}
+        p->iph = NULL;
+        return;
+    }
 
-	if (ip_len != len) {
-		if (ip_len > len) {
-			ip_len = len;
-		} else {
-		}
-	}
+    if (ip_len != len) {
+        if (ip_len > len) {
+            ip_len = len;
+        } else {
+        }
+    }
 
-	if (ip_len < hlen) {
-		p->iph = NULL;
-		return;
-	}
+    if (ip_len < hlen) {
+        p->iph = NULL;
+        return;
+    }
 
-	/* test for IP options */
-	p->ip_options_len = hlen - IP_HEADER_LEN;
+    /* test for IP options */
+    p->ip_options_len = hlen - IP_HEADER_LEN;
 
-	if (p->ip_options_len > 0) {
-		p->ip_options_data = pkt + IP_HEADER_LEN;
-		DecodeIPOptions((pkt + IP_HEADER_LEN), p->ip_options_len, p, snaplen);
-	} else {
-		p->ip_option_count = 0;
-	}
+    if (p->ip_options_len > 0) {
+        p->ip_options_data = pkt + IP_HEADER_LEN;
+        DecodeIPOptions((pkt + IP_HEADER_LEN), p->ip_options_len, p, snaplen);
+    } else {
+        p->ip_option_count = 0;
+    }
 
-	/* set the remaining packet length */
-	ip_len -= hlen;
+    /* set the remaining packet length */
+    ip_len -= hlen;
 
-	/* check for fragmented packets */
-	p->frag_offset = ntohs(p->iph->ip_off);
+    /* check for fragmented packets */
+    p->frag_offset = ntohs(p->iph->ip_off);
 
-	/*
-	 * get the values of the reserved, more
-	 * fragments and don't fragment flags
-	 */
-	p->rf = (unsigned char)((p->frag_offset & 0x8000) >> 15);
-	p->df = (unsigned char)((p->frag_offset & 0x4000) >> 14);
-	p->mf = (unsigned char)((p->frag_offset & 0x2000) >> 13);
+    /*
+     * get the values of the reserved, more
+     * fragments and don't fragment flags
+     */
+    p->rf = (unsigned char)((p->frag_offset & 0x8000) >> 15);
+    p->df = (unsigned char)((p->frag_offset & 0x4000) >> 14);
+    p->mf = (unsigned char)((p->frag_offset & 0x2000) >> 13);
 
-	/* mask off the high bits in the fragment offset field */
-	p->frag_offset &= 0x1FFF;
+    /* mask off the high bits in the fragment offset field */
+    p->frag_offset &= 0x1FFF;
 
-	if (p->frag_offset || p->mf) {
-		/* set the packet fragment flag */
-		p->frag_flag = 1;
-	}
+    if (p->frag_offset || p->mf) {
+        /* set the packet fragment flag */
+        p->frag_flag = 1;
+    }
 
-	/* if this packet isn't a fragment */
-	if (!(p->frag_flag)) {
-		/* set the packet fragment flag */
-		p->frag_flag = 0;
+    /* if this packet isn't a fragment */
+    if (!(p->frag_flag)) {
+        /* set the packet fragment flag */
+        p->frag_flag = 0;
 
-		switch (p->iph->ip_proto) {
-		case IPPROTO_TCP:
-			DecodeTCP(pkt + hlen, ip_len, p, snaplen);
-			return;
+        switch (p->iph->ip_proto) {
+        case IPPROTO_TCP:
+            DecodeTCP(pkt + hlen, ip_len, p, snaplen);
+            return;
 
-		case IPPROTO_UDP:
-			DecodeUDP(pkt + hlen, ip_len, p, snaplen);
-			return;
+        case IPPROTO_UDP:
+            DecodeUDP(pkt + hlen, ip_len, p, snaplen);
+            return;
 
-		case IPPROTO_ICMP:
-			DecodeICMP(pkt + hlen, ip_len, p, snaplen);
-			return;
+        case IPPROTO_ICMP:
+            DecodeICMP(pkt + hlen, ip_len, p, snaplen);
+            return;
 
-		default:
+        default:
 
-			p->data = pkt + hlen;
-			p->dsize = (unsigned int)ip_len;
-			return;
-		}
-	} else {
-		/* set the payload pointer and payload size */
-		p->data = pkt + hlen;
-		p->dsize = (unsigned int)ip_len;
-	}
+            p->data = pkt + hlen;
+            p->dsize = (unsigned int)ip_len;
+            return;
+        }
+    } else {
+        /* set the payload pointer and payload size */
+        p->data = pkt + hlen;
+        p->dsize = (unsigned int)ip_len;
+    }
 }
 
 /**
@@ -1022,46 +1019,47 @@ void DecodeIP(unsigned char *pkt, const unsigned int len, anonpacket * p, int sn
  * @param pkt [in] pointer to the packet data
  * @param len [in] length of packet data buffer
  * @param p   [in] pointer to anonpacket structure
+ * @param snaplen [in] length of packet from pcap header
  *
  * @return Nothing
  */
-void DecodeIPv6(unsigned char *pkt, const unsigned int len, anonpacket *p)
+void DecodeIPv6(unsigned char *pkt, const unsigned int len, anonpacket *p, int snaplen)
 {
-	IPv6Hdr		*hdr = (IPv6Hdr *)pkt;
-	uint32_t	payload_len;
+    IPv6Hdr     *hdr = (IPv6Hdr *)pkt;
+    uint32_t    payload_len;
 
-	if(len < IPV6_HDR_LEN) {
-		p->ipv6_hdr = NULL;
-		return;
-	}
+    if(len < IPV6_HDR_LEN) {
+        p->ipv6_hdr = NULL;
+        return;
+    }
 
-	if(hdr->ipv6_vfc >> 4 != 6) {
-		p->ipv6_hdr = NULL;
-		return;
-	}
+    if(hdr->ipv6_vfc >> 4 != 6) {
+        p->ipv6_hdr = NULL;
+        return;
+    }
 
-	if(hdr->ipv6_next == IPPROTO_IPIP
-	|| hdr->ipv6_next == IPPROTO_IPV6
-	|| hdr->ipv6_next == IPPROTO_GRE) {
-		/* Multiple encapsulation in packet */
-		return;
-	} else {
-		/*
-		 * Encapsulated packet.
-		 * Save the 'outer' headers and proceed.
-		 */
-	}
+    if(hdr->ipv6_next == IPPROTO_IPIP
+    || hdr->ipv6_next == IPPROTO_IPV6
+    || hdr->ipv6_next == IPPROTO_GRE) {
+        /* Multiple encapsulation in packet */
+        return;
+    } else {
+        /*
+         * Encapsulated packet.
+         * Save the 'outer' headers and proceed.
+         */
+    }
 
-	payload_len = ntohs(hdr->ipv6_plen) + IPV6_HDR_LEN;
+    payload_len = ntohs(hdr->ipv6_plen) + IPV6_HDR_LEN;
 
-	if(payload_len > len) {
-		return;
-	}
+    if(payload_len > len) {
+        return;
+    }
 
-	/* Lay the IP struct over data */
-	p->ipv6_hdr = (IPv6Hdr *) pkt;
+    /* Lay the IP struct over data */
+    p->ipv6_hdr = (IPv6Hdr *) pkt;
 
-	/* TODO */
+    /* TODO */
 }
 
 
@@ -1078,104 +1076,104 @@ void DecodeIPv6(unsigned char *pkt, const unsigned int len, anonpacket *p)
  */
 int DecodeIPOnly(unsigned char *pkt, const unsigned int len, anonpacket * p, int snaplen)
 {
-	unsigned int    ip_len;	/* length from the start of the ip hdr to the
-				 * pkt end */
-	unsigned int    hlen;	/* ip header length */
+    unsigned int    ip_len; /* length from the start of the ip hdr to the
+                 * pkt end */
+    unsigned int    hlen;   /* ip header length */
 
-	/* lay the IP struct over the raw data */
-	p->orig_iph = (IPHdr *) pkt;
+    /* lay the IP struct over the raw data */
+    p->orig_iph = (IPHdr *) pkt;
 
-	/* do a little validation */
-	if (len < IP_HEADER_LEN) {
-		p->orig_iph = NULL;
-		return (0);
-	}
+    /* do a little validation */
+    if (len < IP_HEADER_LEN) {
+        p->orig_iph = NULL;
+        return (0);
+    }
 
-	/*
-	 * with datalink DLT_RAW it's impossible to differ ARP datagrams from IP.
-	 * So we are just ignoring non IP datagrams
-	 */
-	if (IP_VER(p->orig_iph) != 4) {
+    /*
+     * with datalink DLT_RAW it's impossible to differ ARP datagrams from IP.
+     * So we are just ignoring non IP datagrams
+     */
+    if (IP_VER(p->orig_iph) != 4) {
 
-		p->orig_iph = NULL;
+        p->orig_iph = NULL;
 
-		return (0);
-	}
+        return (0);
+    }
 
-	/* set the IP datagram length */
-	ip_len = ntohs(p->orig_iph->ip_len);
+    /* set the IP datagram length */
+    ip_len = ntohs(p->orig_iph->ip_len);
 
-	/* set the IP header length */
-	hlen = IP_HLEN(p->orig_iph) << 2;
+    /* set the IP header length */
+    hlen = IP_HLEN(p->orig_iph) << 2;
 
-	if (len < hlen) {
+    if (len < hlen) {
 
-		p->orig_iph = NULL;
+        p->orig_iph = NULL;
 
-		return (0);
-	}
+        return (0);
+    }
 
-	p->ip_option_count = 0;
+    p->ip_option_count = 0;
 
-	/* set the remaining packet length */
-	ip_len = len - hlen;
+    /* set the remaining packet length */
+    ip_len = len - hlen;
 
-	/* check for fragmented packets */
-	p->frag_offset = ntohs(p->orig_iph->ip_off);
+    /* check for fragmented packets */
+    p->frag_offset = ntohs(p->orig_iph->ip_off);
 
-	/* get the values of the reserved, more
-	 * fragments and don't fragment flags
-	 */
-	p->rf = (unsigned char)(p->frag_offset & 0x8000) >> 15;
-	p->df = (unsigned char)(p->frag_offset & 0x4000) >> 14;
-	p->mf = (unsigned char)(p->frag_offset & 0x2000) >> 13;
+    /* get the values of the reserved, more
+     * fragments and don't fragment flags
+     */
+    p->rf = (unsigned char)(p->frag_offset & 0x8000) >> 15;
+    p->df = (unsigned char)(p->frag_offset & 0x4000) >> 14;
+    p->mf = (unsigned char)(p->frag_offset & 0x2000) >> 13;
 
-	/* mask off the high bits in the fragment offset field */
-	p->frag_offset &= 0x1FFF;
+    /* mask off the high bits in the fragment offset field */
+    p->frag_offset &= 0x1FFF;
 
-	if (p->frag_offset || p->mf) {
-		/* set the packet fragment flag */
-		p->frag_flag = 1;
+    if (p->frag_offset || p->mf) {
+        /* set the packet fragment flag */
+        p->frag_flag = 1;
 
-		/* set the payload pointer and payload size */
-		p->data = pkt + hlen;
-		p->dsize = (unsigned int)ip_len;
-	} else {
-		p->frag_flag = 0;
+        /* set the payload pointer and payload size */
+        p->data = pkt + hlen;
+        p->dsize = (unsigned int)ip_len;
+    } else {
+        p->frag_flag = 0;
 
-		switch (p->orig_iph->ip_proto) {
-		case IPPROTO_TCP:	/* decode the interesting part of the header */
-			if (ip_len > 4) {
-				p->orig_tcph = (TCPHdr *) (pkt + hlen);
+        switch (p->orig_iph->ip_proto) {
+        case IPPROTO_TCP:   /* decode the interesting part of the header */
+            if (ip_len > 4) {
+                p->orig_tcph = (TCPHdr *) (pkt + hlen);
 
-				/* stuff more data into the printout data struct */
-				p->orig_sp = ntohs(p->orig_tcph->th_sport);
-				p->orig_dp = ntohs(p->orig_tcph->th_dport);
-			}
+                /* stuff more data into the printout data struct */
+                p->orig_sp = ntohs(p->orig_tcph->th_sport);
+                p->orig_dp = ntohs(p->orig_tcph->th_dport);
+            }
 
-			break;
+            break;
 
-		case IPPROTO_UDP:
-			if (ip_len > 4) {
-				p->orig_udph = (UDPHdr *) (pkt + hlen);
+        case IPPROTO_UDP:
+            if (ip_len > 4) {
+                p->orig_udph = (UDPHdr *) (pkt + hlen);
 
-				/* fill in the printout data structs */
-				p->orig_sp = ntohs(p->orig_udph->uh_sport);
-				p->orig_dp = ntohs(p->orig_udph->uh_dport);
-			}
+                /* fill in the printout data structs */
+                p->orig_sp = ntohs(p->orig_udph->uh_sport);
+                p->orig_dp = ntohs(p->orig_udph->uh_dport);
+            }
 
-			break;
+            break;
 
-		case IPPROTO_ICMP:
-			if (ip_len > 4) {
-				p->orig_icmph = (ICMPHdr *) (pkt + hlen);
-			}
+        case IPPROTO_ICMP:
+            if (ip_len > 4) {
+                p->orig_icmph = (ICMPHdr *) (pkt + hlen);
+            }
 
-			break;
-		}
-	}
+            break;
+        }
+    }
 
-	return (1);
+    return (1);
 }
 
 /*
@@ -1183,17 +1181,17 @@ int DecodeIPOnly(unsigned char *pkt, const unsigned int len, anonpacket * p, int
  *
  * Purpose: Decode the SCTP transport layer.
  *
- * Arguments:	pkt => pointer to the packet data
- * 		len => length from pkt to the end of the packet
- * 		p   => pointer to packet decoding structure
+ * Arguments:   pkt => pointer to the packet data
+ *      len => length from pkt to the end of the packet
+ *      p   => pointer to packet decoding structure
  *
  * Returns: void
  */
 void DecodeSCTP(unsigned char *pkt, const unsigned int len, anonpacket *p, int snaplen)
 {
-	/* TODO */
+    /* TODO */
 
-	return;
+    return;
 }
 
 /*
@@ -1209,58 +1207,58 @@ void DecodeSCTP(unsigned char *pkt, const unsigned int len, anonpacket *p, int s
  */
 void DecodeTCP(unsigned char *pkt, const unsigned int len, anonpacket * p, int snaplen)
 {
-	struct pseudoheader {	/* pseudo header for TCP checksum calculations */
-		unsigned int    sip, dip;	/* IP addr */
-		unsigned char   zero;	/* checksum placeholder */
-		unsigned char   protocol;	/* protocol number */
-		unsigned int    tcplen;	/* tcp packet length */
-	};
-	unsigned int    hlen;	/* TCP header length */
+    struct pseudoheader {   /* pseudo header for TCP checksum calculations */
+        unsigned int    sip, dip;   /* IP addr */
+        unsigned char   zero;   /* checksum placeholder */
+        unsigned char   protocol;   /* protocol number */
+        unsigned int    tcplen; /* tcp packet length */
+    };
+    unsigned int    hlen;   /* TCP header length */
 //    u_short csum;              /* checksum */
 //    struct pseudoheader ph;    /* pseudo header declaration */
 
-	if (len < 20) {
+    if (len < 20) {
 
-		p->tcph = NULL;
-		return;
-	}
+        p->tcph = NULL;
+        return;
+    }
 
-	/* lay TCP on top of the data cause there is enough of it! */
-	p->tcph = (TCPHdr *) pkt;
+    /* lay TCP on top of the data cause there is enough of it! */
+    p->tcph = (TCPHdr *) pkt;
 
-	/* multiply the payload offset value by 4 */
-	hlen = TCP_OFFSET(p->tcph) << 2;
+    /* multiply the payload offset value by 4 */
+    hlen = TCP_OFFSET(p->tcph) << 2;
 
-	if (hlen < 20) {
+    if (hlen < 20) {
 
-		p->tcph = NULL;
+        p->tcph = NULL;
 
-		return;
-	}
+        return;
+    }
 
-	/* if options are present, decode them */
-	p->tcp_options_len = hlen - 20;
+    /* if options are present, decode them */
+    p->tcp_options_len = hlen - 20;
 
-	if (p->tcp_options_len > 0) {
+    if (p->tcp_options_len > 0) {
 
-		p->tcp_options_data = pkt + 20;
-		DecodeTCPOptions((unsigned char *)(pkt + 20), p->tcp_options_len, p, snaplen);
-	} else {
-		p->tcp_option_count = 0;
-	}
+        p->tcp_options_data = pkt + 20;
+        DecodeTCPOptions((unsigned char *)(pkt + 20), p->tcp_options_len, p, snaplen);
+    } else {
+        p->tcp_option_count = 0;
+    }
 
-	/* stuff more data into the printout data struct */
-	p->sp = ntohs(p->tcph->th_sport);
-	p->dp = ntohs(p->tcph->th_dport);
+    /* stuff more data into the printout data struct */
+    p->sp = ntohs(p->tcph->th_sport);
+    p->dp = ntohs(p->tcph->th_dport);
 
-	/* set the data pointer and size */
-	p->data = (unsigned char *)(pkt + hlen);
+    /* set the data pointer and size */
+    p->data = (unsigned char *)(pkt + hlen);
 
-	if (hlen < len) {
-		p->dsize = (unsigned int)(len - hlen);
-	} else {
-		p->dsize = 0;
-	}
+    if (hlen < len) {
+        p->dsize = (unsigned int)(len - hlen);
+    } else {
+        p->dsize = 0;
+    }
 
 }
 
@@ -1277,36 +1275,36 @@ void DecodeTCP(unsigned char *pkt, const unsigned int len, anonpacket * p, int s
  */
 void DecodeUDP(unsigned char *pkt, const unsigned int len, anonpacket * p, int snaplen)
 {
-	struct pseudoheader {
-		unsigned int    sip, dip;
-		unsigned char   zero;
-		unsigned char   protocol;
-		unsigned int    udplen;
-	};
+    struct pseudoheader {
+        unsigned int    sip, dip;
+        unsigned char   zero;
+        unsigned char   protocol;
+        unsigned int    udplen;
+    };
 //    u_short csum;
 //    struct pseudoheader ph;
 
-	if (len < sizeof(UDPHdr)) {
+    if (len < sizeof(UDPHdr)) {
 
-		p->udph = NULL;
+        p->udph = NULL;
 
-		return;
-	}
+        return;
+    }
 
-	/* set the ptr to the start of the UDP header */
-	p->udph = (UDPHdr *) pkt;
+    /* set the ptr to the start of the UDP header */
+    p->udph = (UDPHdr *) pkt;
 
-	/* fill in the printout data structs */
-	p->sp = ntohs(p->udph->uh_sport);
-	p->dp = ntohs(p->udph->uh_dport);
+    /* fill in the printout data structs */
+    p->sp = ntohs(p->udph->uh_sport);
+    p->dp = ntohs(p->udph->uh_dport);
 
-	p->data = (unsigned char *)(pkt + UDP_HEADER_LEN);
+    p->data = (unsigned char *)(pkt + UDP_HEADER_LEN);
 
-	if ((len - UDP_HEADER_LEN) > 0) {
-		p->dsize = (unsigned int)(len - UDP_HEADER_LEN);
-	} else {
-		p->dsize = 0;
-	}
+    if ((len - UDP_HEADER_LEN) > 0) {
+        p->dsize = (unsigned int)(len - UDP_HEADER_LEN);
+    } else {
+        p->dsize = 0;
+    }
 }
 
 /*
@@ -1323,107 +1321,107 @@ void DecodeUDP(unsigned char *pkt, const unsigned int len, anonpacket * p, int s
 void DecodeICMP(unsigned char *pkt, const unsigned int len, anonpacket * p, int snaplen)
 {
 //    unsigned short int csum;
-	unsigned int    orig_p_caplen;
+    unsigned int    orig_p_caplen;
 
-	if (len < ICMP_HEADER_LEN) {
+    if (len < ICMP_HEADER_LEN) {
 
-		p->icmph = NULL;
-		return;
-	}
+        p->icmph = NULL;
+        return;
+    }
 
-	/* set the header ptr first */
-	p->icmph = (ICMPHdr *) pkt;
+    /* set the header ptr first */
+    p->icmph = (ICMPHdr *) pkt;
 
-	switch (p->icmph->type) {
-	case ICMP_ECHOREPLY:
-	case ICMP_DEST_UNREACH:
-	case ICMP_SOURCE_QUENCH:
-	case ICMP_REDIRECT:
-	case ICMP_ECHO:
-	case ICMP_ROUTER_ADVERTISE:
-	case ICMP_ROUTER_SOLICIT:
-	case ICMP_TIME_EXCEEDED:
-	case ICMP_PARAMETERPROB:
-	case ICMP_INFO_REQUEST:
-	case ICMP_INFO_REPLY:
-		if (len < 8) {
-			p->icmph = NULL;
+    switch (p->icmph->type) {
+    case ICMP_ECHOREPLY:
+    case ICMP_DEST_UNREACH:
+    case ICMP_SOURCE_QUENCH:
+    case ICMP_REDIRECT:
+    case ICMP_ECHO:
+    case ICMP_ROUTER_ADVERTISE:
+    case ICMP_ROUTER_SOLICIT:
+    case ICMP_TIME_EXCEEDED:
+    case ICMP_PARAMETERPROB:
+    case ICMP_INFO_REQUEST:
+    case ICMP_INFO_REPLY:
+        if (len < 8) {
+            p->icmph = NULL;
 
-			return;
-		}
+            return;
+        }
 
-		break;
+        break;
 
-	case ICMP_TIMESTAMP:
-	case ICMP_TIMESTAMPREPLY:
-		if (len < 20) {
-			p->icmph = NULL;
-			return;
-		}
+    case ICMP_TIMESTAMP:
+    case ICMP_TIMESTAMPREPLY:
+        if (len < 20) {
+            p->icmph = NULL;
+            return;
+        }
 
-		break;
+        break;
 
-	case ICMP_ADDRESS:
-	case ICMP_ADDRESSREPLY:
-		if (len < 12) {
-			p->icmph = NULL;
-			return;
-		}
+    case ICMP_ADDRESS:
+    case ICMP_ADDRESSREPLY:
+        if (len < 12) {
+            p->icmph = NULL;
+            return;
+        }
 
-		break;
-	}
+        break;
+    }
 
-	p->dsize = (unsigned int)(len - ICMP_HEADER_LEN);
-	p->data = pkt + ICMP_HEADER_LEN;
+    p->dsize = (unsigned int)(len - ICMP_HEADER_LEN);
+    p->data = pkt + ICMP_HEADER_LEN;
 
-	switch (p->icmph->type) {
-	case ICMP_ECHOREPLY:
-		/* setup the pkt id ans seq numbers */
-		p->dsize -= sizeof(struct idseq);
-		p->data += sizeof(struct idseq);
-		break;
+    switch (p->icmph->type) {
+    case ICMP_ECHOREPLY:
+        /* setup the pkt id ans seq numbers */
+        p->dsize -= sizeof(struct idseq);
+        p->data += sizeof(struct idseq);
+        break;
 
-	case ICMP_ECHO:
-		/* setup the pkt id and seq numbers */
-		p->dsize -= sizeof(struct idseq);	/* add the size of the
-							 * echo ext to the data
-							 * ptr and subtract it
-							 * from the data size */
-		p->data += sizeof(struct idseq);
-		break;
+    case ICMP_ECHO:
+        /* setup the pkt id and seq numbers */
+        p->dsize -= sizeof(struct idseq);   /* add the size of the
+                             * echo ext to the data
+                             * ptr and subtract it
+                             * from the data size */
+        p->data += sizeof(struct idseq);
+        break;
 
-	case ICMP_DEST_UNREACH:
-	{
-		/* if unreach packet is smaller than expected! */
-		if (len < 16) {
+    case ICMP_DEST_UNREACH:
+    {
+        /* if unreach packet is smaller than expected! */
+        if (len < 16) {
 
-			/* if it is less than 8 we are in trouble */
-			if (len < 8)
-				break;
-		}
+            /* if it is less than 8 we are in trouble */
+            if (len < 8)
+                break;
+        }
 
-		orig_p_caplen = len - 8;
+        orig_p_caplen = len - 8;
 
-	}
+    }
 
-		break;
+        break;
 
-	case ICMP_REDIRECT:
-	{
-		/* if unreach packet is smaller than expected! */
-		if (p->dsize < 28) {
-			if (p->dsize < 8)
-				break;
-		}
+    case ICMP_REDIRECT:
+    {
+        /* if unreach packet is smaller than expected! */
+        if (p->dsize < 28) {
+            if (p->dsize < 8)
+                break;
+        }
 
-		orig_p_caplen = p->dsize - 8;
+        orig_p_caplen = p->dsize - 8;
 
-	}
+    }
 
-		break;
-	}
+        break;
+    }
 
-	return;
+    return;
 }
 
 /*
@@ -1440,13 +1438,13 @@ void DecodeICMP(unsigned char *pkt, const unsigned int len, anonpacket * p, int 
 void DecodeARP(unsigned char *pkt, unsigned int len, anonpacket * p, int snaplen)
 {
 
-	p->ah = (EtherARP *) pkt;
+    p->ah = (EtherARP *) pkt;
 
-	if (len < sizeof(EtherARP)) {
-		return;
-	}
+    if (len < sizeof(EtherARP)) {
+        return;
+    }
 
-	return;
+    return;
 }
 
 /*
@@ -1462,17 +1460,17 @@ void DecodeARP(unsigned char *pkt, unsigned int len, anonpacket * p, int snaplen
  */
 void DecodeEapol(unsigned char *pkt, unsigned int len, anonpacket * p, int snaplen)
 {
-	p->eplh = (EtherEapol *) pkt;
-	if (len < sizeof(EtherEapol)) {
+    p->eplh = (EtherEapol *) pkt;
+    if (len < sizeof(EtherEapol)) {
 
-		return;
-	}
-	if (p->eplh->eaptype == EAPOL_TYPE_EAP) {
-		DecodeEAP(pkt + sizeof(EtherEapol), len - sizeof(EtherEapol), p, snaplen);
-	} else if (p->eplh->eaptype == EAPOL_TYPE_KEY) {
-		DecodeEapolKey(pkt + sizeof(EtherEapol), len - sizeof(EtherEapol), p, snaplen);
-	}
-	return;
+        return;
+    }
+    if (p->eplh->eaptype == EAPOL_TYPE_EAP) {
+        DecodeEAP(pkt + sizeof(EtherEapol), len - sizeof(EtherEapol), p, snaplen);
+    } else if (p->eplh->eaptype == EAPOL_TYPE_KEY) {
+        DecodeEapolKey(pkt + sizeof(EtherEapol), len - sizeof(EtherEapol), p, snaplen);
+    }
+    return;
 }
 
 /*
@@ -1488,13 +1486,13 @@ void DecodeEapol(unsigned char *pkt, unsigned int len, anonpacket * p, int snapl
  */
 void DecodeEapolKey(unsigned char *pkt, unsigned int len, anonpacket * p, int snaplen)
 {
-	p->eapolk = (EapolKey *) pkt;
-	if (len < sizeof(EapolKey)) {
+    p->eapolk = (EapolKey *) pkt;
+    if (len < sizeof(EapolKey)) {
 
-		return;
-	}
+        return;
+    }
 
-	return;
+    return;
 }
 
 /*
@@ -1510,14 +1508,14 @@ void DecodeEapolKey(unsigned char *pkt, unsigned int len, anonpacket * p, int sn
  */
 void DecodeEAP(unsigned char *pkt, const unsigned int len, anonpacket * p, int snaplen)
 {
-	p->eaph = (EAPHdr *) pkt;
-	if (len < sizeof(EAPHdr)) {
-		return;
-	}
-	if (p->eaph->code == EAP_CODE_REQUEST || p->eaph->code == EAP_CODE_RESPONSE) {
-		p->eaptype = pkt + sizeof(EAPHdr);
-	}
-	return;
+    p->eaph = (EAPHdr *) pkt;
+    if (len < sizeof(EAPHdr)) {
+        return;
+    }
+    if (p->eaph->code == EAP_CODE_REQUEST || p->eaph->code == EAP_CODE_RESPONSE) {
+        p->eaptype = pkt + sizeof(EAPHdr);
+    }
+    return;
 }
 
 /*
@@ -1533,7 +1531,7 @@ void DecodeEAP(unsigned char *pkt, const unsigned int len, anonpacket * p, int s
  */
 void DecodeIPX(unsigned char *pkt, unsigned int len, int snaplen)
 {
-	return;
+    return;
 }
 
 /*
@@ -1549,86 +1547,86 @@ void DecodeIPX(unsigned char *pkt, unsigned int len, int snaplen)
  */
 void DecodeTCPOptions(unsigned char *o_list, unsigned int o_len, anonpacket * p, int snaplen)
 {
-	unsigned char  *option_ptr;
-	unsigned int    bytes_processed;
-	unsigned int    current_option;
-	unsigned char   done = 0;
+    unsigned char  *option_ptr;
+    unsigned int    bytes_processed;
+    unsigned int    current_option;
+    unsigned char   done = 0;
 
-	if (TCP_OFFSET(p->tcph) == 5)
-		return;
+    if (TCP_OFFSET(p->tcph) == 5)
+        return;
 
-	option_ptr = o_list;
-	bytes_processed = 0;
-	current_option = 0;
+    option_ptr = o_list;
+    bytes_processed = 0;
+    current_option = 0;
 
-	while ((bytes_processed < o_len) && (current_option < 40) && !done) {
-		p->tcp_options[current_option].code = *option_ptr;
+    while ((bytes_processed < o_len) && (current_option < 40) && !done) {
+        p->tcp_options[current_option].code = *option_ptr;
 
-		switch (*option_ptr) {
-		case TCPOPT_NOP:
-		case TCPOPT_EOL:
-			if (*option_ptr == TCPOPT_EOL)
-				done = 1;
+        switch (*option_ptr) {
+        case TCPOPT_NOP:
+        case TCPOPT_EOL:
+            if (*option_ptr == TCPOPT_EOL)
+                done = 1;
 
-			p->tcp_options[current_option].len = 0;
-			p->tcp_options[current_option].data = NULL;
-			bytes_processed++;
-			current_option++;
-			option_ptr++;
+            p->tcp_options[current_option].len = 0;
+            p->tcp_options[current_option].data = NULL;
+            bytes_processed++;
+            current_option++;
+            option_ptr++;
 
-			break;
+            break;
 
-		case TCPOPT_SACKOK:
-			p->tcp_options[current_option].len = 0;
-			p->tcp_options[current_option].data = NULL;
-			bytes_processed += 2;
-			option_ptr += 2;
-			current_option++;
-			break;
+        case TCPOPT_SACKOK:
+            p->tcp_options[current_option].len = 0;
+            p->tcp_options[current_option].data = NULL;
+            bytes_processed += 2;
+            option_ptr += 2;
+            current_option++;
+            break;
 
-		case TCPOPT_WSCALE:
-			p->tcp_options[current_option].len = 3;
-			p->tcp_options[current_option].data = option_ptr + 2;
-			option_ptr += 3;
-			bytes_processed += 3;
-			current_option++;
-			break;
+        case TCPOPT_WSCALE:
+            p->tcp_options[current_option].len = 3;
+            p->tcp_options[current_option].data = option_ptr + 2;
+            option_ptr += 3;
+            bytes_processed += 3;
+            current_option++;
+            break;
 
-		default:
-			p->tcp_options[current_option].len = *(option_ptr + 1);
+        default:
+            p->tcp_options[current_option].len = *(option_ptr + 1);
 
-			if (p->tcp_options[current_option].len > 40) {
-				p->tcp_options[current_option].len = 40;
-			} else if (p->tcp_options[current_option].len == 0) {
-				/* got a bad option, we're all done */
-				done = 1;
-				p->tcp_lastopt_bad = 1;
-			}
+            if (p->tcp_options[current_option].len > 40) {
+                p->tcp_options[current_option].len = 40;
+            } else if (p->tcp_options[current_option].len == 0) {
+                /* got a bad option, we're all done */
+                done = 1;
+                p->tcp_lastopt_bad = 1;
+            }
 
-			p->tcp_options[current_option].data = option_ptr + 2;
-			option_ptr += p->tcp_options[current_option].len;
-			bytes_processed += p->tcp_options[current_option].len;
-			current_option++;
-			break;
-		}
-	}
+            p->tcp_options[current_option].data = option_ptr + 2;
+            option_ptr += p->tcp_options[current_option].len;
+            bytes_processed += p->tcp_options[current_option].len;
+            current_option++;
+            break;
+        }
+    }
 
-	if (bytes_processed > o_len) {
-		p->tcp_options[current_option].len =
-		    p->tcp_options[current_option].len - (bytes_processed - o_len);
-		/*
-		 * in reality shouldn't happen until we got the option type and len
-		 * on the packet header boundary.. then we just drop last option (as
-		 * it is corrupted anyway).
-		 */
+    if (bytes_processed > o_len) {
+        p->tcp_options[current_option].len =
+            p->tcp_options[current_option].len - (bytes_processed - o_len);
+        /*
+         * in reality shouldn't happen until we got the option type and len
+         * on the packet header boundary.. then we just drop last option (as
+         * it is corrupted anyway).
+         */
 /*        if(p->tcp_options[current_option].len < 0)
             current_option--;
 */
-	}
+    }
 
-	p->tcp_option_count = current_option;
+    p->tcp_option_count = current_option;
 
-	return;
+    return;
 }
 
 /*
@@ -1644,71 +1642,71 @@ void DecodeTCPOptions(unsigned char *o_list, unsigned int o_len, anonpacket * p,
  */
 void DecodeIPOptions(unsigned char *o_list, unsigned int o_len, anonpacket * p, int snaplen)
 {
-	unsigned char  *option_ptr;
-	unsigned int    bytes_processed;
-	unsigned int    current_option;
-	unsigned char   done = 0;
+    unsigned char  *option_ptr;
+    unsigned int    bytes_processed;
+    unsigned int    current_option;
+    unsigned char   done = 0;
 
-	option_ptr = o_list;
-	bytes_processed = 0;
-	current_option = 0;
+    option_ptr = o_list;
+    bytes_processed = 0;
+    current_option = 0;
 
-	if (IP_HLEN(p->iph) == 5)
-		return;
+    if (IP_HLEN(p->iph) == 5)
+        return;
 
-	while ((bytes_processed < o_len) && (current_option < 40) && !done) {
+    while ((bytes_processed < o_len) && (current_option < 40) && !done) {
 
-		p->ip_options[current_option].code = *option_ptr;
+        p->ip_options[current_option].code = *option_ptr;
 
-		switch (*option_ptr) {
-		case IPOPT_RTRALT:
-		case IPOPT_NOP:
-		case IPOPT_EOL:
-			/* if we hit an EOL, we're done */
-			if (*option_ptr == IPOPT_EOL)
-				done = 1;
+        switch (*option_ptr) {
+        case IPOPT_RTRALT:
+        case IPOPT_NOP:
+        case IPOPT_EOL:
+            /* if we hit an EOL, we're done */
+            if (*option_ptr == IPOPT_EOL)
+                done = 1;
 
-			p->ip_options[current_option].len = 0;
-			p->ip_options[current_option].data = NULL;
-			bytes_processed++;
-			current_option++;
-			option_ptr++;
+            p->ip_options[current_option].len = 0;
+            p->ip_options[current_option].data = NULL;
+            bytes_processed++;
+            current_option++;
+            option_ptr++;
 
-			break;
+            break;
 
-		default:
-			p->ip_options[current_option].len = *(option_ptr + 1);
+        default:
+            p->ip_options[current_option].len = *(option_ptr + 1);
 
-			if (p->ip_options[current_option].len > 40) {
-				p->ip_options[current_option].len = 40;
-			} else if (p->ip_options[current_option].len == 0) {
-				/*
-				 * this shouldn't happen, indicates a bad option list
-				 * so we bail
-				 */
-				done = 1;
-				p->ip_lastopt_bad = 1;
-			}
+            if (p->ip_options[current_option].len > 40) {
+                p->ip_options[current_option].len = 40;
+            } else if (p->ip_options[current_option].len == 0) {
+                /*
+                 * this shouldn't happen, indicates a bad option list
+                 * so we bail
+                 */
+                done = 1;
+                p->ip_lastopt_bad = 1;
+            }
 
-			p->ip_options[current_option].data = option_ptr + 2;
-			option_ptr += p->ip_options[current_option].len;
-			bytes_processed += p->ip_options[current_option].len;
-			current_option++;
-			break;
+            p->ip_options[current_option].data = option_ptr + 2;
+            option_ptr += p->ip_options[current_option].len;
+            bytes_processed += p->ip_options[current_option].len;
+            current_option++;
+            break;
 
-		}
-	}
+        }
+    }
 
-	if (bytes_processed > o_len) {
-		p->ip_options[current_option].len =
-		    p->ip_options[current_option].len - (bytes_processed - o_len);
+    if (bytes_processed > o_len) {
+        p->ip_options[current_option].len =
+            p->ip_options[current_option].len - (bytes_processed - o_len);
 /*        if(p->ip_options[current_option].len < 0)
             current_option--;*/
-	}
+    }
 
-	p->ip_option_count = current_option;
+    p->ip_option_count = current_option;
 
-	return;
+    return;
 }
 
 /*
@@ -1718,108 +1716,108 @@ void DecodeIPOptions(unsigned char *o_list, unsigned int o_len, anonpacket * p, 
  */
 grinder_t SetPktProcessor(int datalink)
 {
-	grinder_t       grinder;
+    grinder_t       grinder;
 
-	switch (datalink) {
-	case DLT_EN10MB:
-		/* Ethernet */
-		grinder = DecodeEthPkt;
-		break;
+    switch (datalink) {
+    case DLT_EN10MB:
+        /* Ethernet */
+        grinder = DecodeEthPkt;
+        break;
 
 #ifdef DLT_IEEE802_11
-	case DLT_IEEE802_11:
-		grinder = DecodeIEEE80211Pkt;
-		break;
+    case DLT_IEEE802_11:
+        grinder = DecodeIEEE80211Pkt;
+        break;
 #endif
 /* TODO IPsec encapsulated packet grinder
  *
 #ifdef DLT_ENC
-	case DLT_ENC:
-		break;
+    case DLT_ENC:
+        break;
 #else
-	case 13:
+    case 13:
 #endif
 */
-	case 13:
-	case DLT_IEEE802:
-		/* Token Ring */
-		grinder = DecodeTRPkt;
-		break;
+    case 13:
+    case DLT_IEEE802:
+        /* Token Ring */
+        grinder = DecodeTRPkt;
+        break;
 
-	case DLT_FDDI:
-		/* FDDI */
-		grinder = DecodeFDDIPkt;
-		break;
+    case DLT_FDDI:
+        /* FDDI */
+        grinder = DecodeFDDIPkt;
+        break;
 
-	case DLT_SLIP:
-		/* Serial Line Internet Protocol */
-		grinder = DecodeSlipPkt;
-		break;
+    case DLT_SLIP:
+        /* Serial Line Internet Protocol */
+        grinder = DecodeSlipPkt;
+        break;
 
-	case DLT_PPP:
-		/* point-to-point protocol */
-		grinder = DecodePppPkt;
-		break;
+    case DLT_PPP:
+        /* point-to-point protocol */
+        grinder = DecodePppPkt;
+        break;
 
 #ifdef DLT_LINUX_SLL
-	case DLT_LINUX_SLL:
-		grinder = DecodeLinuxSLLPkt;
-		break;
+    case DLT_LINUX_SLL:
+        grinder = DecodeLinuxSLLPkt;
+        break;
 #endif
 
 #ifdef DLT_PFLOG
-	case DLT_PFLOG:
-		grinder = DecodePflog;
-		break;
+    case DLT_PFLOG:
+        grinder = DecodePflog;
+        break;
 #endif
 
 #ifdef DLT_LOOP
-	case DLT_LOOP:
+    case DLT_LOOP:
 #endif
-	case DLT_NULL:
-		grinder = DecodeNullPkt;
-		break;
+    case DLT_NULL:
+        grinder = DecodeNullPkt;
+        break;
 
 #ifdef DLT_RAW
-	case DLT_RAW:
+    case DLT_RAW:
 #endif
-	case DLT_IPV4:
-		grinder = DecodeRawPkt;
-		break;
+    case DLT_IPV4:
+        grinder = DecodeRawPkt;
+        break;
 
-/*	TODO In progress TODO
-	case DLT_IPV6:
-		grinder = DecodeRawPkt6;
-		break;
+/*  TODO In progress TODO
+    case DLT_IPV6:
+        grinder = DecodeRawPkt6;
+        break;
 */
 
 #ifdef DLT_I4L_RAWIP
-	case DLT_I4L_RAWIP:
-		grinder = DecodeI4LRawIPPkt;
-		break;
+    case DLT_I4L_RAWIP:
+        grinder = DecodeI4LRawIPPkt;
+        break;
 #endif
 #ifdef DLT_I4L_IP
-	case DLT_I4L_IP:
-		if (!pv.readmode_flag && !pv.quiet_flag)
-			LogMessage("Decoding I4L-ip on interface %s\n",
-				   PRINT_INTERFACE(pv.interfaces[num]));
+    case DLT_I4L_IP:
+        if (!pv.readmode_flag && !pv.quiet_flag)
+            LogMessage("Decoding I4L-ip on interface %s\n",
+                   PRINT_INTERFACE(pv.interfaces[num]));
 
-		grinder = DecodeEthPkt;
+        grinder = DecodeEthPkt;
 
-		break;
+        break;
 #endif
 
 #ifdef DLT_I4L_CISCOHDLC
-	case DLT_I4L_CISCOHDLC:
-		grinder = DecodeI4LCiscoIPPkt;
-		break;
+    case DLT_I4L_CISCOHDLC:
+        grinder = DecodeI4LCiscoIPPkt;
+        break;
 #endif
 
-	default:
-		/* Unhandled. */
-		fprintf(stderr, "Unable to decode data link type %d\n", datalink);
-		return NULL;
-	}
+    default:
+        /* Unhandled. */
+        fprintf(stderr, "Unable to decode data link type %d\n", datalink);
+        return NULL;
+    }
 
-	return grinder;
+    return grinder;
 }

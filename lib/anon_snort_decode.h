@@ -74,7 +74,7 @@
 #define WLAN_TYPE_MGMT_REREQ   0x20     /* 0010    00  Reassoc. Req.   */
 #define WLAN_TYPE_MGMT_RERES   0x30     /* 0011    00  Reassoc. Resp.  */
 #define WLAN_TYPE_MGMT_PRREQ   0x40     /* 0100    00  Probe Request   */
-#define WLAN_TYPE_MGMT_PRRES   0x50     /* 0101    00  Probe Response  */ 
+#define WLAN_TYPE_MGMT_PRRES   0x50     /* 0101    00  Probe Response  */
 #define WLAN_TYPE_MGMT_BEACON  0x80     /* 1000    00  Beacon          */
 #define WLAN_TYPE_MGMT_ATIM    0x90     /* 1001    00  ATIM message    */
 #define WLAN_TYPE_MGMT_DIS     0xa0     /* 1010    00  Disassociation  */
@@ -116,7 +116,7 @@
 #define EAPOL_TYPE_ASF      0x04      /* EAPOL Encapsulated ASF-Alert */
 
 /* Extensible Authentication Protocol Codes RFC 2284*/
-#define EAP_CODE_REQUEST    0x01   
+#define EAP_CODE_REQUEST    0x01
 #define EAP_CODE_RESPONSE   0x02
 #define EAP_CODE_SUCCESS    0x03
 #define EAP_CODE_FAILURE    0x04
@@ -174,7 +174,7 @@ struct ppp_header {
 #define TCP_OPTLENMAX           40 /* (((2^4) - 1) * 4  - TCP_HEADER_LEN) */
 
 #ifndef IP_MAXPACKET
-#define	IP_MAXPACKET	65535		/* maximum packet size */
+#define IP_MAXPACKET            65535       /* maximum packet size */
 #endif /* IP_MAXPACKET */
 
 #define TH_FIN  0x01
@@ -187,10 +187,11 @@ struct ppp_header {
 #define TH_RES1 0x80
 #define TH_NORESERVED (TH_FIN|TH_SYN|TH_RST|TH_PUSH|TH_ACK|TH_URG)
 
-/* http://www.iana.org/assignments/tcp-parameters
+/*
+ * http://www.iana.org/assignments/tcp-parameters
  *
  * tcp options stuff. used to be in <netinet/tcp.h> but it breaks
- * things on AIX
+ * things on AIX. I no longer care about that but it's still good.
  */
 #define TCPOPT_EOL              0   /* End of Option List [RFC793] */
 #define TCPOLEN_EOL             1   /* Always one byte */
@@ -228,38 +229,33 @@ struct ppp_header {
 #define TCPOPT_CC               11  /*  T/TCP Connection count  [RFC1644] */
 #define TCPOPT_CC_NEW           12  /*  CC.NEW [RFC1644] */
 #define TCPOPT_CC_ECHO          13  /*  CC.ECHO [RFC1644] */
-#define TCPOLEN_CC             6  /* page 17 of rfc1644 */
-#define TCPOLEN_CC_NEW         6  /* page 17 of rfc1644 */
-#define TCPOLEN_CC_ECHO        6  /* page 17 of rfc1644 */
+#define TCPOLEN_CC               6  /* page 17 of rfc1644 */
+#define TCPOLEN_CC_NEW           6  /* page 17 of rfc1644 */
+#define TCPOLEN_CC_ECHO          6  /* page 17 of rfc1644 */
 
 #define TCPOPT_ALTCSUM          15  /* TCP Alternate Checksum Data [RFC1146], variable length */
 #define TCPOPT_SKEETER          16  /* Skeeter [Knowles] */
 #define TCPOPT_BUBBA            17  /* Bubba   [Knowles] */
 
 #define TCPOPT_TRAILER_CSUM     18  /* Trailer Checksum Option [Subbu & Monroe] */
-#define TCPOLEN_TRAILER_CSUM  3  
+#define TCPOLEN_TRAILER_CSUM     3
 
 #define TCPOPT_MD5SIG           19  /* MD5 Signature Option [RFC2385] */
-#define TCPOLEN_MD5SIG        18
+#define TCPOLEN_MD5SIG          18
 
 /* Space Communications Protocol Standardization */
 #define TCPOPT_SCPS             20  /* Capabilities [Scott] */
 #define TCPOPT_SELNEGACK        21  /* Selective Negative Acknowledgements [Scott] */
-#define TCPOPT_RECORDBOUND         22  /* Record Boundaries [Scott] */
-#define TCPOPT_CORRUPTION          23  /* Corruption experienced [Scott] */
+#define TCPOPT_RECORDBOUND      22  /* Record Boundaries [Scott] */
+#define TCPOPT_CORRUPTION       23  /* Corruption experienced [Scott] */
 
-#define TCPOPT_SNAP                24  /* SNAP [Sukonnik] -- anyone have info?*/
-#define TCPOPT_UNASSIGNED          25  /* Unassigned (released 12/18/00) */
-#define TCPOPT_COMPRESSION         26  /* TCP Compression Filter [Bellovin] */
+#define TCPOPT_SNAP             24  /* SNAP [Sukonnik] -- anyone have info?*/
+#define TCPOPT_UNASSIGNED       25  /* Unassigned (released 12/18/00) */
+#define TCPOPT_COMPRESSION      26  /* TCP Compression Filter [Bellovin] */
 /* http://www.research.att.com/~smb/papers/draft-bellovin-tcpcomp-00.txt*/
 
-#define TCP_OPT_TRUNC -1
+#define TCP_OPT_TRUNC  -1
 #define TCP_OPT_BADLEN -2
-
-/* Why are these lil buggers here? Never Used. -- cmg */
-#define TCPOLEN_TSTAMP_APPA     (TCPOLEN_TIMESTAMP+2)    /* appendix A / rfc 1323 */
-#define TCPOPT_TSTAMP_HDR    \
-    (TCPOPT_NOP<<24|TCPOPT_NOP<<16|TCPOPT_TIMESTAMP<<8|TCPOLEN_TIMESTAMP)
 
 /*
  * Default maximum segment size for TCP.
@@ -267,7 +263,6 @@ struct ppp_header {
  * but 512 is probably more convenient.
  * This should be defined as MIN(512, IP_MSS - sizeof (struct tcpiphdr)).
  */
-
 #ifndef TCP_MSS
     #define    TCP_MSS      512
 #endif
@@ -276,8 +271,8 @@ struct ppp_header {
     #define    TCP_MAXWIN   65535    /* largest value for (unscaled) window */
 #endif
 
-#ifndef TCP_MAX_WINSHIFT 
-    #define TCP_MAX_WINSHIFT    14    /* maximum window shift */
+#ifndef TCP_MAX_WINSHIFT
+    #define TCP_MAX_WINSHIFT   14    /* maximum window shift */
 #endif
 
 /*
@@ -406,8 +401,7 @@ struct ppp_header {
 #define ICMP_PKT_FILTERED       13    /* Packet filtered */
 #define ICMP_PREC_VIOLATION     14    /* Precedence violation */
 #define ICMP_PREC_CUTOFF        15    /* Precedence cut off */
-#define NR_ICMP_UNREACH         15    /* instead of hardcoding immediate
-                                       * value */
+#define NR_ICMP_UNREACH         15    /* instead of hardcoding immediate value */
 
 #define ICMP_REDIR_NET          0
 #define ICMP_REDIR_HOST         1
@@ -501,15 +495,15 @@ struct ppp_header {
 #define EXTRACT_16BITS(p) ((u_short) ntohs (*(u_short *)(p)))
 
 #ifdef WORDS_MUSTALIGN
-	#if defined(__GNUC__)
-	/* force word-aligned ntohl parameter */
-		#define EXTRACT_32BITS(p) \
-		({ u_int32_t __tmp; memmove(&__tmp, (p), sizeof(u_int32_t)); (u_int32_t) ntohl(__tmp);})
-	#endif /* __GNUC__ */
+    #if defined(__GNUC__)
+    /* force word-aligned ntohl parameter */
+        #define EXTRACT_32BITS(p) \
+        ({ u_int32_t __tmp; memmove(&__tmp, (p), sizeof(u_int32_t)); (u_int32_t) ntohl(__tmp);})
+    #endif /* __GNUC__ */
 #else
-	/* allows unaligned ntohl parameter - dies w/SIGBUS on SPARCs */
-	#define EXTRACT_32BITS(p) ((u_int32_t) ntohl (*(u_int32_t *)(p)))
-#endif                /* WORDS_MUSTALIGN */
+    /* allows unaligned p - unaligned accesses are not allowed on some archs, like SPARC */
+    #define EXTRACT_32BITS(p) ((u_int32_t) ntohl (*(u_int32_t *)(p)))
+#endif /* WORDS_MUSTALIGN */
 
 /* packet status flags */
 #define PKT_REBUILT_FRAG     0x00000001  /* is a rebuilt fragment */
@@ -519,7 +513,7 @@ struct ppp_header {
                                           * direction
                                           */
 #define PKT_STREAM_UNEST_BI  0x00000008  /* is from an unestablished stream and
-                                          * we've seen traffic in both 
+                                          * we've seen traffic in both
                                           * directions
                                           */
 #define PKT_STREAM_EST       0x00000010  /* is from an established stream */
@@ -529,7 +523,7 @@ struct ppp_header {
 #define PKT_FROM_CLIENT      0x00000080  /* this packet came from the client
                                             side of a connection (TCP) */
 #define PKT_HTTP_DECODE      0x00000100  /* this packet has normalized http */
-#define PKT_FRAG_ALERTED     0x00000200  /* this packet has been alerted by 
+#define PKT_FRAG_ALERTED     0x00000200  /* this packet has been alerted by
                                             defrag */
 #define PKT_STREAM_INSERT    0x00000400  /* this packet has been inserted into stream4 */
 #define PKT_ALT_DECODE       0x00000800  /* this packet has been normalized by telnet
@@ -537,14 +531,15 @@ struct ppp_header {
                                          */
 #define PKT_OBFUSCATED       0x40000000  /* this packet has been obfuscated */
 #define PKT_LOGGED           0x80000000  /* this packet has been logged */
-/*  D A T A  S T R U C T U R E S  *********************************************/
+
+
+/* DATA STRUCTURES */
 
 /* Start Token Ring Data Structures */
 
-
 #ifdef WIN32
     /* Visual C++ pragma to disable warning messages about nonstandard bit field type */
-    #pragma warning( disable : 4214 )  
+    #pragma warning( disable : 4214 )
 #endif
 
 /* LLC structure */
@@ -564,7 +559,7 @@ typedef struct _Trh_llc
 
 #ifdef WIN32
   /* Visual C++ pragma to disable warning messages about nonstandard bit field type */
-  #pragma warning( disable : 4214 )  
+  #pragma warning( disable : 4214 )
 #endif
 
 
@@ -577,9 +572,9 @@ typedef struct _Trh_llc
       u_int16_t bcast:3, len:5, dir:1, lf:3, res:4;
    #else
       u_int16_t len:5,         length of RIF field, including RC itself
-      bcast:3,       broadcast indicator 
-      res:4,         reserved 
-      lf:3,      largest frame size 
+      bcast:3,       broadcast indicator
+      res:4,         reserved
+      lf:3,      largest frame size
       dir:1;         direction
 */
 
@@ -707,15 +702,15 @@ typedef struct _Pflog_hdr
 
 
 #ifdef WIN32
-  /* Visual C++ pragma to disable warning messages 
-   * about nonstandard bit field type 
+  /* Visual C++ pragma to disable warning messages
+   * about nonstandard bit field type
    */
-  #pragma warning( disable : 4214 )  
+  #pragma warning( disable : 4214 )
 #endif
 
 #define VTH_PRIORITY(vh)  ((ntohs((vh)->vth_pri_cfi_vlan) & 0xe000) >> 13)
-#define VTH_CFI(vh)	  ((ntohs((vh)->vth_pri_cfi_vlan & 0x0100) >> 12))
-#define VTH_VLAN(vh)	  ((ntohs((vh)->vth_pri_cfi_vlan) & 0x0FFF))
+#define VTH_CFI(vh)   ((ntohs((vh)->vth_pri_cfi_vlan & 0x0100) >> 12))
+#define VTH_VLAN(vh)      ((ntohs((vh)->vth_pri_cfi_vlan) & 0x0FFF))
 
 typedef struct _VlanTagHdr
 {
@@ -742,7 +737,7 @@ typedef struct _EthLlcOther
 } EthLlcOther;
 
 
-/* 
+/*
  * Ethernet header
  */
 
@@ -770,18 +765,18 @@ typedef struct _WifiHdr
 } WifiHdr;
 
 
-/* Can't add any fields not in the real header here 
+/* Can't add any fields not in the real header here
    because of how the decoder uses structure overlaying */
 #ifdef WIN32
-  /* Visual C++ pragma to disable warning messages 
-   * about nonstandard bit field type 
+  /* Visual C++ pragma to disable warning messages
+   * about nonstandard bit field type
    */
-  #pragma warning( disable : 4214 )  
+  #pragma warning( disable : 4214 )
 #endif
 
 /* tcpdump shows us the way to cross platform compatibility */
-#define IP_VER(iph)	(((iph)->ip_verhl & 0xf0) >> 4)
-#define IP_HLEN(iph)	((iph)->ip_verhl & 0x0f)
+#define IP_VER(iph) (((iph)->ip_verhl & 0xf0) >> 4)
+#define IP_HLEN(iph)    ((iph)->ip_verhl & 0x0f)
 
 /* we need to change them as well as get them */
 #define SET_IP_VER(iph, value)  ((iph)->ip_verhl = (((iph)->ip_verhl & 0x0f) | (value << 4)))
@@ -812,31 +807,31 @@ typedef struct _IPHdr
  * thanks to all the folks at libpcap/tcpdump. You guys rule.
  */
 typedef struct {
-	union {
-		struct {
-			/*
-			 * version - 4 bits
-			 * traffic class - 8 bits
-			 * flow label - 20 bits
-			 */
-			uint32_t	ip6_un_flow;
-			uint16_t	ip6_un_plen;
-			uint8_t		ip6_un_next,
-					ip6_un_hlim;
-		} un;
-		uint8_t			ip6_un_vfc;
-	} ipv6_ctlunion;
-	uint8_t		ipv6_src[16];
-	uint8_t		ipv6_dst[16];
+    union {
+        struct {
+            /*
+             * version - 4 bits
+             * traffic class - 8 bits
+             * flow label - 20 bits
+             */
+            uint32_t    ip6_un_flow;
+            uint16_t    ip6_un_plen;
+            uint8_t     ip6_un_next,
+                    ip6_un_hlim;
+        } un;
+        uint8_t         ip6_un_vfc;
+    } ipv6_ctlunion;
+    uint8_t     ipv6_src[16];
+    uint8_t     ipv6_dst[16];
 } IPv6Hdr;
 
-#define ipv6_vfc	ipv6_ctlunion.ip6_un_vfc
-#define ipv6_flow	ipv6_ctlunion.un.ip6_un_flow
-#define ipv6_plen	ipv6_ctlunion.un.ip6_un_plen
-#define ipv6_next	ipv6_ctlunion.un.ip6_un_next
-#define ipv6_hlim	ipv6_ctlunion.un.ip6_un_hlim
+#define ipv6_vfc    ipv6_ctlunion.ip6_un_vfc
+#define ipv6_flow   ipv6_ctlunion.un.ip6_un_flow
+#define ipv6_plen   ipv6_ctlunion.un.ip6_un_plen
+#define ipv6_next   ipv6_ctlunion.un.ip6_un_next
+#define ipv6_hlim   ipv6_ctlunion.un.ip6_un_hlim
 
-#define IPV6_HDR_LEN	sizeof(IPv6Hdr)
+#define IPV6_HDR_LEN    sizeof(IPv6Hdr)
 
 /* IPv6 definitions and convenience macros */
 #define IPv6_VER(ipv6h) (((ipv6h)->ipv6_vfc & 0xf0) >> 4)
@@ -848,17 +843,17 @@ typedef struct {
  * IPv6 options TLV
  */
 typedef struct {
-	uint8_t ipv6_opt_type;
-	uint8_t ipv6_opt_len;
+    uint8_t ipv6_opt_type;
+    uint8_t ipv6_opt_len;
 } ipv6_options;
 
 /*
  * IPv6 jumbo payload option
  */
 typedef struct {
-	uint8_t ipv6_oj_type,
-		ipv6_oj_len,
-		ipv6_oj_jumbolen[4];
+    uint8_t ipv6_oj_type,
+        ipv6_oj_len,
+        ipv6_oj_jumbolen[4];
 } ipv6_options_jumbo;
 #define IPV6_OPT_JUMBO_LEN 6
 
@@ -866,160 +861,160 @@ typedef struct {
  * IPv6 NSAP address option
  */
 typedef struct {
-	uint8_t ipv6_on_type,
-		ipv6_on_len,
-		ipv6_on_src_len,
-		ipv6_on_dst_len;
-	/* followed by source NSAP,
-	 * and destination NSAP
-	 */
+    uint8_t ipv6_on_type,
+        ipv6_on_len,
+        ipv6_on_src_len,
+        ipv6_on_dst_len;
+    /* followed by source NSAP,
+     * and destination NSAP
+     */
 } ipv6_options_nsap;
 
 /*
  * IPv6 Tunnel Limit option
  */
 typedef struct {
-	uint8_t ipv6_ot_type,
-		ipv6_ot_len,
-		ipv6_ot_encap_limit;
+    uint8_t ipv6_ot_type,
+        ipv6_ot_len,
+        ipv6_ot_encap_limit;
 } ipv6_options_tunnel;
 
 /*
  * IPv6 Router Alert option
  */
 typedef struct {
-	uint8_t ipv6_or_type,
-		ipv6_or_len,
-		ipv6_or_value[2];
+    uint8_t ipv6_or_type,
+        ipv6_or_len,
+        ipv6_or_value[2];
 } ipv6_options_router;
 
 /*
  * IPv6 hop-by-hop options header
  */
 typedef struct {
-	uint8_t ipv6_hbh_next,
-		ipv6_hbh_len;
-	ipv6_options *opts;
+    uint8_t ipv6_hbh_next,
+        ipv6_hbh_len;
+    ipv6_options *opts;
 } ipv6_hbh;
 
 /*
  * IPv6 destination options header
  */
 typedef struct {
-	uint8_t ipv6_dest_next;
-	uint8_t ipv6_dest_len;
-	ipv6_options *opts;
+    uint8_t ipv6_dest_next;
+    uint8_t ipv6_dest_len;
+    ipv6_options *opts;
 } ipv6_dest;
 
 /* Option types and related macros */
-#define IP6OPT_PAD1		0x00	/* 00 0 00000 */
-#define IP6OPT_PADN		0x01	/* 00 0 00001 */
-#define IP6OPT_JUMBO		0xC2	/* 11 0 00010 = 194 */
-#define IP6OPT_JUMBO_LEN	6
-#define IP6OPT_ROUTER_ALERT	0x05	/* 00 0 00101 */
+#define IP6OPT_PAD1     0x00    /* 00 0 00000 */
+#define IP6OPT_PADN     0x01    /* 00 0 00001 */
+#define IP6OPT_JUMBO        0xC2    /* 11 0 00010 = 194 */
+#define IP6OPT_JUMBO_LEN    6
+#define IP6OPT_ROUTER_ALERT 0x05    /* 00 0 00101 */
 
-#define IP6OPT_RTALERT_LEN	4
-#define IP6OPT_RTALERT_MLD	0	/* Datagram contains an MLD message */
-#define IP6OPT_RTALERT_RSVP	1	/* Datagram contains an RSVP message */
-#define IP6OPT_RTALERT_ACTNET	2 	/* contains an Active Networks msg */
-#define IP6OPT_MINLEN		2
+#define IP6OPT_RTALERT_LEN  4
+#define IP6OPT_RTALERT_MLD  0   /* Datagram contains an MLD message */
+#define IP6OPT_RTALERT_RSVP 1   /* Datagram contains an RSVP message */
+#define IP6OPT_RTALERT_ACTNET   2   /* contains an Active Networks msg */
+#define IP6OPT_MINLEN       2
 
-#define IP6OPT_BINDING_UPDATE	0xc6	/* 11 0 00110 */
-#define IP6OPT_BINDING_ACK	0x07	/* 00 0 00111 */
-#define IP6OPT_BINDING_REQ	0x08	/* 00 0 01000 */
-#define IP6OPT_HOME_ADDRESS	0xc9	/* 11 0 01001 */
-#define IP6OPT_EID		0x8a	/* 10 0 01010 */
+#define IP6OPT_BINDING_UPDATE   0xc6    /* 11 0 00110 */
+#define IP6OPT_BINDING_ACK  0x07    /* 00 0 00111 */
+#define IP6OPT_BINDING_REQ  0x08    /* 00 0 01000 */
+#define IP6OPT_HOME_ADDRESS 0xc9    /* 11 0 01001 */
+#define IP6OPT_EID      0x8a    /* 10 0 01010 */
 
-#define IP6OPT_TYPE(o)		((o) & 0xC0)
-#define IP6OPT_TYPE_SKIP	0x00
-#define IP6OPT_TYPE_DISCARD	0x40
-#define IP6OPT_TYPE_FORCEICMP	0x80
-#define IP6OPT_TYPE_ICMP	0xC0
+#define IP6OPT_TYPE(o)      ((o) & 0xC0)
+#define IP6OPT_TYPE_SKIP    0x00
+#define IP6OPT_TYPE_DISCARD 0x40
+#define IP6OPT_TYPE_FORCEICMP   0x80
+#define IP6OPT_TYPE_ICMP    0xC0
 
-#define IP6OPT_MUTABLE		0x20
+#define IP6OPT_MUTABLE      0x20
 
 /*
  * IPv6 routing header
  */
 typedef struct {
-	uint8_t ipv6_rthdr_next;
-	uint8_t ipv6_rthdr_len;
-	uint8_t ipv6_rthdr_type;
-	uint8_t ipv6_rthdr_segleft;
-	/* TODO +routing specific data.. */
+    uint8_t ipv6_rthdr_next;
+    uint8_t ipv6_rthdr_len;
+    uint8_t ipv6_rthdr_type;
+    uint8_t ipv6_rthdr_segleft;
+    /* TODO +routing specific data.. */
 } ipv6_rthdr;
 
 /*
  * IPv6 type 0 routing header
  */
 typedef struct {
-	uint8_t ipv6_rthdr0_next,
-		ipv6_rthdr0_len,
-		ipv6_rthdr0_type,
-		ipv6_rthdr0_segleft,
-		ipv6_rthdr0_reserved,
-		ipv6_rthdr0_slmap[3];
-	uint8_t	*ipv6_rthdr0_src[16];
+    uint8_t ipv6_rthdr0_next,
+        ipv6_rthdr0_len,
+        ipv6_rthdr0_type,
+        ipv6_rthdr0_segleft,
+        ipv6_rthdr0_reserved,
+        ipv6_rthdr0_slmap[3];
+    uint8_t *ipv6_rthdr0_src[16];
 } ipv6_rthdr0;
 
 /*
  * IPv6 fragment header
  */
 typedef struct {
-	uint8_t  ipv6_frag_next,
-		 ipv6_frag_reserved;
-	uint16_t ipv6_frag_offlg;
-	uint32_t ipv6_frag_ident;
+    uint8_t  ipv6_frag_next,
+         ipv6_frag_reserved;
+    uint16_t ipv6_frag_offlg;
+    uint32_t ipv6_frag_ident;
 } ipv6_frag;
 
-#define IP6F_OFF_MASK		0xfff8	/* mask of offset bits   in ipv6_offlg */
-#define IP6F_RESERVED_MASK	0x0006	/* mask of reserved bits in ipv6_offlg */
-#define IP6F_MORE_FRAG_MASK	0x0001	/* more-fragments flag */
+#define IP6F_OFF_MASK       0xfff8  /* mask of offset bits   in ipv6_offlg */
+#define IP6F_RESERVED_MASK  0x0006  /* mask of reserved bits in ipv6_offlg */
+#define IP6F_MORE_FRAG_MASK 0x0001  /* more-fragments flag */
 
 #define IPv6_FH_OFFSET(fh) ((ntohs((fh)->ipv6_frag_offlg) & IP6F_OFF_MASK) >> 3)
 #define IPv6_FH_RES(fh) (fh)->ipv6_frag_reserved
 #define IPv6_FH_MF(fh) (ntohs((fh)->ipv6_frag_offlg) & IP6F_MORE_FRAG_MASK)
 
-/* Can't add any fields not in the real header here 
+/* Can't add any fields not in the real header here
    because of how the decoder uses structure overlaying */
 #ifdef WIN32
-  /* Visual C++ pragma to disable warning 
-   * messages about nonstandard bit field type 
+  /* Visual C++ pragma to disable warning
+   * messages about nonstandard bit field type
    */
-  #pragma warning( disable : 4214 )  
+  #pragma warning( disable : 4214 )
 #endif
 
 /* SCTP protocol definitions */
 typedef struct _SCTPCommonHeader {
-	uint16_t	sport; /* source port */
-	uint16_t	dport; /* destination port */
-	uint32_t	tag; /* verification tag */
-	uint32_t	sum; /* checksum */
+    uint16_t    sport; /* source port */
+    uint16_t    dport; /* destination port */
+    uint32_t    tag; /* verification tag */
+    uint32_t    sum; /* checksum */
 } SCTPCommonHeader;
 
 typedef struct _SCTPParameter {
-	uint16_t	type; /* parameter type */
-	uint16_t	length; /* parameter length */
-	unsigned char  *value; /* parameter value */
+    uint16_t    type; /* parameter type */
+    uint16_t    length; /* parameter length */
+    unsigned char  *value; /* parameter value */
 } SCTPParameter;
 
 typedef struct _SCTPChunk {
-	uint8_t		type; /* chunk type */
-	uint8_t		flags; /* flags */
-	uint16_t	length; /* chunk length */
-	unsigned char  *value; /* chunk value */
-	uint16_t	nparams; /* number of parameters */
-	SCTPParameter **params; /* parameters */
+    uint8_t     type; /* chunk type */
+    uint8_t     flags; /* flags */
+    uint16_t    length; /* chunk length */
+    unsigned char  *value; /* chunk value */
+    uint16_t    nparams; /* number of parameters */
+    SCTPParameter **params; /* parameters */
 } SCTPChunk;
 
 typedef struct _STCPHdr {
-	SCTPCommonHeader	*common_header;
-	SCTPChunk		**chunks;
+    SCTPCommonHeader    *common_header;
+    SCTPChunk       **chunks;
 } SCTPHdr;
 
 /* more macros for TCP offset */
-#define TCP_OFFSET(tcph)	(((tcph)->th_offx2 & 0xf0) >> 4)
-#define TCP_X2(tcph)	((tcph)->th_offx2 & 0x0f)
+#define TCP_OFFSET(tcph)    (((tcph)->th_offx2 & 0xf0) >> 4)
+#define TCP_X2(tcph)    ((tcph)->th_offx2 & 0x0f)
 
 /* we need to change them as well as get them */
 #define SET_TCP_OFFSET(tcph, value)  ((tcph)->th_offx2 = (((tcph)->th_offx2 & 0x0f) | (value << 4)))
@@ -1039,8 +1034,8 @@ typedef struct _TCPHdr
 
 }       TCPHdr;
 #ifdef WIN32
-  /* Visual C++ pragma to enable warning messages 
-   * about nonstandard bit field type 
+  /* Visual C++ pragma to enable warning messages
+   * about nonstandard bit field type
    */
   #pragma warning( default : 4214 )
 #endif
@@ -1075,13 +1070,13 @@ typedef struct _ICMPHdr
 
         int sih_void;
 
-        struct pmtu 
+        struct pmtu
         {
             u_int16_t ipm_void;
             u_int16_t nextmtu;
         } pmtu;
 
-        struct rtradv 
+        struct rtradv
         {
             u_int8_t num_addrs;
             u_int8_t wpa;
@@ -1100,24 +1095,24 @@ typedef struct _ICMPHdr
 #define s_icmp_wpa        icmp_hun.rtradv.wpa
 #define s_icmp_lifetime   icmp_hun.rtradv.lifetime
 
-    union 
+    union
     {
         /* timestamp */
-        struct ts 
+        struct ts
         {
             u_int32_t otime;
             u_int32_t rtime;
             u_int32_t ttime;
         } ts;
-        
+
         /* IP header for unreach */
-        struct ih_ip  
+        struct ih_ip
         {
             IPHdr *ip;
             /* options and then 64 bits of data */
         } ip;
-        
-        struct ra_addr 
+
+        struct ra_addr
         {
             u_int32_t addr;
             u_int32_t preference;
@@ -1226,11 +1221,11 @@ typedef struct _HttpUri
 {
     u_int8_t *uri;  /* static buffer for uri length */
     u_int16_t length;
-    u_int32_t decode_flags; 
+    u_int32_t decode_flags;
 } HttpUri;
 
 /* Default classification for decoder alerts */
-#define DECODE_CLASS 25 
+#define DECODE_CLASS 25
 
 typedef struct _DecoderFlags
 {
