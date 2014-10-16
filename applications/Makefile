@@ -11,7 +11,7 @@ TARGETS=anonymize_tool anonymize_ipfix anonymize_netflow_v5 anonymize_netflow_v9
 all: ../lib/anonlib.so $(TARGETS)
 
 anonymize_tool: anonymize_tool.c
-	$(CC) $(CFLAGS) `xml2-config --cflags --libs` -o $@ $^ ../lib/libnids.so ../lib/anonlib.so $(LIBRARIES)
+	$(CC) $(CFLAGS) -o $@ $^ ../lib/libnids.so ../lib/anonlib.so $(LIBRARIES)
 anonymize_netflow_v9: anonymize_netflow_v9.c
 	$(CC) $(CFLAGS) -o $@ $^ ../lib/libnids.so ../lib/anonlib.so $(LIBRARIES)
 anonymize_netflow_v5: anonymize_netflow_v5.c
