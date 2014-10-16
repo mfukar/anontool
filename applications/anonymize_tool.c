@@ -1,9 +1,12 @@
 /*
  * This application uses AAPI to perform anonymization on packet traces.
+ * It is meant as an example of how you can use the AAPI to build an application, and is
+ * deliberately written as small and simple as possible.
+ *
+ * Feel free to build around it or use the general idea to build a tool of your own!
  *
  * See './anonymize_tool -h' for usage information.
  */
-
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -36,11 +39,9 @@ void usage(char *en)
 
 int main(int argc, char *argv[])
 {
-    char           *config = NULL;
+    int sd = 0, opt, print_pkt = 0, fix_cks = 0, status;
 
-    int             sd = 0, opt, print_pkt = 0, fix_cks = 0, status;
-
-    static char    *opstring = "czhpa:e:d:t:i:f:o:";
+    static char *opstring = "czhpa:e:d:t:i:f:o:";
 
     if (argc == 1) {
         usage(argv[0]);
@@ -156,5 +157,5 @@ int main(int argc, char *argv[])
     printf("\nStart anonymize...\n");
     start_processing();
     printf("End anonymize\n");
-    return (1);
+    return EXIT_SUCCESS;
 }

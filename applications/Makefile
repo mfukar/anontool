@@ -11,13 +11,13 @@ TARGETS=anonymize_tool anonymize_ipfix anonymize_netflow_v5 anonymize_netflow_v9
 all: ../lib/anonlib.so $(TARGETS)
 
 anonymize_tool: anonymize_tool.c
-	$(CC) $(CFLAGS) -o $@ $^ ../lib/libnids.so ../lib/anonlib.so $(LIBRARIES)
+	$(CC) $(CFLAGS) -o $@ $^ ../lib/anonlib.so ../lib/libnids.so $(LIBRARIES)
 anonymize_netflow_v9: anonymize_netflow_v9.c
-	$(CC) $(CFLAGS) -o $@ $^ ../lib/libnids.so ../lib/anonlib.so $(LIBRARIES)
+	$(CC) $(CFLAGS) -o $@ $^ ../lib/anonlib.so ../lib/libnids.so $(LIBRARIES)
 anonymize_netflow_v5: anonymize_netflow_v5.c
-	$(CC) $(CFLAGS) -o $@ $^ ../lib/libnids.so ../lib/anonlib.so $(LIBRARIES)
+	$(CC) $(CFLAGS) -o $@ $^ ../lib/anonlib.so ../lib/libnids.so $(LIBRARIES)
 anonymize_ipfix: anonymize_ipfix.c
-	$(CC) $(CFLAGS) -o $@ $^ ../lib/libnids.so ../lib/anonlib.so $(LIBRARIES)
+	$(CC) $(CFLAGS) -o $@ $^ ../lib/anonlib.so ../lib/libnids.so $(LIBRARIES)
 
 clean:
 	rm -f *.o *.so *~ $(TARGETS)
