@@ -1,10 +1,10 @@
+# TODO list
+
 * Documentation
-	- Doxygen for code?
-	- XML config was a bad idea from the start. Something more usable like a JSON
-	format would be nicer.
+    - Doxygen for code?
 
 * If flist is used in the fastpath, use a pool allocator rather than malloc [although
-  I might be able to rely on malloc to be somewhat clever]
+  I am able to rely on popular malloc implementations to be somewhat clever]
 * Get rid of all the magic numbers in the code.
 * Get rid of all the non-standard types, use exact width types from stdint.h where needed.
 * Get rid of all the standard random functions. Instead, use MT (already
@@ -12,7 +12,7 @@
 
 * Finish stream6, get rid of libnids.
 
-* Binary payload matchers are way outdated. I have to figure out what to do with that
+* Binary payload matchers are OUTDATED. I have to figure out what to do with that
   feature..
 
 * Measure PIC version on x86. If it's significantly slower, try to compile
@@ -20,12 +20,11 @@
 
 * Configurable keys for AES/3DES (prefix-preserving anon)
     - Current setup is just plain shit.
-	- If the recent attacks on 10-round 256-bit AES get any better, we might have to
-	  at least emit some warning?
 
 * Add support for SCTP (primarily for IPFIX transport), GRE, L2TP, GTP, etc.
 
 * Implement IPv6 and IPsec decoding. (IPX? Is that used *at all* anymore?)
 
 * Implement some metric of assessing the achieved anonymization levels
-depending on the functions/parameters used. Reading bibliography..
+depending on the functions/parameters used. Bibliography read...this stuff
+is a whole year of research on its own.

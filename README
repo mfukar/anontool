@@ -8,7 +8,6 @@ Anontool depends on the following:
     - libnet1-dev
     - libpcre3, libpcre3-dev
     - libpcap0.8-dev
-    - libxml2-dev
 
 COMPILATION
     - Just type 'make' :-)
@@ -63,11 +62,10 @@ TODO
     A TCP reassembly processor (so we can get rid of libnids),
     affectionately named stream6, is also on the way.
 
-    If you want anonymization for another protocol to be implemented,
-    drop me a line and I will consider it. Be informed, however, that the
-    tool was designed with the thought of new protocols/input sources/etc.
-    being added constantly in mind, so it follows a very simple modular
-    architecture to allow this without requiring
-    extensive knowledge of the code, ie. you can also do it yourself.
+    If you want anonymization for another protocol to be implemented, drop me a line and I
+    will consider it. Be informed, however, that the tool was designed with the thought of
+    new protocols/input sources/etc.  being added constantly in mind, so it follows a very
+    simple modular architecture to allow this without requiring extensive knowledge of the
+    code, ie. you can also do it yourself.
 
     A more detailed list is in the file TODO (duh).
