@@ -30,14 +30,20 @@ LIBS		= @LIBS@ @GLIB_LIBS@ @GTHREAD_LIBS@
 RANLIB		= @RANLIB@
 INSTALL		= @INSTALL@
 
-OBJS		= checksum.o ip_fragment.o ip_options.o killtcp.o \
-		  libnids.o scan.o tcp.o util.o allpromisc.o hash.o
+OBJS		= checksum.o ip_fragment.o ip_options.o killtcp.o libnids.o scan.o tcp.o util.o allpromisc.o hash.o
 OBJS_SHARED	= $(OBJS:.o=_pic.o)
+
+ifeq ($(shell uname),Darwin)
+	MAKE_SHARED_LIBRARY=$(CC) -shared -Wl,-install_name,$(LIBSHARED) -o $(LIBSHARED) $(OBJS_SHARED) $(LIBS) $(LNETLIB) $(PCAPLIB)
+else
+	MAKE_SHARED_LIBRARY=$(CC) -shared -Wl,-soname,$(LIBSHARED) -o $(LIBSHARED) $(OBJS_SHARED) $(LIBS) $(LNETLIB) $(PCAPLIB)
+endif
+
 .c.o:
 	$(CC) -c $(CFLAGS) -I. $(LIBS_CFLAGS) $<
 static: $(LIBSTATIC)
 shared: $(LIBSHARED)
-# How to write the following rules compactly and portably ? 
+# How to write the following rules compactly and portably ?
 # gmake accepts "%_pic.o: %.c", bsd make does not.
 checksum_pic.o: checksum.c
 	$(CC) -fPIC $(CFLAGS) -I. $(LIBS_CFLAGS) -c checksum.c -o $@
@@ -65,7 +71,7 @@ $(LIBSTATIC): $(OBJS)
 	ar -cr $@ $(OBJS)
 	$(RANLIB) $@
 $(LIBSHARED): $(OBJS_SHARED)
-	$(CC) -shared -Wl,-soname,$(LIBSHARED) -o $(LIBSHARED) $(OBJS_SHARED) $(LIBS) $(LNETLIB) $(PCAPLIB)
+	$(MAKE_SHARED_LIBRARY)
 
 _install install: $(LIBSTATIC)
 	../mkinstalldirs $(install_prefix)$(libdir)
@@ -77,7 +83,7 @@ _install install: $(LIBSTATIC)
 _installshared installshared: install $(LIBSHARED)
 	$(INSTALL) -c -m 755 $(LIBSHARED) $(install_prefix)$(libdir)
 	ln -s -f $(LIBSHARED) $(install_prefix)$(libdir)/libnids.so
- 
+
 clean:
 	rm -f *.o *~ $(LIBSTATIC) $(LIBSHARED)
 

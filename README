@@ -1,7 +1,7 @@
-anontool - an open source anonymization tool
+# anontool - an open source anonymization tool
 
 
-DEPENDS
+# DEPENDS
 Anontool depends on the following:
 (Ubuntu aptitude packages used as a reference)
     - libglib2.0-dev
@@ -9,11 +9,13 @@ Anontool depends on the following:
     - libpcre3, libpcre3-dev
     - libpcap0.8-dev
 
-COMPILATION
+# COMPILATION
+
     - Just type 'make' :-)
     - See below for some important usage notes.
 
-NOTES - USAGE
+# NOTES - USAGE
+
     - /lib/anonlib.so is the shared library containing the implementation
     of the anonymization framework. Applications are linking onto this
     library.
@@ -43,16 +45,16 @@ NOTES - USAGE
     - For more information on what you can do with the sample applications
     have a look in /doc/README.
 
-MAINTENANCE
-    The current maintainer of this tool is Michael Foukarakis.
-    Please report any bugs or feature requests to:
-    foukarakis DOT michael AT google's email service domain name
+# MAINTENANCE
+
+    This software is no longer maintained.
 
     If you wanted, you could fork anontool from github
     [ https://github.com/mfukar/anontool ], make your changes
     and a pull request to me. :-)
 
-TODO
+# TODO
+
     Autoconf and automake support will never come, at least from me. If,
     however, you can point me to a usable, stable and free alternative,
     I'd be more than happy to take a look at it.
